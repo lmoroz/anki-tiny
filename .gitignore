@@ -27,6 +27,7 @@ coverage
 *.sln
 *.sw?
 /.vscode/
+/.agent/
 
 *.tsbuildinfo
 
