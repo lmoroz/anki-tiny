@@ -40,6 +40,7 @@ fetch(`http://localhost:${PORT}/api/courses`, {
 ```
 
 **Ожидаемый результат:**
+
 ```json
 {
   "id": 1,
@@ -119,6 +120,7 @@ fetch(`http://localhost:${PORT}/api/courses`, {
 ```
 
 **Ожидаемый результат:**
+
 ```json
 {
   "error": "Validation error",
