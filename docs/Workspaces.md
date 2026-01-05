@@ -113,7 +113,9 @@ npm install -D <package> -w root
 
 1. **Команда `dev`** в корневом `package.json` запускает Electron приложение с hot reload для frontend
 2. **Команда `bundle`** собирает frontend, компилирует backend и создаёт installer
-3. **PostInstall скрипт**: После установки зависимостей автоматически выполняется `postinstall` в backend workspace, который запускает `electron-rebuild -f -w better-sqlite3` для сборки нативного модуля. Это необходимо для корректной работы SQLite
+3. **PostInstall скрипт**: После установки зависимостей автоматически выполняется `postinstall` в backend workspace,  
+   который запускает `electron-rebuild -f -w better-sqlite3` для сборки нативного модуля.  
+   Это необходимо для корректной работы SQLite
 4. Все `node_modules` хранятся в корне проекта (благодаря hoisting)
 5. Каждый workspace может иметь свои независимые версии зависимостей при конфликтах
 
