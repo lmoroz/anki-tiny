@@ -16,154 +16,154 @@
 ### Backend ✅
 
 - [x] **Database Service**
-  - [x] Конфигурация приложения
-  - [x] Схема БД с Kysely типами
-  - [x] Миграции для таблицы courses
-  - [x] Singleton Database Service
+    - [x] Конфигурация приложения
+    - [x] Схема БД с Kysely типами
+    - [x] Миграции для таблицы courses
+    - [x] Singleton Database Service
 - [x] **Courses API**
-  - [x] Course Repository (CRUD)
-  - [x] Validation схемы (Zod)
-  - [x] API Routes (GET, POST, PUT, DELETE)
-  - [x] Интеграция в Express server
+    - [x] Course Repository (CRUD)
+    - [x] Validation схемы (Zod)
+    - [x] API Routes (GET, POST, PUT, DELETE)
+    - [x] Интеграция в Express server
 
 ### Frontend - Управление курсами ✅
 
 - [x] **Data Layer**
-  - [x] API client с автоопределением порта backend
-  - [x] Pinia store для курсов
-  - [x] TypeScript типы для entities
+    - [x] API client с автоопределением порта backend
+    - [x] Pinia store для курсов
+    - [x] TypeScript типы для entities
 - [x] **UI Layer - Shared Components**
-  - [x] Input компонент (с поддержкой textarea)
-  - [x] Modal компонент
+    - [x] Input компонент (с поддержкой textarea)
+    - [x] Modal компонент
 - [x] **UI Layer - Widgets**
-  - [x] CourseList widget
-  - [x] CourseCard компонент
-  - [x] CourseEditorModal
+    - [x] CourseList widget
+    - [x] CourseCard компонент
+    - [x] CourseEditorModal
 - [x] **Pages**
-  - [x] HomePage с полным CRUD функционалом
+    - [x] HomePage с полным CRUD функционалом
 - [x] **Тестирование**
-  - [x] Загрузка списка курсов
-  - [x] Создание курса
+    - [x] Загрузка списка курсов
+    - [x] Создание курса
 
 ### Frontend - Работа с карточками (следующая фаза)
 
 - [ ] **Backend Cards API**
-  - [ ] Миграции для таблицы cards
-  - [ ] Card Repository (CRUD)
-  - [ ] Validation схемы (Zod)
-  - [ ] API Routes для карточек
+    - [ ] Миграции для таблицы cards
+    - [ ] Card Repository (CRUD)
+    - [ ] Validation схемы (Zod)
+    - [ ] API Routes для карточек
 - [ ] **Frontend Cards Integration**
-  - [ ] API сервис для карточек
-  - [ ] Pinia store для карточек
-  - [ ] TypeScript типы
+    - [ ] API сервис для карточек
+    - [ ] Pinia store для карточек
+    - [ ] TypeScript типы
 - [ ] **UI Components**
-  - [ ] CardList widget
-  - [ ] CardItem компонент
-  - [ ] CardEditorModal
-  - [ ] QuickAddCard компонент (быстрое добавление карточек)
+    - [ ] CardList widget
+    - [ ] CardItem компонент
+    - [ ] CardEditorModal
+    - [ ] QuickAddCard компонент (быстрое добавление карточек)
 - [ ] **Pages**
-  - [ ] CoursePage с управлением карточками
-  
+    - [ ] CoursePage с управлением карточками
+
 ### Система тренировок
 
 - [ ] **Backend**
-  - [ ] Spaced Repetition Service (SM-2 алгоритм)
-  - [ ] Training API endpoints
-  - [ ] Review tracking
+    - [ ] Spaced Repetition Service (FSRS алгоритм)
+    - [ ] Training API endpoints
+    - [ ] Review tracking
 - [ ] **Frontend**
-  - [ ] TrainingPage
-  - [ ] Card display с flip анимацией
-  - [ ] Difficulty buttons (Again, Hard, Good, Easy)
-  - [ ] Progress tracking
+    - [ ] TrainingPage
+    - [ ] Card display с flip анимацией
+    - [ ] Difficulty buttons (Again, Hard, Good, Easy)
+    - [ ] Progress tracking
 
 ## Фаза 4: Настройки
 
 ### Глобальные настройки
 
 - [ ] **Backend Settings API**
-  - [ ] Миграция для таблицы settings
-  - [ ] Settings Repository
-  - [ ] GET/PUT `/api/settings` endpoints
-  - [ ] Validation схемы (Zod)
+    - [ ] Миграция для таблицы settings
+    - [ ] Settings Repository
+    - [ ] GET/PUT `/api/settings` endpoints
+    - [ ] Validation схемы (Zod)
 - [ ] **Settings Schema**
-  - [ ] `trainingStartHour` (8 по умолчанию)
-  - [ ] `trainingEndHour` (22 по умолчанию)
-  - [ ] `minTimeBeforeEnd` (4 часа по умолчанию)
-  - [ ] `notificationsEnabled` (boolean)
+    - [ ] `trainingStartHour` (8 по умолчанию)
+    - [ ] `trainingEndHour` (22 по умолчанию)
+    - [ ] `minTimeBeforeEnd` (4 часа по умолчанию)
+    - [ ] `notificationsEnabled` (boolean)
 - [ ] **Frontend Settings**
-  - [ ] SettingsPage UI
-  - [ ] Time picker компоненты
-  - [ ] Сохранение настроек
+    - [ ] SettingsPage UI
+    - [ ] Time picker компоненты
+    - [ ] Сохранение настроек
 
 ### Настройки курса (индивидуальные)
 
 - [ ] **Backend**
-  - [ ] Миграция для таблицы course_settings
-  - [ ] CourseSettings Repository
-  - [ ] API endpoints для настроек курса
-  - [ ] Наследование из глобальных настроек
+    - [ ] Миграция для таблицы course_settings
+    - [ ] CourseSettings Repository
+    - [ ] API endpoints для настроек курса
+    - [ ] Наследование из глобальных настроек
 - [ ] **Frontend**
-  - [ ] Course Settings UI
-  - [ ] Переключатель "Use global settings"
-  - [ ] Индивидуальные настройки для курса
+    - [ ] Course Settings UI
+    - [ ] Переключатель "Use global settings"
+    - [ ] Индивидуальные настройки для курса
 
 ## Фаза 5: Системная интеграция
 
 ### Система уведомлений
 
 - [ ] **Backend Notifications Service**
-  - [ ] Проверка due cards каждый час
-  - [ ] Фильтрация по времени тренировок (trainingStartHour/trainingEndHour)
-  - [ ] Проверка "не предлагать новые карточки если до конца дня < 4 часов"
-  - [ ] Electron Notification API integration
+    - [ ] Проверка due cards каждый час
+    - [ ] Фильтрация по времени тренировок (trainingStartHour/trainingEndHour)
+    - [ ] Проверка "не предлагать новые карточки если до конца дня < 4 часов"
+    - [ ] Electron Notification API integration
 - [ ] **Electron Main Process**
-  - [ ] IPC handlers для уведомлений
-  - [ ] Системные уведомления Windows/Linux/macOS
-  - [ ] Click handlers для уведомлений (открыть тренировку)
+    - [ ] IPC handlers для уведомлений
+    - [ ] Системные уведомления Windows/Linux/macOS
+    - [ ] Click handlers для уведомлений (открыть тренировку)
 - [ ] **Frontend**
-  - [ ] Настройка частоты уведомлений в Settings
-  - [ ] Тест уведомлений из UI
+    - [ ] Настройка частоты уведомлений в Settings
+    - [ ] Тест уведомлений из UI
 
 ### Tray Integration
 
 - [ ] **Electron Main Process**
-  - [ ] Создание Tray icon
-  - [ ] Tray menu (Открыть, Выход)
-  - [ ] Click handlers для tray
-  - [ ] Изменение window-close: hide вместо quit
-  - [ ] Показ окна из трея
+    - [ ] Создание Tray icon
+    - [ ] Tray menu (Открыть, Выход)
+    - [ ] Click handlers для tray
+    - [ ] Изменение window-close: hide вместо quit
+    - [ ] Показ окна из трея
 - [ ] **Frontend**
-  - [ ] Кнопка "Свернуть" в title bar
-  - [ ] Визуальная обратная связь при сворачивании
+    - [ ] Кнопка "Свернуть" в title bar
+    - [ ] Визуальная обратная связь при сворачивании
 
 ## Фаза 6: Расширенный функционал (опционально)
 
 - [ ] **Статистика прогресса обучения**
-  - [ ] Backend: API для статистики
-  - [ ] Frontend: Dashboard страница с графиками
-  - [ ] Отображение прогресса по дням/неделям
+    - [ ] Backend: API для статистики
+    - [ ] Frontend: Dashboard страница с графиками
+    - [ ] Отображение прогресса по дням/неделям
 
 - [ ] **Импорт/Экспорт курсов**
-  - [ ] Backend: JSON export/import endpoints
-  - [ ] Frontend: UI для импорта/экспорта
-  - [ ] Формат файлов (совместимость с Anki?)
+    - [ ] Backend: JSON export/import endpoints
+    - [ ] Frontend: UI для импорта/экспорта
+    - [ ] Формат файлов (совместимость с Anki?)
 
 - [ ] **Медиа в карточках**
-  - [ ] Backend: File upload endpoints
-  - [ ] Database: media_files таблица
-  - [ ] Frontend: Image/Audio upload компоненты
-  - [ ] Отображение медиа в тренировках
+    - [ ] Backend: File upload endpoints
+    - [ ] Database: media_files таблица
+    - [ ] Frontend: Image/Audio upload компоненты
+    - [ ] Отображение медиа в тренировках
 
 - [ ] **Поиск по карточкам**
-  - [ ] Backend: Full-text search API
-  - [ ] Frontend: SearchBar компонент
-  - [ ] Фильтрация результатов
+    - [ ] Backend: Full-text search API
+    - [ ] Frontend: SearchBar компонент
+    - [ ] Фильтрация результатов
 
 - [ ] **Теги и категории**
-  - [ ] Database: tags таблица, card_tags связь
-  - [ ] Backend: Tags API
-  - [ ] Frontend: Tag management UI
-  - [ ] Фильтрация по тегам
+    - [ ] Database: tags таблица, card_tags связь
+    - [ ] Backend: Tags API
+    - [ ] Frontend: Tag management UI
+    - [ ] Фильтрация по тегам
 
 ## Фаза 7: Тестирование и полировка
 

@@ -127,10 +127,10 @@ npm run build
 ### ✅ Electron Configuration
 
 - Корректная конфигурация `main.ts` (восстановлена пользователем)
-- IPC handlers в `app.on('ready')`  
+- IPC handlers в `app.on('ready')`
 - Добавлены скрипты в `package.json`:
-  - `rebuild` - пересборка нативных модулей (better-sqlite3)
-  - `postinstall` - автоматическая установка app deps
+    - `rebuild` - пересборка нативных модулей (better-sqlite3)
+    - `postinstall` - автоматическая установка app deps
 
 ### ✅ Конфигурация проекта (ручные изменения)
 
@@ -156,17 +156,17 @@ npm run build
 Проект переведён на npm workspaces для упрощения управления монорепозиторием:
 
 - **Корневой `package.json`**
-  - Определены workspaces: `frontend` и `backend`
-  - Общие команды: `dev`, `bundle`, `lint`, `format`
-  
+    - Определены workspaces: `frontend` и `backend`
+    - Общие команды: `dev`, `bundle`, `lint`, `format`
+
 - **Backend `package.json`**
-  - Удалены команды `dev` и `bundle` (перенесены в корень)
-  - Сохранён `postinstall` скрипт для `electron-rebuild`
+    - Удалены команды `dev` и `bundle` (перенесены в корень)
+    - Сохранён `postinstall` скрипт для `electron-rebuild`
 
 - **Документация**
-  - Создан `docs/Workspaces.md` с полным руководством
-  - Обновлён `README.md` с новыми инструкциями по установке
-  - Добавлены примечания о `postinstall` скрипте
+    - Создан `docs/Workspaces.md` с полным руководством
+    - Обновлён `README.md` с новыми инструкциями по установке
+    - Добавлены примечания о `postinstall` скрипте
 
 ### ✅ Преимущества workspaces
 
@@ -201,14 +201,14 @@ npm run dev
 ## Что протестировать
 
 1. **Database Layer**:
-   - Создание БД в `userData/repetitio.db`
-   - Работу CRUD API через DevTools Console
-   - Персистентность данных после перезапуска
+    - Создание БД в `userData/repetitio.db`
+    - Работу CRUD API через DevTools Console
+    - Персистентность данных после перезапуска
 
 2. **Frontend Integration** (завершено):
-   - API client в `frontend/src/shared/api/client.js`
-   - CourseList widget
-   - HomePage с управлением курсами
+    - API client в `frontend/src/shared/api/client.js`
+    - CourseList widget
+    - HomePage с управлением курсами
 
 ---
 
@@ -225,10 +225,10 @@ npm run dev
 #### Глобальные настройки
 
 - Backend: таблица `settings` с полями:
-  - `trainingStartHour` (начало дня для тренировок, по умолчанию 8)
-  - `trainingEndHour` (конец дня для тренировок, по умолчанию 22)
-  - `minTimeBeforeEnd` (минимальное время до конца дня, 4 часа)
-  - `notificationsEnabled` (включены ли уведомления)
+    - `trainingStartHour` (начало дня для тренировок, по умолчанию 8)
+    - `trainingEndHour` (конец дня для тренировок, по умолчанию 22)
+    - `minTimeBeforeEnd` (минимальное время до конца дня, 4 часа)
+    - `notificationsEnabled` (включены ли уведомления)
 - Frontend: SettingsPage с time picker компонентами
 
 #### Настройки курса (индивидуальные)
@@ -238,7 +238,7 @@ npm run dev
 
 ### 3. Система интервального повторения (Spaced Repetition)
 
-- Backend: реализация SM-2 алгоритма в `services/spaced-repetition.ts`
+- Backend: реализация FSRS алгоритма в `services/spaced-repetition.ts`
 - API endpoints для тренировок и отправки результатов повторения
 - Frontend: TrainingPage с flip-анимацией и кнопками оценки (Again, Hard, Good, Easy)
 
@@ -249,7 +249,7 @@ npm run dev
 >
 > - Проверять настройки `trainingStartHour` и `trainingEndHour`
 > - **НЕ предлагать новые карточки, если до конца дня осталось меньше 4 часов**
->   (первый шаг интервального повторения = 4 часа)
+    > (первый шаг интервального повторения = 4 часа)
 
 - Backend: `services/notifications.ts` с периодической проверкой (каждый час)
 - Electron: IPC handlers для системных уведомлений

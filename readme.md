@@ -227,8 +227,8 @@ backend/src/
 ### In Progress
 
 - 🔄 Backend API endpoints (courses, cards, training)
-- 🔄 Алгоритм интервального повторения (SM-2)
-- 🔄 Персистентное хранилище данных (SQLite/JSON)
+- 🔄 Алгоритм интервального повторения (FSRS)
+- 🔄 Персистентное хранилище данных (SQLite)
 - 🔄 Системные уведомления
 - 🔄 Tray integration (сворачивание в трей)
 

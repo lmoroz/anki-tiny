@@ -92,9 +92,9 @@ frontend/src/
 - Отображение title приложения
 - Область с `-webkit-app-region: drag` для перетаскивания окна
 - Кнопки управления окном:
-  - **Minimize**: `window.electronAPI.minimize()`
-  - **Maximize/Restore**: `window.electronAPI.toggleMaximize()`
-  - **Close**: `window.electronAPI.close()`
+    - **Minimize**: `window.electronAPI.minimize()`
+    - **Maximize/Restore**: `window.electronAPI.toggleMaximize()`
+    - **Close**: `window.electronAPI.close()`
 
 **Стилизация:**
 
@@ -107,10 +107,11 @@ frontend/src/
 
 ```css
 .title-bar {
-  -webkit-app-region: drag;
+    -webkit-app-region: drag;
 }
+
 .window-controls button {
-  -webkit-app-region: no-drag;
+    -webkit-app-region: no-drag;
 }
 ```
 
@@ -181,12 +182,12 @@ import axios from 'axios';
 let backendPort = 3000;
 
 window.electronAPI?.onBackendPort((port) => {
-  backendPort = port;
+    backendPort = port;
 });
 
 const api = axios.create({
-  baseURL: `http://localhost:${backendPort}/api`,
-});
+                             baseURL: `http://localhost:${ backendPort }/api`,
+                         });
 
 export default api;
 ```
@@ -243,10 +244,10 @@ export {};
 
 - `GET /api/settings` - получение глобальных настроек
 - `PUT /api/settings` - обновление настроек
-  - `trainingStartHour`: начало дня для тренировок (по умолчанию 8)
-  - `trainingEndHour`: конец дня для тренировок (по умолчанию 22)
-  - `minTimeBeforeEnd`: минимальное время до конца дня (4 часа)
-  - `notificationsEnabled`: включены ли уведомления
+    - `trainingStartHour`: начало дня для тренировок (по умолчанию 8)
+    - `trainingEndHour`: конец дня для тренировок (по умолчанию 22)
+    - `minTimeBeforeEnd`: минимальное время до конца дня (4 часа)
+    - `notificationsEnabled`: включены ли уведомления
 
 ##### [NEW] [routes/course-settings.ts](file:///e:/Develop/anki-tiny/backend/src/routes/course-settings.ts)
 
@@ -267,7 +268,7 @@ export {};
 
 ##### [NEW] [services/spaced-repetition.ts](file:///e:/Develop/anki-tiny/backend/src/services/spaced-repetition.ts)
 
-Реализация алгоритма интервального повторения (SM-2 или упрощенная версия):
+Реализация алгоритма интервального повторения (FSRS):
 
 - Расчет следующего интервала повторения
 - Обновление easiness factor
@@ -301,21 +302,21 @@ export {};
 **Добавить поддержку Tray:**
 
 ```typescript
-import { Tray, Menu } from 'electron';
+import {Tray, Menu} from 'electron';
 
 let tray: Tray | null = null;
 
 function createTray() {
   tray = new Tray(path.join(__dirname, '../../icon.png'));
-  
+
   const contextMenu = Menu.buildFromTemplate([
-    { label: 'Открыть', click: () => mainWindow?.show() },
-    { label: 'Выход', click: () => app.quit() }
+    {label: 'Открыть', click: () => mainWindow?.show()},
+    {label: 'Выход', click: () => app.quit()}
   ]);
-  
+
   tray.setToolTip('Repetitio');
   tray.setContextMenu(contextMenu);
-  
+
   tray.on('click', () => {
     mainWindow?.show();
   });
@@ -337,10 +338,10 @@ app.on('before-quit', () => {
 **Настроить уведомления:**
 
 ```typescript
-import { Notification } from 'electron';
+import {Notification} from 'electron';
 
 ipcMain.handle('show-notification', (_, title, body) => {
-  new Notification({ title, body }).show();
+  new Notification({title, body}).show();
 });
 ```
 
@@ -351,7 +352,7 @@ ipcMain.handle('show-notification', (_, title, body) => {
 ```typescript
 contextBridge.exposeInMainWorld('electronAPI', {
   // ... существующие методы
-  showNotification: (title: string, body: string) => 
+  showNotification: (title: string, body: string) =>
     ipcRenderer.invoke('show-notification', title, body),
 });
 ```
@@ -380,6 +381,7 @@ CSP политика уже настроена корректно для про�
 Обновить путь к main.js:
 
 ```html
+
 <script type="module" src="/src/app/main.js"></script>
 ```
 
@@ -420,9 +422,9 @@ npm run test
 1. Запустить приложение: `cd backend && npm run electron:dev`
 2. Убедиться, что заголовок окна отображается корректно
 3. Проверить работу кнопок:
-   - **Minimize** - окно сворачивается
-   - **Maximize** - окно разворачивается на весь экран
-   - **Close** - окно сворачивается в трей (не закрывается)
+    - **Minimize** - окно сворачивается
+    - **Maximize** - окно разворачивается на весь экран
+    - **Close** - окно сворачивается в трей (не закрывается)
 4. Попробовать перетащить окно за title bar
 
 **Ожидаемый результат:** Все кнопки работают, окно можно перетаскивать.
