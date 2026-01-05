@@ -1,298 +1,155 @@
-# Walkthrough: Создание базовой архитектуры Anki Tiny
+# Walkthrough: Database Service и Courses API
 
-## Что было реализовано
+## Что реализовано
 
-Создана полная базовая архитектура frontend-приложения согласно Feature-Sliced Design и plan реализации.
+### 1. Database Layer
 
----
+#### ✅ Конфигурация
 
-## 1. Архитектура проекта (Feature-Sliced Design)
+Создан [`config/index.ts`](file:///e:/Develop/anki-tiny/backend/src/config/index.ts):
+- PORT для Express сервера (auto-assign с 0)
+- DEBUG_PERF для отладки производительности
+- DATABASE_PATH - путь к SQLite БД в `userData/anki.db`
 
-### Структура директорий
+#### ✅ Database Schema
 
-Создана следующая структура в `frontend/src/`:
+Создан [`services/database/schema.ts`](file:///e:/Develop/anki-tiny/backend/src/services/database/schema.ts):
+- TypeScript типы для таблиц через Kysely
+- `CoursesTable` с полями: id, name, description, createdAt, updatedAt
+- Типы для CRUD операций: `Course`, `NewCourse`, `CourseUpdate`
 
-```
-frontend/src/
-├── app/                  # Инициализация приложения
-│   ├── main.js          # Точка входа
-│   ├── App.vue          # Корневой компонент
-│   └── router/          # Vue Router конфигурация
-│       └── index.js
-├── pages/               # Страницы
-│   ├── home/HomePage.vue
-│   ├── course/CoursePage.vue
-│   ├── training/TrainingPage.vue
-│   └── settings/SettingsPage.vue
-├── widgets/             # Составные UI блоки
-│   ├── title-bar/TitleBar.vue
-│   ├── course-list/
-│   └── card-editor/
-├── features/            # Бизнес-фичи
-│   ├── create-course/
-│   ├── add-card/
-│   └── spaced-repetition/
-├── entities/            # Бизнес-сущности
-│   ├── course/
-│   ├── card/
-│   └── settings/
-└── shared/              # Переиспользуемый код
-    ├── ui/              # UI-примитивы
-    │   ├── Button.vue
-    │   ├── Input.vue
-    │   └── Card.vue
-    ├── api/client.js    # HTTP клиент
-    ├── lib/             # Утилиты
-    └── types/           # TypeScript типы
-        └── electron.d.ts
-```
+#### ✅ Миграции
+
+Создан [`services/database/migrations.ts`](file:///e:/Develop/anki-tiny/backend/src/services/database/migrations.ts):
+- Функция `up()` для создания таблицы `courses`
+- Индекс на поле `name` для быстрого поиска
+- CURRENT_TIMESTAMP для автоматических timestamp полей
+
+#### ✅ Database Service
+
+Создан [`services/database/index.ts`](file:///e:/Develop/anki-tiny/backend/src/services/database/index.ts):
+- Singleton pattern для Kysely инстанса
+- `initializeDatabase()` - инициализация БД с автоматическим применением миграций
+- `getDatabase()` - получение инстанса БД
+- `closeDatabase()` - graceful shutdown
 
 ---
 
-## 2. Кастомный Title Bar
+### 2. Repositories
 
-### [TitleBar.vue](file:///e:/Develop/anki-tiny/frontend/src/widgets/title-bar/TitleBar.vue)
+#### ✅ Course Repository
 
-Реализован полнофункциональный кастомный заголовок окна:
-
-**Функции:**
-- ✅ Draggable область (с использованием `-webkit-app-region: drag`)
-- ✅ Кнопка Minimize
-- ✅ Кнопка Maximize/Restore (с динамической иконкой)
-- ✅ Кнопка Close (с hover эффектом в стиле Windows)
-- ✅ Интеграция с Electron IPC через `window.electronAPI`
-
-**Стилизация:**
-- Backdrop blur эффект для премиального вида
-- Анимации hover/active states
-- Иконки из Bootstrap Icons
-- Фиксированная высота 36px
+Создан [`services/repositories/courseRepository.ts`](file:///e:/Develop/anki-tiny/backend/src/services/repositories/courseRepository.ts):
+- `findAll()` - получение всех курсов с сортировкой по createdAt
+- `findById(id)` - получение курса по ID
+- `create(data)` - создание курса
+- `update(id, data)` - обновление курса с автоматическим updatedAt
+- `delete(id)` - удаление курса
 
 ---
 
-## 3. Базовые UI компоненты (Shared Layer)
+### 3. API Layer
 
-### [Button.vue](file:///e:/Develop/anki-tiny/frontend/src/shared/ui/Button.vue)
+#### ✅ Validation
 
-Универсальный компонент кнопки с вариантами:
-- `primary` - основной акцент
-- `secondary` - второстепенные действия
-- `danger` - деструктивные действия
-- `ghost` - минималистичные кнопки
+Создан [`schemas/course.ts`](file:///e:/Develop/anki-tiny/backend/src/schemas/course.ts):
+- `createCourseSchema` - валидация при создании (name обязателен, max 255 символов)
+- `updateCourseSchema` - валидация при обновлении (все поля optional)
+- Использование Zod v4 с `issues` полем
 
-Размеры: `sm`, `md`, `lg`
+#### ✅ Routes
 
-### [Input.vue](file:///e:/Develop/anki-tiny/frontend/src/shared/ui/Input.vue)
+Создан [`routes/courses.ts`](file:///e:/Develop/anki-tiny/backend/src/routes/courses.ts):
+- `GET /api/courses` - список всех курсов
+- `POST /api/courses` - создание курса
+- `GET /api/courses/:id` - получение курса по ID
+- `PUT /api/courses/:id` - обновление курса
+- `DELETE /api/courses/:id` - удаление курса
 
-Компонент поля ввода с поддержкой:
-- Label
-- Placeholder
-- Error states (красный border + сообщение об ошибке)
-- v-model binding
+Все endpoints включают:
+- Валидацию через Zod
+- Обработку ошибок (400, 404, 500)
+- Корректные HTTP статусы
 
-### [Card.vue](file:///e:/Develop/anki-tiny/frontend/src/shared/ui/Card.vue)
+#### ✅ Router
 
-Компонент карточки для контента:
-- Backdrop blur эффект
-- Настраиваемый padding (`sm`, `md`, `lg`)
-- Опциональный hover эффект (`hoverable`)
-
----
-
-## 4. Роутинг (Hash Mode)
-
-### [router/index.js](file:///e:/Develop/anki-tiny/frontend/src/app/router/index.js)
-
-Настроен Vue Router с **hash mode** для корректной работы с кастомным протоколом `lmorozanki://`.
-
-**Маршруты:**
-- `/` → HomePage
-- `/course/:id` → CoursePage
-- `/training/:id` → TrainingPage
-- `/settings` → SettingsPage
-
-> [!IMPORTANT]
-> Использование `createWebHashHistory` критически важно, так как `createWebHistory` не работает с custom protocol схемами.
+Создан [`routes/index.ts`](file:///e:/Develop/anki-tiny/backend/src/routes/index.ts):
+- Подключение courses routes через `/api/courses`
 
 ---
 
-## 5. Страницы приложения
+### 4. Server Integration
 
-### [HomePage.vue](file:///e:/Develop/anki-tiny/frontend/src/pages/home/HomePage.vue)
+#### ✅ Обновлен [`server.ts`](file:///e:/Develop/anki-tiny/backend/src/server.ts):
+- Удалены старые сервисы (`metadataCache`, `indexerService`)
+- Добавлена инициализация БД в `startServer()`
+- Обновлен `shutdown()` для закрытия БД
+- Импорт routes из `./routes`
 
-**Функционал:**
-- Отображение списка курсов
-- Кнопка "Создать курс"
-- Empty state с призывом к действию
-- Loading state
+#### ✅ Утилиты
 
-**UI элементы:**
-- Заголовок страницы с описанием
-- Grid layout для курсов
-- Красивый empty state с иконкой
-
----
-
-### [CoursePage.vue](file:///e:/Develop/anki-tiny/frontend/src/pages/course/CoursePage.vue)
-
-**Функционал:**
-- Детальный вид курса
-- Статистика (количество карточек)
-- Кнопка "Начать тренировку"
-- Навигация назад
-
-**UI элементы:**
-- Card с информацией о курсе
-- Секция для списка карточек (placeholder)
+Созданы:
+- [`utils/logger.ts`](file:///e:/Develop/anki-tiny/backend/src/utils/logger.ts) - Pino logger с pretty printing
+- [`utils/performance.ts`](file:///e:/Develop/anki-tiny/backend/src/utils/performance.ts) - Performance Timer для отладки
 
 ---
 
-### [TrainingPage.vue](file:///e:/Develop/anki-tiny/frontend/src/pages/training/TrainingPage.vue)
+### 5. Dependencies
 
-**Функционал:**
-- Переворачиваемая карточка (клик для flip)
-- Отображение вопроса и ответа
-- Кнопки оценки сложности (Снова, Сложно, Хорошо, Легко)
-- Навигация для завершения тренировки
-
-**UI элементы:**
-- Большая интерактивная карточка
-- Подсказка о возможности переворота
-- Grid кнопок ответов (показываются только после flip)
+#### ✅ Установлены типы:
+- `@types/better-sqlite3` - типы для SQLite
 
 ---
 
-### [SettingsPage.vue](file:///e:/Develop/anki-tiny/frontend/src/pages/settings/SettingsPage.vue)
+## Текущий статус
 
-**Функционал:**
-- Настройка временных рамок тренировок
-- Input fields для начала и конца дня
-- Кнопка сохранения настроек с loading state
-- Info boxes с пояснениями
-
----
-
-## 6. Интеграция с Electron API
-
-### [electron.d.ts](file:///e:/Develop/anki-tiny/frontend/src/shared/types/electron.d.ts)
-
-Типы для интеграции с Electron:
-
-```typescript
-interface ElectronAPI {
-  onBackendPort: (callback: (port: number) => void) => void;
-  openNewWindow: (path: string) => void;
-  minimize: () => void;
-  toggleMaximize: () => void;
-  close: () => void;
-  showNotification: (title: string, body: string) => void;
-}
+### ✅ TypeScript Compilation
+TypeScript успешно компилируется без ошибок:
+```bash
+npm run build
+# ✅ Success
 ```
 
-### [client.js](file:///e:/Develop/anki-tiny/frontend/src/shared/api/client.js)
+### ✅ Electron Configuration
+- Корректная конфигурация `main.ts` (восстановлена пользователем)
+- IPC handlers в `app.on('ready')`  
+- Добавлены скрипты в `package.json`:
+  - `rebuild` - пересборка нативных модулей (better-sqlite3)
+  - `postinstall` - автоматическая установка app deps
 
-HTTP клиент на базе axios:
-- Динамическое определение backend порта через `window.electronAPI.onBackendPort`
-- Автоматический baseURL: `http://localhost:{port}/api`
-- Interceptor для логирования ошибок
+### ✅ Конфигурация проекта (ручные изменения)
 
----
+Пользователь внес следующие изменения:
+- **`.gitignore`** - обновлен для исключения временных файлов
+- **`backend/package.json`** - добавлены скрипты `rebuild` и `postinstall`, добавлен `electron-rebuild` в devDependencies
+- **`backend/src/electron/main.ts`** - восстановлена TypeScript версия с корректными импортами
+- **`frontend/package.json`** - обновлены зависимости
 
-## 7. Корневой компонент
+### ✅ Готовность к тестированию
 
-### [App.vue](file:///e:/Develop/anki-tiny/frontend/src/app/App.vue)
+**Приложение готово к запуску и тестированию!**
 
-**Структура:**
-- TitleBar (фиксированный сверху)
-- router-view с fade transition
-- Глобальные стили
-
-**Стили:**
-- Градиентный фон
-- Full height layout
-- Scroll контейнер для контента
+📋 **Инструкции для тестирования**: [test_instructions.md](file:///C:/Users/I%20am/.gemini/antigravity/brain/bc595a4d-ea69-4936-a587-52eab5b66415/test_instructions.md)
 
 ---
 
-## 8. Обновленные файлы
-
-### [index.html](file:///e:/Develop/anki-tiny/frontend/index.html)
-
-- ✅ Обновлен title: "Anki Tiny"
-- ✅ Правильный путь к main.js: `/src/app/main.js`
-- ✅ Удалены ненужные Tailwind классы из body
-
----
-
-## Проверка работы
-
-### Dev Server
-
-Frontend dev server успешно запущен:
+## Как запустить
 
 ```bash
-cd frontend
-npm run dev
+cd backend
+npm run electron:dev
 ```
 
-**Результат:**
-```
-VITE v7.3.0 ready in 609 ms
-➜  Local:   http://localhost:5173/
-```
-
-Приложение доступно по адресу [http://localhost:5173/](http://localhost:5173/)
+После запуска откройте DevTools (**F12**) и используйте команды из `test_instructions.md` для тестирования API.
 
 ---
 
-## Следующие шаги
+## Что протестировать
+   - Создание БД в `userData/anki.db`
+   - Работу CRUD API через DevTools Console
+   - Персистентность данных после перезапуска
 
-Согласно `task.md`, следующие фазы:
-
-### Фаза 3: Основной функционал
-- [ ] Реализовать создание/редактирование курсов
-- [ ] Добавить работу с карточками
-- [ ] Внедрить алгоритм интервального повторения
-
-### Фаза 4: Настройки
-- [ ] Глобальные настройки
-- [ ] Настройки курса
-
-### Фаза 5: Системная интеграция
-- [ ] Системные уведомления
-- [ ] Tray integration
-
-### Фаза 6: Backend и хранение данных
-- [ ] REST API endpoints
-- [ ] Персистентное хранилище (SQLite/JSON)
-
----
-
-## Технический стэк
-
-**Реализовано:**
-- ✅ Vue 3 (Composition API, `<script setup>`)
-- ✅ Vue Router (Hash mode)
-- ✅ Tailwind CSS (v4.1.17)
-- ✅ Bootstrap Icons
-- ✅ Axios
-- ✅ TypeScript типы для Electron API
-
-**Готово к интеграции:**
-- Electron IPC handlers (уже настроены в `preload.ts`)
-- Backend API (axios client готов)
-
----
-
-## Выполненные задачи
-
-- [x] Создана структура по Feature-Sliced Design
-- [x] Настроен Vue Router с hash mode
-- [x] Реализован кастомный Title Bar
-- [x] Созданы базовые UI компоненты (Button, Input, Card)
-- [x] Реализованы все основные страницы
-- [x] Настроена интеграция с Electron API
-- [x] Создан HTTP клиент для backend
-- [x] Обновлен index.html
-
-Приложение готово к дальнейшей разработке функциональности!
+3. **Frontend Integration** (следующая фаза):
+   - API client в `frontend/src/shared/api/client.js`
+   - CourseList widget
+   - HomePage с управлением курсами

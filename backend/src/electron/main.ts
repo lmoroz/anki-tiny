@@ -15,7 +15,7 @@ let mainWindow: BrowserWindow | null;
 const isDev = !app.isPackaged;
 
 // В режиме разработки (ts-node) путь отличается от продакшена (dist)
-const DIST_PATH = isDev ? path.join(__dirname, '../../frontend/dist') : path.join(__dirname, '../../frontend-dist');
+const DIST_PATH = isDev ? path.join(__dirname, '../../../frontend/dist') : path.join(__dirname, '../../frontend-dist');
 
 async function createWindow() {
   protocol.handle('lmorozanki', (req: Request) => {
@@ -26,6 +26,7 @@ async function createWindow() {
       if (pathName === '/' || !pathName) pathName = '/index.html';
       const filePath = path.join(DIST_PATH, pathName);
 
+      console.log('--- [DEBUG] DIST_PATH:', DIST_PATH);
       console.log('--- [DEBUG] Target Path:', filePath);
 
       if (!existsSync(filePath)) {
@@ -86,16 +87,6 @@ async function createWindow() {
   // @ts-expect-error: Window config types
   mainWindow = new BrowserWindow(windowConfig);
 
-  ipcMain.on('open-new-window', async (_event, routePath) => {
-    // @ts-expect-error: Window config types
-    let win: BrowserWindow | null = new BrowserWindow(windowConfig);
-    registerHandlers(win);
-    await win.loadURL(`lmorozanki://app/index.html#${routePath}`);
-    win.on('closed', () => {
-      win = null;
-    });
-  });
-
   registerHandlers(mainWindow);
   await mainWindow.loadURL('lmorozanki://app/index.html');
 
@@ -104,26 +95,6 @@ async function createWindow() {
   });
 }
 
-// Global IPC Handlers
-ipcMain.on('window-minimize', (event) => {
-  const win = BrowserWindow.fromWebContents(event.sender);
-  win?.minimize();
-});
-
-ipcMain.on('window-toggle-maximize', (event) => {
-  const win = BrowserWindow.fromWebContents(event.sender);
-  if (win?.isMaximized()) {
-    win.unmaximize();
-  } else {
-    win?.maximize();
-  }
-});
-
-ipcMain.on('window-close', (event) => {
-  const win = BrowserWindow.fromWebContents(event.sender);
-  win?.close();
-});
-
 protocol.registerSchemesAsPrivileged([
   {
     scheme: 'lmorozanki',
@@ -131,7 +102,32 @@ protocol.registerSchemesAsPrivileged([
   },
 ]);
 
-app.on('ready', createWindow);
+// Global IPC Handlers
+function registerIpcHandlers() {
+  ipcMain.on('window-minimize', (event) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    win?.minimize();
+  });
+
+  ipcMain.on('window-toggle-maximize', (event) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    if (win?.isMaximized()) {
+      win.unmaximize();
+    } else {
+      win?.maximize();
+    }
+  });
+
+  ipcMain.on('window-close', (event) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    win?.close();
+  });
+}
+
+app.on('ready', () => {
+  registerIpcHandlers();
+  createWindow();
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {

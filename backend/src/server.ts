@@ -3,11 +3,10 @@ import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
 import { config } from './config';
-import apiRoutes from './routes/api';
+import apiRoutes from './routes';
 import { PerformanceTimer } from './utils/performance';
 import { logger, requestLogger } from './utils/logger';
-import metadataCache from './services/metadataCache';
-import indexerService from './services/indexerService';
+import { initializeDatabase, closeDatabase } from './services/database';
 import http from 'http';
 
 const app = express();
@@ -42,7 +41,11 @@ app.get('*', (req: Request, res: Response) => {
 
 let server: http.Server;
 
-function startServer(port: number = 0): Promise<number> {
+async function startServer(port: number = 0): Promise<number> {
+  // Инициализировать БД перед запуском сервера
+  await initializeDatabase();
+  logger.info('✅ Database initialized');
+
   return new Promise((resolve, reject) => {
     server = app.listen(port, () => {
       const address = server.address();
@@ -68,9 +71,8 @@ async function shutdown(signal: string) {
   }
 
   try {
-    await indexerService.stop(); // Stop watchers
-    await metadataCache.saveToDisk(); // Save cache
-    logger.info('💾 State saved successfully.');
+    await closeDatabase();
+    logger.info('💾 Database closed successfully.');
     process.exit(0);
   } catch (err) {
     logger.error({ err }, '❌ Error during shutdown');
