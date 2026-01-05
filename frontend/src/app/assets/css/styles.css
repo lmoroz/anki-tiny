@@ -1,0 +1,30 @@
+@import url('../fonts/Roboto/css2.css');
+@import 'tailwindcss';
+
+:root {
+    font-family: Roboto, Arial, sans-serif;
+    --color-black: rgb(15, 15, 15);
+    --title-bar-height: 0px;
+    margin: 0;
+    padding: 0;
+    min-height: 100dvh;
+    overflow: hidden;
+}
+
+#app, body {
+    background: transparent;
+    height: 100vh;
+}
+
+body.is-electron {
+    --title-bar-height: 32px;
+    background: transparent;
+}
+
+div.wrapper {
+    position: absolute;
+    overflow-y: scroll;
+    top: var(--title-bar-height);
+    height: calc(100dvh - var(--title-bar-height));
+    width: 100vw;
+}

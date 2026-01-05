@@ -1,0 +1,153 @@
+<script setup>
+import { ref, onMounted } from 'vue';
+import Card from '@/shared/ui/Card.vue';
+import Button from '@/shared/ui/Button.vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+const courses = ref([]);
+const isLoading = ref(true);
+
+onMounted(() => {
+  // TODO: Загрузка курсов из API
+  setTimeout(() => {
+    courses.value = [];
+    isLoading.value = false;
+  }, 300);
+});
+
+const handleCreateCourse = () => {
+  // TODO: Открыть модальное окно создания курса
+  console.log('Create course');
+};
+</script>
+
+<template>
+  <div class="page-container">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Мои курсы</h1>
+        <p class="page-subtitle">Управление курсами и карточками для обучения</p>
+      </div>
+      <Button @click="handleCreateCourse" variant="primary">
+        <i class="bi bi-plus-lg"/>
+        Создать курс
+      </Button>
+    </div>
+
+    <div v-if="isLoading" class="loading-state">
+      <div class="spinner"/>
+      <p>Загрузка курсов...</p>
+    </div>
+
+    <div v-else-if="courses.length === 0" class="empty-state">
+      <Card padding="lg">
+        <div class="empty-state-content">
+          <i class="bi bi-journal-bookmark empty-state-icon"/>
+          <h2 class="empty-state-title">Нет курсов</h2>
+          <p class="empty-state-text">
+            Создайте свой первый курс, чтобы начать обучение с помощью интервального повторения
+          </p>
+          <Button @click="handleCreateCourse" variant="primary" size="lg">
+            <i class="bi bi-plus-lg"/>
+            Создать первый курс
+          </Button>
+        </div>
+      </Card>
+    </div>
+
+    <div v-else class="courses-grid">
+      <!-- TODO: Список курсов через CourseList widget -->
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+}
+
+.page-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 8px;
+}
+
+.page-subtitle {
+  font-size: 15px;
+  color: #94a3b8;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  gap: 16px;
+  color: #94a3b8;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(148, 163, 184, 0.2);
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.empty-state {
+  margin-top: 40px;
+}
+
+.empty-state-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.empty-state-icon {
+  font-size: 64px;
+  color: #3b82f6;
+  margin-bottom: 24px;
+  opacity: 0.7;
+}
+
+.empty-state-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #f1f5f9;
+  margin-bottom: 12px;
+}
+
+.empty-state-text {
+  font-size: 15px;
+  color: #94a3b8;
+  max-width: 400px;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+</style>
