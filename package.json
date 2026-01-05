@@ -1,0 +1,22 @@
+{
+  "name": "anki-tiny",
+  "version": "0.1.0",
+  "description": "Anki Tiny - Desktop application for language learning",
+  "author": "Morozhnikova Larisa",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=backend",
+    "bundle": "npm run build --workspace=frontend && npm run build --workspace=backend && cd backend && node build-installer.js",
+    "lint": "npm run lint --workspaces --if-present",
+    "format": "npm run format --workspaces --if-present"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

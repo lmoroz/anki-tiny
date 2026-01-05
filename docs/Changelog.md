@@ -5,6 +5,36 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/),
 и проект придерживается [Semantic Versioning](https://semver.org/lang/ru/).
 
+## [0.1.0] - 2026-01-05 17:04
+
+### Changed
+
+#### Project Structure: NPM Workspaces
+
+- **Рефакторинг структуры монорепозитория**
+    - Создан корневой `package.json` с поддержкой npm workspaces
+    - Frontend и backend объявлены как отдельные workspaces
+    - Централизованное управление зависимостями через корневой package.json
+
+- **Упрощение команд разработки**
+    - Команды `dev` и `bundle` перенесены из `backend/package.json` в корневой
+    - Команда `npm run dev` теперь запускается из корня проекта
+    - Команда `npm run bundle` собирает frontend, backend и создаёт installer
+    - Добавлены общие команды `lint` и `format` для всех workspaces
+
+- **Обновлена документация**
+    - README.md обновлён с инструкциями по использованию workspaces
+    - Создан `docs/Workspaces.md` с полным руководством по работе с workspaces
+    - Описаны команды установки, разработки и сборки
+
+### Technical Details
+
+- npm workspaces позволяют:
+    - Установить все зависимости одной командой (`npm install` из корня)
+    - Использовать hoisting для общих зависимостей
+    - Запускать команды для конкретных workspaces: `npm run <script> --workspace=<name>`
+    - Упростить CI/CD pipeline
+
 ## [0.1.0] - 2026-01-05 16:50
 
 ### Added

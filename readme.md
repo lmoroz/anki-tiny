@@ -280,89 +280,77 @@ backend/src/
    cd anki-tiny
    ```
 
-2. Установите зависимости для backend:
+2. Установите зависимости для всех workspaces (один раз из корня проекта):
 
    ```bash
-   cd backend
    npm install
    ```
 
-3. Установите зависимости для frontend:
+   Это установит зависимости как для frontend, так и для backend благодаря npm workspaces.
 
-   ```bash
-   cd ../frontend
-   npm install
-   ```
+   > **⚠️ Важно**: После установки зависимостей автоматически выполнится `postinstall` скрипт в backend, который запустит `electron-rebuild` для сборки нативного модуля `better-sqlite3`. Это может занять 1-2 минуты при первой установке.
 
 ### Development mode
 
-For development, it is recommended to run the backend and frontend separately
-for Hot Module Replacement (HMR) to work.
+Теперь все команды запускаются из корня проекта:
 
-1. **Running the Backend (API Server)**
-
-   ```bash
-   cd backend
-   npm start
-   # The server will be launched at http://localhost:3000
-   ```
-
-2. **Launching Frontend (Vite Dev Server)**
+1. **Запуск приложения в режиме разработки (Electron + HMR)**
 
    ```bash
-   cd frontend
    npm run dev
-   # The application will be available via the link in the terminal
-   # (usually http://localhost:5173)
    ```
 
-### Running in Electron (Dev) mode
+   Эта команда запустит frontend dev server (Vite) и Electron с hot reload.
 
-If you need to check the operation inside the Electron window:
-
-1. Build the frontend (since electron-main.js loads static files or
-   <http://localhost:3000>, which distributes static files in the current
-   configuration):
+2. **Запуск только backend для тестирования API**
 
    ```bash
-   cd frontend
-   npm run build
+   npm start --workspace=backend
    ```
 
-2. Run Electron from the backend folder:
+   Сервер будет доступен по адресу `http://localhost:8080`
+
+3. **Запуск только frontend для разработки UI**
 
    ```bash
-   cd backend
-   npm run electron:dev
+   npm run dev --workspace=frontend
    ```
+
+   Vite dev server будет доступен по адресу `http://localhost:5173`
 
 ### Building the application (Production Build)
 
-#### To create an installation file in two steps (exe and installer)
-
-1. **Frontend build**
-
-   ```bash
-   cd frontend
-   npm run build
-   ```
-
-   This will create a `dist` folder inside `frontend`.
-
-2. **Building the Backend and Installer**
-
-   ```bash
-   cd backend
-   npm run dist
-   ```
-
-   The application installer file will appear in the `dist` folder.
-
-#### To create the installer file in one step
+#### Создание установочного файла (exe и installer) одной командой
 
 ```bash
-cd backend
 npm run bundle
 ```
 
-The application installer file will appear in the `dist` folder.
+Эта команда:
+
+1. Соберёт frontend (`npm run build` в frontend workspace)
+2. Скомпилирует backend TypeScript код
+3. Создаст установщик через electron-builder
+
+Готовый установщик появится в папке `dist`.
+
+### Дополнительные команды
+
+- **Линтинг всех workspaces:**
+
+  ```bash
+  npm run lint
+  ```
+
+- **Форматирование кода во всех workspaces:**
+
+  ```bash
+  npm run format
+  ```
+
+- **Команды для конкретного workspace:**
+
+  ```bash
+  npm run <script> --workspace=frontend
+  npm run <script> --workspace=backend
+  ```

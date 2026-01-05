@@ -7,13 +7,10 @@
   "scripts": {
     "start": "nodemon --watch 'src/**/*.ts' --exec \"npx ts-node\" src/server.ts",
     "electron:dev": "concurrently \"npm run dev --prefix ../frontend\" \"cross-env NODE_ENV=development tsc && electron .\" -n \"frontend,backend\" -c \"blue,green\"",
-    "dev": "concurrently \"npm run dev --prefix ../frontend\" \"cross-env NODE_ENV=development tsc && electron .\" -n \"frontend,backend\" -c \"blue,green\"",
     "test": "vitest",
     "build": "tsc",
-    "rebuild": "electron-rebuild -f -w better-sqlite3",
-    "postinstall": "electron-builder install-app-deps",
+    "postinstall": "electron-rebuild -f -w better-sqlite3",
     "dist": "npm run build && node build-installer.js",
-    "bundle": "cd ../frontend && npm run build && cd ../backend && npm run build && node build-installer.js",
     "lint": "eslint .",
     "format": "prettier --write .",
     "structure": "node utils/run-tree.js > STRUCTURE.md"

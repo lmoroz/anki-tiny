@@ -133,11 +133,49 @@ npm run build
 
 ---
 
+## Project Structure Update (2026-01-05)
+
+### ✅ NPM Workspaces
+
+Проект переведён на npm workspaces для упрощения управления монорепозиторием:
+
+- **Корневой `package.json`**
+  - Определены workspaces: `frontend` и `backend`
+  - Общие команды: `dev`, `bundle`, `lint`, `format`
+  
+- **Backend `package.json`**
+  - Удалены команды `dev` и `bundle` (перенесены в корень)
+  - Сохранён `postinstall` скрипт для `electron-rebuild`
+
+- **Документация**
+  - Создан `docs/Workspaces.md` с полным руководством
+  - Обновлён `README.md` с новыми инструкциями по установке
+  - Добавлены примечания о `postinstall` скрипте
+
+### ✅ Преимущества workspaces
+
+- Централизованная установка зависимостей: `npm install` из корня
+- Упрощённые команды разработки из корня проекта
+- Hoisting общих зависимостей
+- Автоматический запуск `postinstall` для сборки нативных модулей
+
+---
+
 ## Как запустить
 
+### Установка зависимостей
+
 ```bash
-cd backend
-npm run electron:dev
+# Из корня проекта (один раз)
+npm install
+# Автоматически выполнится postinstall: electron-rebuild для better-sqlite3
+```
+
+### Режим разработки
+
+```bash
+# Из корня проекта
+npm run dev
 ```
 
 После запуска откройте DevTools (**F12**) и используйте команды из `test_instructions.md` для тестирования API.
