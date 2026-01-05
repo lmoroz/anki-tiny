@@ -10,7 +10,8 @@
 ### Fixed
 
 - **Исправлены все ошибки markdown линтинга в документации**:
-    - `Implementation_Plan.md` — разбиты длинные строки, исправлена иерархия заголовков (h5→h4), добавлен язык для code block
+    - `Implementation_Plan.md` — разбиты длинные строки, исправлена иерархия заголовков (h5→h4),
+       добавлен язык для code block
     - `Frontend_Integration_Plan.md` — разбиты длинные строки, исправлены blockquotes
     - `Testing_API.md` — добавлены пустые строки вокруг code blocks (MD031)
     - `Walkthrough.md` — убраны trailing punctuation из заголовков, разбиты длинные строки
