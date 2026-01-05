@@ -77,7 +77,7 @@
 
 ## [0.0.0] - 2026-01-05
 
-### Added
+### Initial Release
 
 - Начальный scaffolding проекта (commit 1ef8e25)
 - `.gitignore` файл (commit 9d80175)
