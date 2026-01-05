@@ -19,23 +19,23 @@ defineProps({
 
 <style scoped>
 .card {
-  background: rgba(30, 41, 59, 0.6);
-  border: 1px solid rgba(148, 163, 184, 0.1);
+  background: #ffffff;
+  border: 1px solid #e9ecef;
   border-radius: 12px;
-  backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: all 0.25s ease;
 }
 
 .card-padding-sm {
-  padding: 12px;
+  padding: 16px;
 }
 
 .card-padding-md {
-  padding: 20px;
+  padding: 24px;
 }
 
 .card-padding-lg {
-  padding: 28px;
+  padding: 32px;
 }
 
 .card-hoverable {
@@ -43,9 +43,9 @@ defineProps({
 }
 
 .card-hoverable:hover {
-  border-color: rgba(148, 163, 184, 0.3);
-  background: rgba(30, 41, 59, 0.8);
+  border-color: #dee2e6;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 </style>
+

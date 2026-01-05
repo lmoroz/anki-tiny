@@ -79,57 +79,59 @@ const handleInput = (event) => {
 .input-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .input-label {
   font-size: 13px;
   font-weight: 500;
-  color: #cbd5e1;
+  color: #5f6368;
 }
 
 .input-field {
   padding: 10px 14px;
-  background: rgba(100, 116, 139, 0.15);
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: #ffffff;
+  border: 1px solid #dadce0;
   border-radius: 8px;
-  color: #e2e8f0;
+  color: #202124;
   font-size: 14px;
   transition: all 0.2s ease;
   outline: none;
 }
 
 .input-field::placeholder {
-  color: #64748b;
+  color: #80868b;
 }
 
 .input-field:focus {
-  border-color: #3b82f6;
-  background: rgba(100, 116, 139, 0.2);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
 }
 
 .input-field:disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: not-allowed;
+  background: #f8f9fa;
 }
 
 .input-field.input-error {
-  border-color: #ef4444;
+  border-color: #d93025;
 }
 
 .input-field.input-error:focus {
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  box-shadow: 0 0 0 3px rgba(217, 48, 37, 0.1);
 }
 
 .input-error-message {
   font-size: 12px;
-  color: #ef4444;
+  color: #d93025;
 }
 
 textarea.input-field {
   resize: vertical;
   min-height: 80px;
   font-family: inherit;
+  line-height: 1.5;
 }
 </style>
+

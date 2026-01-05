@@ -32,8 +32,8 @@ html, body, #app {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  color: #e2e8f0;
+  background: #fafbfc;
+  color: #212529;
 }
 
 .app-content {
@@ -52,3 +52,4 @@ html, body, #app {
   opacity: 0;
 }
 </style>
+

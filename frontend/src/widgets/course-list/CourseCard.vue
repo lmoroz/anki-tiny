@@ -62,16 +62,16 @@ const handleDelete = (event) => {
 <style scoped>
 .course-card {
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
 .course-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2);
-  border-color: rgba(59, 130, 246, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: #d2e3fc;
 }
 
 .course-header {
@@ -85,7 +85,7 @@ const handleDelete = (event) => {
 .course-title {
   font-size: 18px;
   font-weight: 600;
-  color: #f1f5f9;
+  color: #202124;
   margin: 0;
   flex: 1;
 }
@@ -108,26 +108,26 @@ const handleDelete = (event) => {
   width: 32px;
   height: 32px;
   border: none;
-  background: rgba(100, 116, 139, 0.2);
-  color: #cbd5e1;
+  background: #f1f3f4;
+  color: #5f6368;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .action-btn:hover {
-  background: rgba(100, 116, 139, 0.3);
-  color: #f1f5f9;
+  background: #e8eaed;
+  color: #202124;
 }
 
 .action-delete:hover {
-  background: rgba(239, 68, 68, 0.2);
-  color: #ef4444;
+  background: #fce8e6;
+  color: #d93025;
 }
 
 .course-description {
   font-size: 14px;
-  color: #94a3b8;
+  color: #5f6368;
   margin: 0 0 16px 0;
   flex: 1;
   line-height: 1.5;
@@ -141,7 +141,7 @@ const handleDelete = (event) => {
 .course-footer {
   margin-top: auto;
   padding-top: 12px;
-  border-top: 1px solid rgba(148, 163, 184, 0.1);
+  border-top: 1px solid #e9ecef;
 }
 
 .course-meta {
@@ -149,10 +149,11 @@ const handleDelete = (event) => {
   align-items: center;
   gap: 6px;
   font-size: 13px;
-  color: #64748b;
+  color: #80868b;
 }
 
 .course-meta i {
   font-size: 12px;
 }
 </style>
+

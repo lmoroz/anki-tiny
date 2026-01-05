@@ -203,7 +203,7 @@ const handleCreateCard = () => {
 .page-container {
   max-width: 900px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 32px 24px;
 }
 
 .loading-state {
@@ -215,8 +215,8 @@ const handleCreateCard = () => {
 .spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid rgba(148, 163, 184, 0.2);
-  border-top-color: #3b82f6;
+  border: 3px solid #e8eaed;
+  border-top-color: #1a73e8;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -232,14 +232,16 @@ const handleCreateCard = () => {
 .course-title {
   font-size: 28px;
   font-weight: 700;
-  color: #f1f5f9;
+  color: #202124;
   margin-bottom: 12px;
+  letter-spacing: -0.02em;
 }
 
 .course-description {
   font-size: 15px;
-  color: #94a3b8;
+  color: #5f6368;
   margin-bottom: 24px;
+  line-height: 1.6;
 }
 
 .course-stats {
@@ -257,25 +259,27 @@ const handleCreateCard = () => {
   align-items: center;
   gap: 12px;
   padding: 16px;
-  background: rgba(15, 23, 42, 0.4);
-  border: 1px solid rgba(148, 163, 184, 0.1);
+  background: #e8f0fe;
+  border: 1px solid #d2e3fc;
   border-radius: 10px;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
 }
 
 .stat-item:hover {
-  border-color: rgba(59, 130, 246, 0.3);
-  background: rgba(15, 23, 42, 0.6);
+  border-color: #aecbfa;
+  background: #d2e3fc;
+  transform: translateY(-1px);
 }
 
 .stat-item.highlight {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.1));
-  border-color: rgba(59, 130, 246, 0.3);
+  background: #d2e3fc;
+  border-color: #aecbfa;
+  border-width: 2px;
 }
 
 .stat-item i {
   font-size: 24px;
-  color: #3b82f6;
+  color: #1a73e8;
 }
 
 .stat-content {
@@ -286,19 +290,19 @@ const handleCreateCard = () => {
 .stat-value {
   font-size: 20px;
   font-weight: 700;
-  color: #f1f5f9;
+  color: #202124;
   line-height: 1;
   margin-bottom: 4px;
 }
 
 .stat-label {
   font-size: 12px;
-  color: #94a3b8;
+  color: #5f6368;
 }
 
 .course-actions {
   padding-top: 24px;
-  border-top: 1px solid rgba(148, 163, 184, 0.1);
+  border-top: 1px solid #e9ecef;
 }
 
 .cards-section {
@@ -315,7 +319,8 @@ const handleCreateCard = () => {
 .section-title {
   font-size: 20px;
   font-weight: 600;
-  color: #f1f5f9;
+  color: #202124;
   margin: 0;
 }
 </style>
+

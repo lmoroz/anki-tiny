@@ -125,7 +125,7 @@ const handleCloseModal = () => {
 .page-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 32px 24px;
+  padding: 40px 32px;
 }
 
 .page-header {
@@ -138,13 +138,14 @@ const handleCloseModal = () => {
 .page-title {
   font-size: 32px;
   font-weight: 700;
-  color: #f1f5f9;
+  color: #202124;
   margin-bottom: 8px;
+  letter-spacing: -0.02em;
 }
 
 .page-subtitle {
   font-size: 15px;
-  color: #94a3b8;
+  color: #5f6368;
 }
 
 .loading-state {
@@ -154,14 +155,14 @@ const handleCloseModal = () => {
   justify-content: center;
   padding: 80px 20px;
   gap: 16px;
-  color: #94a3b8;
+  color: #5f6368;
 }
 
 .spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid rgba(148, 163, 184, 0.2);
-  border-top-color: #3b82f6;
+  border: 3px solid #e8eaed;
+  border-top-color: #1a73e8;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -179,28 +180,29 @@ const handleCloseModal = () => {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 40px 20px;
+  padding: 48px 24px;
 }
 
 .empty-state-icon {
   font-size: 64px;
-  color: #3b82f6;
+  color: #1a73e8;
   margin-bottom: 24px;
-  opacity: 0.7;
+  opacity: 0.9;
 }
 
 .empty-state-title {
   font-size: 24px;
   font-weight: 600;
-  color: #f1f5f9;
+  color: #202124;
   margin-bottom: 12px;
 }
 
 .empty-state-text {
   font-size: 15px;
-  color: #94a3b8;
+  color: #5f6368;
   max-width: 400px;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
   line-height: 1.6;
 }
 </style>
+

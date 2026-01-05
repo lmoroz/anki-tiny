@@ -254,16 +254,12 @@ const switchMode = (newMode) => {
 
 <style scoped>
 .quick-add-card {
-  background: linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(51, 65, 85, 0.85));
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(148, 163, 184, 0.25);
-  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
   padding: 32px;
-  margin-bottom: 32px;
-  box-shadow: 
-    0 4px 6px -1px rgba(0, 0, 0, 0.3),
-    0 2px 4px -1px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 0 rgba(148, 163, 184, 0.1);
+  margin-bottom: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .card-header {
@@ -279,71 +275,65 @@ const switchMode = (newMode) => {
   align-items: center;
   gap: 12px;
   font-size: 20px;
-  font-weight: 700;
-  color: #f1f5f9;
+  font-weight: 600;
+  color: #202124;
   margin: 0;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
 .section-title i {
-  font-size: 24px;
-  color: #60a5fa;
-  filter: drop-shadow(0 0 8px rgba(96, 165, 250, 0.4));
+  font-size: 22px;
+  color: #1a73e8;
 }
 
 .mode-switcher {
   display: flex;
-  gap: 6px;
-  background: rgba(15, 23, 42, 0.8);
-  padding: 5px;
-  border-radius: 10px;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+  gap: 8px;
+  background: transparent;
+  padding: 0;
+  border-radius: 8px;
 }
 
 .mode-btn {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
   padding: 8px 16px;
   background: transparent;
-  border: none;
-  border-radius: 7px;
-  color: #94a3b8;
+  border: 1px solid #dadce0;
+  border-radius: 6px;
+  color: #5f6368;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s ease;
   white-space: nowrap;
   position: relative;
 }
 
 .mode-btn i {
-  font-size: 15px;
-  transition: transform 0.25s ease;
+  font-size: 14px;
+  transition: transform 0.2s ease;
 }
 
 .mode-btn:hover {
-  color: #e2e8f0;
-  background: rgba(148, 163, 184, 0.12);
-  transform: translateY(-1px);
+  border-color: #1a73e8;
+  color: #1a73e8;
 }
 
 .mode-btn:hover i {
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
 .mode-btn.active {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: #ffffff;
-  box-shadow: 
-    0 4px 8px rgba(59, 130, 246, 0.3),
-    0 1px 3px rgba(59, 130, 246, 0.4),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+  background: transparent;
+  color: #1a73e8;
+  border: 2px solid #1a73e8;
+  font-weight: 600;
 }
 
 .mode-btn.active i {
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+  color: #1a73e8;
 }
 
 .quick-form,
@@ -404,37 +394,31 @@ const switchMode = (newMode) => {
   align-items: flex-start;
   gap: 12px;
   padding: 14px 16px;
-  background: linear-gradient(135deg, 
-    rgba(59, 130, 246, 0.12) 0%, 
-    rgba(37, 99, 235, 0.08) 100%);
-  border: 1px solid rgba(59, 130, 246, 0.25);
-  border-radius: 10px;
-  font-size: 13.5px;
-  color: #cbd5e1;
+  background: #e8f0fe;
+  border: 1px solid #d2e3fc;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #1967d2;
   line-height: 1.6;
-  box-shadow: 
-    0 2px 4px rgba(59, 130, 246, 0.08),
-    inset 0 1px 0 0 rgba(59, 130, 246, 0.1);
 }
 
 .batch-help i {
-  font-size: 18px;
-  color: #60a5fa;
+  font-size: 16px;
+  color: #1a73e8;
   flex-shrink: 0;
-  margin-top: 2px;
-  filter: drop-shadow(0 0 6px rgba(96, 165, 250, 0.3));
+  margin-top: 1px;
 }
 
 .batch-help code {
-  padding: 3px 8px;
-  background: rgba(15, 23, 42, 0.5);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  border-radius: 5px;
-  color: #f1f5f9;
+  padding: 2px 6px;
+  background: #ffffff;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  color: #202124;
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-  font-size: 12.5px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
+  font-size: 12px;
+  font-weight: 500;
 }
 </style>
+
 

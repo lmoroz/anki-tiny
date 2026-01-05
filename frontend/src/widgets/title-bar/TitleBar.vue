@@ -61,9 +61,8 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   height: 36px;
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  background: #ffffff;
+  border-bottom: 1px solid #e9ecef;
   -webkit-app-region: drag;
   user-select: none;
   z-index: 1000;
@@ -79,13 +78,13 @@ onMounted(() => {
 
 .title-bar-icon {
   font-size: 16px;
-  color: #60a5fa;
+  color: #1a73e8;
 }
 
 .title-bar-title {
   font-size: 13px;
   font-weight: 500;
-  color: #e2e8f0;
+  color: #202124;
 }
 
 .title-bar-controls {
@@ -101,27 +100,27 @@ onMounted(() => {
   height: 36px;
   border: none;
   background: transparent;
-  color: #cbd5e1;
+  color: #5f6368;
   cursor: pointer;
   transition: all 0.15s ease;
   font-size: 14px;
 }
 
 .title-bar-btn:hover {
-  background: rgba(148, 163, 184, 0.15);
+  background: #f1f3f4;
 }
 
 .title-bar-btn:active {
-  background: rgba(148, 163, 184, 0.25);
+  background: #e8eaed;
 }
 
 .close-btn:hover {
-  background: #dc2626;
+  background: #d93025;
   color: #fff;
 }
 
 .close-btn:active {
-  background: #b91c1c;
+  background: #b31412;
 }
 
 .minimize-btn i {
@@ -136,3 +135,4 @@ onMounted(() => {
   font-size: 13px;
 }
 </style>
+

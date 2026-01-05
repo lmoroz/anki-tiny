@@ -141,26 +141,26 @@ const formatDate = (dateString) => {
   position: absolute;
   width: 100%;
   backface-visibility: hidden;
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(51, 65, 85, 0.5));
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: #ffffff;
+  border: 1px solid #e9ecef;
   border-radius: 12px;
   padding: 16px;
   min-height: 140px;
   display: flex;
   flex-direction: column;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .card-front:hover,
 .card-back:hover {
-  border-color: rgba(59, 130, 246, 0.5);
-  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.2);
+  border-color: #d2e3fc;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
 .card-back {
   transform: rotateY(180deg);
-  background: linear-gradient(135deg, rgba(51, 65, 85, 0.7), rgba(71, 85, 105, 0.5));
+  background: #f8f9fa;
 }
 
 .card-header {
@@ -180,27 +180,27 @@ const formatDate = (dateString) => {
 }
 
 .badge-new {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
+  background: #e8f0fe;
+  color: #1a73e8;
 }
 
 .badge-learning {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  color: white;
+  background: #fef7e0;
+  color: #f9ab00;
 }
 
 .badge-review {
-  background: linear-gradient(135deg, #10b981, #059669);
-  color: white;
+  background: #e6f4ea;
+  color: #0f9d58;
 }
 
 .badge-relearning {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  color: white;
+  background: #fce8e6;
+  color: #d93025;
 }
 
 .back-label {
-  color: #94a3b8;
+  color: #5f6368;
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
@@ -223,8 +223,8 @@ const formatDate = (dateString) => {
   height: 32px;
   border: none;
   border-radius: 8px;
-  background: rgba(15, 23, 42, 0.6);
-  color: #cbd5e1;
+  background: #f1f3f4;
+  color: #5f6368;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -233,16 +233,16 @@ const formatDate = (dateString) => {
 }
 
 .action-btn:hover {
-  background: rgba(15, 23, 42, 0.9);
-  transform: scale(1.1);
+  background: #e8eaed;
+  transform: scale(1.05);
 }
 
 .edit-btn:hover {
-  color: #3b82f6;
+  color: #1a73e8;
 }
 
 .delete-btn:hover {
-  color: #ef4444;
+  color: #d93025;
 }
 
 .card-body {
@@ -251,7 +251,7 @@ const formatDate = (dateString) => {
 }
 
 .card-text {
-  color: #f1f5f9;
+  color: #202124;
   font-size: 15px;
   line-height: 1.6;
   margin: 0;
@@ -271,7 +271,7 @@ const formatDate = (dateString) => {
   justify-content: space-between;
   align-items: center;
   padding-top: 12px;
-  border-top: 1px solid rgba(148, 163, 184, 0.1);
+  border-top: 1px solid #e9ecef;
 }
 
 .due-date,
@@ -280,7 +280,7 @@ const formatDate = (dateString) => {
   align-items: center;
   gap: 6px;
   font-size: 12px;
-  color: #94a3b8;
+  color: #5f6368;
 }
 
 .due-date i,
@@ -289,11 +289,12 @@ const formatDate = (dateString) => {
 }
 
 .flip-hint {
-  opacity: 0.6;
+  opacity: 0.7;
 }
 
 .card-item:hover .flip-hint {
   opacity: 1;
-  color: #3b82f6;
+  color: #1a73e8;
 }
 </style>
+

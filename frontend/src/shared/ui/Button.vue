@@ -68,7 +68,7 @@ const handleClick = (event) => {
 
 /* Sizes */
 .btn-sm {
-  padding: 6px 12px;
+  padding: 6px 14px;
   font-size: 13px;
 }
 
@@ -78,49 +78,53 @@ const handleClick = (event) => {
 }
 
 .btn-lg {
-  padding: 12px 24px;
+  padding: 12px 28px;
   font-size: 16px;
 }
 
 /* Variants */
 .btn-primary {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: #1a73e8;
   color: #fff;
+  box-shadow: 0 1px 3px rgba(26, 115, 232, 0.3);
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  background: #1557b0;
+  box-shadow: 0 2px 8px rgba(26, 115, 232, 0.4);
 }
 
 .btn-secondary {
-  background: rgba(100, 116, 139, 0.2);
-  color: #e2e8f0;
-  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: #fff;
+  color: #5f6368;
+  border: 1px solid #dadce0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .btn-secondary:hover {
-  background: rgba(100, 116, 139, 0.3);
-  border-color: rgba(148, 163, 184, 0.5);
+  background: #f8f9fa;
+  border-color: #dadce0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .btn-danger {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  background: #d93025;
   color: #fff;
+  box-shadow: 0 1px 3px rgba(217, 48, 37, 0.3);
 }
 
 .btn-danger:hover {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  background: #b31412;
+  box-shadow: 0 2px 8px rgba(217, 48, 37, 0.4);
 }
 
 .btn-ghost {
   background: transparent;
-  color: #cbd5e1;
+  color: #5f6368;
 }
 
 .btn-ghost:hover {
-  background: rgba(148, 163, 184, 0.1);
+  background: #f1f3f4;
 }
 
 /* Modifiers */
@@ -129,8 +133,9 @@ const handleClick = (event) => {
 }
 
 .btn-disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: not-allowed;
   pointer-events: none;
 }
 </style>
+
