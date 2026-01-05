@@ -1,24 +1,71 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { useCourseStore } from '@/entities/course/model/useCourseStore';
 import Card from '@/shared/ui/Card.vue';
 import Button from '@/shared/ui/Button.vue';
-import { useRouter } from 'vue-router';
+import CourseList from '@/widgets/course-list/CourseList.vue';
+import CourseEditorModal from '@/widgets/course-editor/CourseEditorModal.vue';
 
 const router = useRouter();
-const courses = ref([]);
-const isLoading = ref(true);
+const courseStore = useCourseStore();
 
-onMounted(() => {
-  // TODO: Загрузка курсов из API
-  setTimeout(() => {
-    courses.value = [];
-    isLoading.value = false;
-  }, 300);
+const showEditorModal = ref(false);
+const editingCourse = ref(null);
+
+const isLoading = computed(() => courseStore.loading);
+const courses = computed(() => courseStore.sortedCourses);
+
+onMounted(async () => {
+  try {
+    await courseStore.fetchCourses();
+  } catch (error) {
+    console.error('[HomePage] Failed to load courses:', error);
+  }
 });
 
 const handleCreateCourse = () => {
-  // TODO: Открыть модальное окно создания курса
-  console.log('Create course');
+  editingCourse.value = null;
+  showEditorModal.value = true;
+};
+
+const handleEditCourse = (course) => {
+  editingCourse.value = course;
+  showEditorModal.value = true;
+};
+
+const handleDeleteCourse = async (course) => {
+  const confirmed = confirm(`Вы уверены, что хотите удалить курс "${course.name}"?`);
+  if (!confirmed) return;
+  
+  try {
+    await courseStore.deleteCourse(course.id);
+  } catch (error) {
+    alert('Ошибка при удалении курса. Попробуйте еще раз.');
+  }
+};
+
+const handleSelectCourse = (course) => {
+  router.push(`/course/${course.id}`);
+};
+
+const handleSaveCourse = async (data) => {
+  try {
+    if (editingCourse.value) {
+      await courseStore.updateCourse(editingCourse.value.id, data);
+    } else {
+      await courseStore.createCourse(data);
+    }
+    showEditorModal.value = false;
+    editingCourse.value = null;
+  } catch (error) {
+    alert('Ошибка при сохранении курса. Попробуйте еще раз.');
+  }
+};
+
+const handleCloseModal = () => {
+  showEditorModal.value = false;
+  editingCourse.value = null;
 };
 </script>
 
@@ -35,7 +82,7 @@ const handleCreateCourse = () => {
       </Button>
     </div>
 
-    <div v-if="isLoading" class="loading-state">
+    <div v-if="isLoading && courses.length === 0" class="loading-state">
       <div class="spinner"/>
       <p>Загрузка курсов...</p>
     </div>
@@ -56,9 +103,21 @@ const handleCreateCourse = () => {
       </Card>
     </div>
 
-    <div v-else class="courses-grid">
-      <!-- TODO: Список курсов через CourseList widget -->
-    </div>
+    <CourseList
+      v-else
+      :courses="courses"
+      :loading="isLoading"
+      @select="handleSelectCourse"
+      @edit="handleEditCourse"
+      @delete="handleDeleteCourse"
+    />
+
+    <CourseEditorModal
+      :show="showEditorModal"
+      :course="editingCourse"
+      @save="handleSaveCourse"
+      @close="handleCloseModal"
+    />
   </div>
 </template>
 
@@ -143,11 +202,5 @@ const handleCreateCourse = () => {
   max-width: 400px;
   margin-bottom: 24px;
   line-height: 1.6;
-}
-
-.courses-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
 }
 </style>

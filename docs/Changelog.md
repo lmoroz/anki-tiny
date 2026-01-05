@@ -5,6 +5,62 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/),
 и проект придерживается [Semantic Versioning](https://semver.org/lang/ru/).
 
+## [0.1.0] - 2026-01-05 18:08
+
+### Added
+
+#### Frontend: Управление курсами (Courses Management)
+
+- **Data Layer**
+  - API сервис для курсов (`shared/api/courses.js`) с полным CRUD функционалом
+  - TypeScript типы для курсов (`shared/types/course.ts`)
+  - Pinia store (`entities/course/model/useCourseStore.js`) с reactive state management
+  - Getters: `sortedCourses`, `getCourseById`
+  - Actions: `fetchCourses`, `createCourse`, `updateCourse`, `deleteCourse`
+
+- **UI Components**
+  - Расширен `Input.vue` для поддержки textarea режима с атрибутом rows
+  - Создан `Modal.vue` с backdrop blur, ESC/click-outside закрытием, анимациями
+  - Слоты для header и footer в модальном окне
+
+- **Widgets**
+  - `CourseCard.vue` — карточка курса с hover эффектами, кнопками Edit/Delete
+  - `CourseList.vue` — grid layout для отображения списка курсов
+  - `CourseEditorModal.vue` — модальное окно создания/редактирования курса с валидацией
+
+- **Pages**
+  - Полная интеграция `HomePage.vue` с Pinia store
+  - CRUD операции для курсов
+  - Empty state для новых пользователей
+  - Loading states
+
+### Changed
+
+- **frontend/src/app/main.js**
+  - Интеграция Pinia store manager
+  - Динамическое определение backend URL на основе порта от Electron
+  - Инициализация приложения после получения backend порта через IPC
+
+- **frontend/src/shared/api/client.js**
+  - Обновлен для работы с глобальной переменной `window.__BACKEND_URL__`
+
+### Fixed
+
+- Backend port transmission — приложение корректно получает динамический порт через IPC
+- Code formatting в Vue компонентах
+
+### Documentation
+
+- Создан `docs/Frontend_Integration_Plan.md` с детальным планом реализации
+- Создан `docs/Walkthrough_Frontend_Courses.md` с документацией всех компонентов
+- Обновлен `docs/Task.md` с прогрессом выполнения
+
+### Verified
+
+- ✅ Загрузка списка курсов из backend API
+- ✅ Создание нового курса через UI
+- ✅ Backend port transmission через Electron IPC
+
 ## [0.1.0] - 2026-01-05 17:04
 
 ### Changed

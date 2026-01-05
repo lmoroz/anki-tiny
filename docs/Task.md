@@ -13,7 +13,7 @@
 
 ## Фаза 3: Основной функционал
 
-### Backend (✅ Завершено в текущей сессии)
+### Backend ✅
 
 - [x] **Database Service**
   - [x] Конфигурация приложения
@@ -26,20 +26,55 @@
   - [x] API Routes (GET, POST, PUT, DELETE)
   - [x] Интеграция в Express server
 
-### Frontend (⏳ Следующая сессия)
+### Frontend - Управление курсами ✅
 
-- [ ] Реализовать страницу управления курсами
-  - [ ] API Client (`shared/api/client.js`)
-  - [ ] CourseList widget
-  - [ ] HomePage с управлением курсами
-- [ ] Реализовать работу с карточками
-  - [ ] Быстрое добавление карточек
-  - [ ] Редактор карточек
-  - [ ] Удаление карточек
-- [ ] Реализовать систему тренировок
-  - [ ] Алгоритм интервального повторения
-  - [ ] Интерфейс тренировки
-  - [ ] Отслеживание прогресса
+- [x] **Data Layer**
+  - [x] API client с автоопределением порта backend
+  - [x] Pinia store для курсов
+  - [x] TypeScript типы для entities
+- [x] **UI Layer - Shared Components**
+  - [x] Input компонент (с поддержкой textarea)
+  - [x] Modal компонент
+- [x] **UI Layer - Widgets**
+  - [x] CourseList widget
+  - [x] CourseCard компонент
+  - [x] CourseEditorModal
+- [x] **Pages**
+  - [x] HomePage с полным CRUD функционалом
+- [x] **Тестирование**
+  - [x] Загрузка списка курсов
+  - [x] Создание курса
+
+### Frontend - Работа с карточками (следующая фаза)
+
+- [ ] **Backend Cards API**
+  - [ ] Миграции для таблицы cards
+  - [ ] Card Repository (CRUD)
+  - [ ] Validation схемы (Zod)
+  - [ ] API Routes для карточек
+- [ ] **Frontend Cards Integration**
+  - [ ] API сервис для карточек
+  - [ ] Pinia store для карточек
+  - [ ] TypeScript типы
+- [ ] **UI Components**
+  - [ ] CardList widget
+  - [ ] CardItem компонент
+  - [ ] CardEditorModal
+  - [ ] QuickAddCard компонент
+- [ ] **Pages**
+  - [ ] CoursePage с управлением карточками
+  
+### Система тренировок
+
+- [ ] **Backend**
+  - [ ] Spaced Repetition Service (SM-2 алгоритм)
+  - [ ] Training API endpoints
+  - [ ] Review tracking
+- [ ] **Frontend**
+  - [ ] TrainingPage
+  - [ ] Card display с flip анимацией
+  - [ ] Difficulty buttons (Again, Hard, Good, Easy)
+  - [ ] Progress tracking
 
 ## Фаза 4: Настройки
 
@@ -61,8 +96,11 @@
 
 ## Текущий статус
 
-**✅ Завершено**: Backend Database Service и Courses API полностью реализованы и готовы к тестированию.
+**✅ Завершено**: Frontend integration для управления курсами (CRUD операции проверены)
 
-**📋 Документация**: [`Testing_API.md`](file:///e:/Develop/anki-tiny/docs/Testing_API.md), [`Walkthrough.md`](file:///e:/Develop/anki-tiny/docs/Walkthrough.md)
+**📋 Документация**:
 
-**⏭️ Следующий шаг**: Frontend integration - API client, CourseList widget, HomePage
+- [`Walkthrough_Frontend_Courses.md`](file:///e:/Develop/anki-tiny/docs/Walkthrough_Frontend_Courses.md)
+- [`Frontend_Integration_Plan.md`](file:///e:/Develop/anki-tiny/docs/Frontend_Integration_Plan.md)
+
+**⏭️ Следующий шаг**: Реализация Cards API (backend) и frontend интеграция для работы с карточками

@@ -8,7 +8,8 @@ const props = defineProps({
   },
   type: {
     type: String,
-    default: 'text'
+    default: 'text',
+    validator: (value) => ['text', 'textarea', 'number', 'email', 'password'].includes(value)
   },
   placeholder: {
     type: String,
@@ -25,6 +26,10 @@ const props = defineProps({
   label: {
     type: String,
     default: ''
+  },
+  rows: {
+    type: Number,
+    default: 4
   }
 });
 
@@ -45,7 +50,19 @@ const handleInput = (event) => {
 <template>
   <div class="input-wrapper">
     <label v-if="label" class="input-label">{{ label }}</label>
+    
+    <textarea
+      v-if="type === 'textarea'"
+      :class="inputClasses"
+      :value="modelValue"
+      :placeholder="placeholder"
+      :disabled="disabled"
+      :rows="rows"
+      @input="handleInput"
+    />
+    
     <input
+      v-else
       :class="inputClasses"
       :type="type"
       :value="modelValue"
@@ -53,6 +70,7 @@ const handleInput = (event) => {
       :disabled="disabled"
       @input="handleInput"
     />
+    
     <div v-if="error" class="input-error-message">{{ error }}</div>
   </div>
 </template>
@@ -107,5 +125,11 @@ const handleInput = (event) => {
 .input-error-message {
   font-size: 12px;
   color: #ef4444;
+}
+
+textarea.input-field {
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
 }
 </style>
