@@ -5,11 +5,69 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/),
 и проект придерживается [Semantic Versioning](https://semver.org/lang/ru/).
 
-## [Unreleased]
+## [0.1.0] - 2026-01-05 16:11
 
 ### Added
 
-#### Frontend Architecture (2026-01-05)
+#### Backend: Database Service (2026-01-05)
+
+- **Database Layer с Kysely + better-sqlite3**
+  - Конфигурация приложения (`config/index.ts`) с путем к БД
+  - TypeScript схема для таблиц (`services/database/schema.ts`)
+  - Автоматические миграции для таблицы `courses`
+  - Singleton Database Service с инициализацией в `userData/anki.db`
+
+- **Course Repository**
+  - CRUD операции: `findAll()`, `findById()`, `create()`, `update()`, `delete()`
+  - Автоматическое обновление `updatedAt` при изменении
+
+#### Backend: Courses API (2026-01-05)
+
+- **REST API endpoints для управления курсами**
+  - `GET /api/courses` — список всех курсов
+  - `POST /api/courses` — создание нового курса
+  - `GET /api/courses/:id` — получение курса по ID
+  - `PUT /api/courses/:id` — обновление курса
+  - `DELETE /api/courses/:id` — удаление курса
+
+- **Валидация с Zod v4**
+  - `createCourseSchema` — валидация при создании (name обязателен)
+  - `updateCourseSchema` — валидация при обновлении (все поля optional)
+  - Детальные сообщения об ошибках через `issues`
+
+#### Infrastructure (2026-01-05)
+
+- **Утилиты**
+  - Pino logger с pretty printing (`utils/logger.ts`)
+  - Performance Timer для отладки (`utils/performance.ts`)
+
+- **Electron configuration**
+  - Добавлены скрипты: `rebuild`, `postinstall` для better-sqlite3
+  - Установлен `electron-rebuild` для нативных модулей
+
+- **Документация**
+  - `docs/Testing_API.md` — инструкции для тестирования API через DevTools
+  - Обновлен `docs/Walkthrough.md` с описанием реализованного функционала
+  - Обновлен `docs/Task.md` с прогрессом выполнения
+
+### Changed
+
+- `backend/src/server.ts` — интеграция Database Service, удалены старые сервисы
+- `backend/src/electron/main.ts` — восстановлена TypeScript версия с корректными импортами
+- `backend/package.json`, `frontend/package.json` — версия обновлена до 0.1.0
+
+### Technical Details
+
+- База данных: SQLite в `userData/anki.db`
+- ORM: Kysely v0.27 с полной типобезопасностью
+- Валидация: Zod v4
+- Установлены типы: `@types/better-sqlite3`
+
+## [Unreleased] - 2026-01-05 14:25
+
+### Added
+
+#### Frontend Architecture
 
 - **Feature-Sliced Design структура**
   - Реализована полная архитектура frontend (app, pages, widgets, features, entities, shared слои)
@@ -75,65 +133,8 @@
 - Исправлены пути к директориям frontend/backend (2026-01-05, commits 57a6f49, 32dba9d)
 - Исправлен backend/package.json (2026-01-05, commit 631e629)
 
-## [0.1.0] - 2026-01-05
 
-### Added
-
-#### Backend: Database Service (2026-01-05)
-
-- **Database Layer с Kysely + better-sqlite3**
-  - Конфигурация приложения (`config/index.ts`) с путем к БД
-  - TypeScript схема для таблиц (`services/database/schema.ts`)
-  - Автоматические миграции для таблицы `courses`
-  - Singleton Database Service с инициализацией в `userData/anki.db`
-
-- **Course Repository**
-  - CRUD операции: `findAll()`, `findById()`, `create()`, `update()`, `delete()`
-  - Автоматическое обновление `updatedAt` при изменении
-
-#### Backend: Courses API (2026-01-05)
-
-- **REST API endpoints для управления курсами**
-  - `GET /api/courses` — список всех курсов
-  - `POST /api/courses` — создание нового курса
-  - `GET /api/courses/:id` — получение курса по ID
-  - `PUT /api/courses/:id` — обновление курса
-  - `DELETE /api/courses/:id` — удаление курса
-
-- **Валидация с Zod v4**
-  - `createCourseSchema` — валидация при создании (name обязателен)
-  - `updateCourseSchema` — валидация при обновлении (все поля optional)
-  - Детальные сообщения об ошибках через `issues`
-
-#### Infrastructure (2026-01-05)
-
-- **Утилиты**
-  - Pino logger с pretty printing (`utils/logger.ts`)
-  - Performance Timer для отладки (`utils/performance.ts`)
-
-- **Electron configuration**
-  - Добавлены скрипты: `rebuild`, `postinstall` для better-sqlite3
-  - Установлен `electron-rebuild` для нативных модулей
-
-- **Документация**
-  - `docs/Testing_API.md` — инструкции для тестирования API через DevTools
-  - Обновлен `docs/Walkthrough.md` с описанием реализованного функционала
-  - Обновлен `docs/Task.md` с прогрессом выполнения
-
-### Changed
-
-- `backend/src/server.ts` — интеграция Database Service, удалены старые сервисы
-- `backend/src/electron/main.ts` — восстановлена TypeScript версия с корректными импортами
-- `backend/package.json`, `frontend/package.json` — версия обновлена до 0.1.0
-
-### Technical Details
-
-- База данных: SQLite в `userData/anki.db`
-- ORM: Kysely v0.27 с полной типобезопасностью
-- Валидация: Zod v4
-- Установлены типы: `@types/better-sqlite3`
-
-## [0.0.0] - 2026-01-05
+## [0.0.0] - 2026-01-05 03:04
 
 ### Initial Release
 
