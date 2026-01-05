@@ -27,11 +27,14 @@ Execute the following actions strictly in order:
 1. **Environment Scan:** Run `git status` to detect any manual changes I made personally.
 2. **Integration:** Incorporate these manual changes into `Walkthrough.md` so the documentation remains consistent with the actual code on disk.
 
-### Phase C: Code Quality Assurance
+### Phase C: Code & Documentation Quality Assurance
 
-1. **Linting:** Run the linting script (e.g., `npm run lint`, `yarn lint`, or backend equivalent) in the active directories (`frontend/` and/or `backend/`).
-2. **Auto-fix:** Apply automatic fixes provided by the linter.
-3. **Resolution:** If there are TypeScript errors or logical linting issues that auto-fix cannot resolve, **fix them immediately**. Do not proceed to commit with broken types or lint errors.
+1. **Code Linting:** Run the standard linting script (`npm run lint` / `yarn lint`) for frontend and backend.
+2. **Markdown Verification:**
+    * **Formatting:** Ensure all `.md` files (especially in `./docs/`) are properly formatted. If `prettier` is available, run it on markdown files.
+    * **Structure:** Check for malformed tables, unclosed code blocks, or broken reference links in `Task.md` and `Walkthrough.md`.
+    * **Fix:** Correct any markdown syntax errors immediately.
+3. **Auto-fix & Resolution:** Apply automatic fixes. If there are TS errors or lint issues that auto-fix cannot resolve, **fix them manually**. Do not proceed to commit with broken types or malformed docs.
 
 ### Phase D: Version Control Maintenance
 
@@ -39,7 +42,7 @@ Execute the following actions strictly in order:
 2. **Update Versions:** If applicable, increment the `version` field in:
     * `frontend/package.json`
     * `backend/package.json` (if a `package.json` or `composer.json` exists)
-3. Follow **SemVer** principles (patch for fixes, minor for features).
+3. Follow **SemVer** principles.
 
 ### Phase E: Git Commit
 
@@ -48,3 +51,4 @@ Execute the following actions strictly in order:
     * Explicitly mention Vue 3/TS or Docker infrastructure changes if applicable.
     * Use `chore: bump version` logic if the version was updated.
 3. **Execution:** Commit the changes.
+
