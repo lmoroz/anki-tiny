@@ -6,7 +6,9 @@ import settingsRouter from './settings';
 
 const router = Router();
 
-router.use(coursesRouter);
+// Важно: courses должен быть зарегистрирован раньше cards,
+// чтобы избежать конфликта /courses/:id с /courses/:courseId/cards
+router.use('/courses', coursesRouter);
 router.use(cardsRouter);
 router.use(trainingRouter);
 router.use(settingsRouter);

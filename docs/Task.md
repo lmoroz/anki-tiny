@@ -91,23 +91,23 @@
     - [x] Prettier форматирование
     - [x] TypeScript compilation
 
-### Frontend - Работа с карточками (Следующий этап)
+### Frontend - Работа с карточками (В процессе)
 
-- [ ] **Entity Layer**
-    - [ ] API сервис для карточек
-    - [ ] Pinia store для карточек
-    - [ ] TypeScript типы (CardState, Rating enum)
+- [x] **Entity Layer**
+    - [x] API сервис для карточек (`shared/api/cards.js`)
+    - [x] Pinia store для карточек (`entities/card/model/useCardStore.js`)
+    - [x] TypeScript типы (`shared/types/card.ts`: CardState enum, Card interface)
 
-- [ ] **Widgets**
-    - [ ] CardList widget
-    - [ ] CardItem компонент
-    - [ ] CardEditor Modal
-    - [ ] QuickAddCard компонент
+- [x] **Widgets**
+    - [x] CardList widget (`widgets/card-list/CardList.vue`)
+    - [x] CardItem компонент (`widgets/card-list/CardItem.vue`)
+    - [x] CardEditorModal (`widgets/card-editor/CardEditorModal.vue`)
+    - [x] QuickAddCard компонент (`widgets/quick-add-card/QuickAddCard.vue`)
 
-- [ ] **Pages**
-    - [ ] CoursePage - интеграция управления карточками
-    - [ ] TrainingPage - интерфейс тренировки с FSRS
-    - [ ] SettingsPage - глобальные и индивидуальные настройки
+- [x] **Pages Integration**
+    - [x] CoursePage - интеграция управления карточками (CRUD operations)
+    - [ ] TrainingPage - интерфейс тренировки с FSRS (следующий этап)
+    - [ ] SettingsPage - глобальные и индивидуальные настройки (следующий этап)
 
 ---
 
@@ -175,10 +175,25 @@
 - TypeScript компиляция успешна  
 - Code formatting применен
 
+**✅ Завершено:** Frontend интеграция курсов (CRUD полностью работает)
+
+**✅ Завершено:** Frontend интеграция карточек (Управление карточками в курсе)
+
+- Entity Layer: API client, Pinia store, TypeScript types
+- Widgets: CardItem (с flip анимацией), CardList, CardEditorModal, QuickAddCard
+- CoursePage интеграция: полный CRUD, статистика, валидация
+- ESLint проверка пройдена
+
 **📋 Документация:**
 
 - [Backend_Cards_FSRS_Walkthrough.md](file:///e:/Develop/anki-tiny/docs/Backend_Cards_FSRS_Walkthrough.md)
 - [Cards_FSRS_Implementation_Plan.md](file:///e:/Develop/anki-tiny/docs/Cards_FSRS_Implementation_Plan.md)
 - [Cards_FSRS_Architecture.md](file:///e:/Develop/anki-tiny/docs/Cards_FSRS_Architecture.md)
+- [Cards_Frontend_Implementation_Plan.md](file:///C:/Users/I%20am/.gemini/antigravity/brain/66d166ab-9158-446a-a995-53247e8be728/Cards_Frontend_Implementation_Plan.md)
+- [Cards_Frontend_Walkthrough.md](file:///C:/Users/I%20am/.gemini/antigravity/brain/66d166ab-9158-446a-a995-53247e8be728/Cards_Frontend_Walkthrough.md)
 
-**⏭️ Следующий шаг:** Frontend интеграция - Entity layer, Widgets и Pages для работы с карточками
+**⏭️ Следующие шаги:** TrainingPage (интерфейс тренировки с FSRS) → SettingsPage
+
+> [!NOTE]
+> Frontend Vite dev server запущен (localhost:5173).
+> Обнаружена ошибка запуска Electron backend (import issue в main.js) - требует отдельного исправления.

@@ -9,12 +9,15 @@
     "backend"
   ],
   "scripts": {
-    "dev": "npm run app:dev --workspace=backend",
+    "app:dev": "npm run app:dev --workspace=backend",
+    "dev": "concurrently \"npm run dev --workspace=frontend\" \"npm run dev --workspace=backend\" -n \"frontend,backend\" -c \"blue,green\"",
     "bundle": "npm run build --workspace=frontend && npm run build --workspace=backend && cd backend && node build-installer.js",
     "lint": "npm run lint --workspaces --if-present",
     "format": "npm run format --workspaces --if-present"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=9.0.0"

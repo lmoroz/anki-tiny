@@ -6,7 +6,7 @@
   "main": "dist/electron/main.js",
   "scripts": {
     "rebuild:electron": "electron-builder install-app-deps",
-    "rebuild:node": "npm rebuild better-sqlite3 --build-from-source --runtime=node",
+    "rebuild:node": "npm rebuild better-sqlite3",
     "dev": "npm run rebuild:node && nodemon --watch 'src/**/*.ts' --exec \"npx ts-node\" src/server.ts",
     "electron:dev": "npm run rebuild:electron && cross-env NODE_ENV=development tsc && electron .",
     "app:dev": "npm run rebuild:electron && concurrently \"npm run dev --prefix ../frontend\" \"cross-env NODE_ENV=development tsc && electron .\" -n \"frontend,backend\" -c \"blue,green\"",

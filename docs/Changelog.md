@@ -5,6 +5,83 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/),
 и проект придерживается [Semantic Versioning](https://semver.org/lang/ru/).
 
+## [0.2.0] - 2026-01-05 22:34
+
+### Added
+
+#### Frontend: Управление карточками (Cards Management)
+
+- **Entity Layer**
+    - API сервис для карточек (`shared/api/cards.js`) с полным CRUD функционалом
+    - TypeScript типы (`shared/types/card.ts`): CardState enum, Card interface, DTOs, CourseStats
+    - Pinia store (`entities/card/model/useCardStore.js`) с reactive state management
+    - Getters: `getCardsByCourse`, `getCourseStats`
+    - Actions: `fetchCardsByCourse`, `fetchCourseStats`, `createCard`, `updateCard`, `deleteCard`
+    - Автоматическое обновление статистики после create/delete операций
+
+- **Widgets**
+    - `CardItem.vue` — карточка с CSS 3D flip анимацией (вопрос ↔ ответ)
+    - State badges (New, Learning, Review, Relearning) с цветовой индикацией
+    - Due date форматирование ("Сегодня", "Завтра", "Через N дней")
+    - Line clamp для обрезки длинного текста
+    - Hover эффекты для кнопок Edit/Delete
+    - `CardList.vue` — список карточек с loading skeleton и empty state
+    - `CardEditorModal.vue` — модальное окно create/edit с валидацией
+    - Character counters для front/back (max 10000 символов)
+    - `QuickAddCard.vue` — inline форма быстрого добавления
+    - Автоочистка формы после успешного добавления
+    - Responsive grid layout (desktop: 2 cols, mobile: 1 col)
+
+- **Pages Integration**
+    - Полная интеграция CoursePage с управлением карточками
+    - Stats Grid: Total, New, Review, Due Today
+    - Training button с dynamic text и disabled state
+    - CRUD handlers с confirm dialogs для удаления
+    - Dual mode support: Quick Add + Modal Editor
+
+### Fixed
+
+- **Backend Routes Conflict**
+    - Исправлен конфликт роутов в `routes/index.ts`
+    - Добавлен префикс `/courses` для coursesRouter
+    - Теперь `GET /api/courses` корректно обрабатывается без ошибки "Invalid course ID"
+    - Порядок регистрации роутов: courses → cards → training → settings
+
+### Changed
+
+- **CoursePage.vue**
+    - Переход с mock данных на реальные API запросы
+    - Интеграция useCourseStore и useCardStore
+    - Computed properties для reactive data
+    - Loading states и error handling
+    - Stats отображение с hover эффектами
+
+### Documentation
+
+- **Cards_Frontend_Implementation_Plan.md** — детальный план реализации frontend карточек
+- **Cards_Frontend_Walkthrough.md** — comprehensive walkthrough с описанием всех компонентов
+    - Обзор 8 созданных файлов
+    - API endpoints integration
+    - Architecture highlights (Feature-Sliced Design)
+    - Manual testing plan
+    - UX Features описание
+
+### Verified
+
+- ✅ ESLint проверка пройдена (Exit code: 0)
+- ✅ TypeScript компиляция успешна
+- ✅ Frontend dev server запущен (Vite на localhost:5173)
+- ✅ Backend routes исправлены и скомпилированы
+
+### Technical Details
+
+- Созданные файлы: 8 (3 Entity Layer + 4 Widgets + 1 Page integration)
+- API endpoints используются: 5 (getByCourseId, create, update, delete, getCourseStats)
+- Feature-Sliced Design соблюден во всех слоях
+- State management: Pinia stores с auto-update локального состояния
+
+---
+
 ## [0.2.0] - 2026-01-05 21:35
 
 ### Added
