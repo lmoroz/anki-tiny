@@ -10,7 +10,7 @@ trigger: always_on
 * **Sync Policy:** Ignore your internal profile/hidden directories. Any change to the plan or task status must be immediately written to the files in `./docs/`.
 * **Naming:** Do not generate files with hashes or timestamps. Use fixed filenames: `Task.md`, `Walkthrough.md`, `Implementation_Plan.md`. Overwrite their content.
 
-## 2. Session Wrap-up (Trigger: "Summarize session" or "Подытожь" or "Подытожь сессию")
+## 2. Session Wrap-up (Trigger: "Summarize session" or "Подытожь" or "Подытожь сессию" or "Заверши сессию")
 
 Execute the following actions strictly in order:
 
@@ -52,4 +52,3 @@ Execute the following actions strictly in order:
     * Explicitly mention Vue 3/TS or Docker infrastructure changes if applicable.
     * Use `chore: bump version` logic if the version was updated.
 3. **Execution:** Commit the changes.
-

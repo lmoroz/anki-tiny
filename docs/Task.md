@@ -11,7 +11,7 @@
 - [x] Реализовать кастомный заголовок окна
 - [x] Настроить базовые UI компоненты
 
-## Фаза 3: Основной функционал
+## Фаза 3: Основной функционал - Курсы ✅
 
 ### Backend ✅
 
@@ -45,81 +45,86 @@
     - [x] Загрузка списка курсов
     - [x] Создание курса
 
-### Frontend - Работа с карточками (следующая фаза)
+---
 
-- [ ] **Backend Cards API**
-    - [ ] Миграции для таблицы cards
-    - [ ] Card Repository (CRUD)
-    - [ ] Validation схемы (Zod)
-    - [ ] API Routes для карточек
-- [ ] **Frontend Cards Integration**
+## Фаза 4: Карточки и FSRS ✅
+
+### Backend (Завершено)
+
+- [x] **Database Schema**
+    - [x] Обновить `schema.ts` с `CardsTable`, `SettingsTable`, `CourseSettingsTable`
+    - [x] Добавить FSRS-специфичные поля (stability, difficulty, state, reps, lapses)
+    - [x] Обновить интерфейс `Database`
+
+- [x] **Database Migrations**
+    - [x] Создать миграцию `002_create_cards_table.sql`
+    - [x] Создать миграцию `003_create_settings_table.sql`
+    - [x] Создать миграцию `004_create_course_settings_table.sql`
+    - [x] Определить индексы (courseId, due, state)
+
+- [x] **FSRS Service**
+    - [x] Установить пакет `ts-fsrs`
+    - [x] Создать `services/fsrs/index.ts`
+    - [x] Реализовать `calculateNextReview()`
+    - [x] Реализовать Learning Steps логику
+    - [x] Реализовать `canShowNewCards()`
+    - [x] Реализовать `initializeNewCard()`
+
+- [x] **Repositories**
+    - [x] Card Repository (CRUD + getDueCards + getCourseStats)
+    - [x] Settings Repository (глобальные + курса + getEffectiveSettings)
+
+- [x] **Validation Schemas**
+    - [x] Создать `schemas/card.ts` (Create, Update, Review)
+    - [x] Создать `schemas/settings.ts` (Global, Course)
+
+- [x] **API Routes**
+    - [x] `routes/cards.ts` (6 endpoints)
+    - [x] `routes/training.ts` (2 endpoints)
+    - [x] `routes/settings.ts` (5 endpoints)
+    - [x] Зарегистрировать в `routes/index.ts`
+
+- [x] **Исправление ошибок и форматирование**
+    - [x] FSRS Rating types
+    - [x] Zod schema syntax
+    - [x] ZodError обработка
+    - [x] Prettier форматирование
+    - [x] TypeScript compilation
+
+### Frontend - Работа с карточками (Следующий этап)
+
+- [ ] **Entity Layer**
     - [ ] API сервис для карточек
     - [ ] Pinia store для карточек
-    - [ ] TypeScript типы
-- [ ] **UI Components**
+    - [ ] TypeScript типы (CardState, Rating enum)
+
+- [ ] **Widgets**
     - [ ] CardList widget
     - [ ] CardItem компонент
-    - [ ] CardEditorModal
-    - [ ] QuickAddCard компонент (быстрое добавление карточек)
+    - [ ] CardEditor Modal
+    - [ ] QuickAddCard компонент
+
 - [ ] **Pages**
-    - [ ] CoursePage с управлением карточками
+    - [ ] CoursePage - интеграция управления карточками
+    - [ ] TrainingPage - интерфейс тренировки с FSRS
+    - [ ] SettingsPage - глобальные и индивидуальные настройки
 
-### Система тренировок
+---
 
-- [ ] **Backend**
-    - [ ] Spaced Repetition Service (FSRS алгоритм)
-    - [ ] Training API endpoints
-    - [ ] Review tracking
-- [ ] **Frontend**
-    - [ ] TrainingPage
-    - [ ] Card display с flip анимацией
-    - [ ] Difficulty buttons (Again, Hard, Good, Easy)
-    - [ ] Progress tracking
-
-## Фаза 4: Настройки
-
-### Глобальные настройки
-
-- [ ] **Backend Settings API**
-    - [ ] Миграция для таблицы settings
-    - [ ] Settings Repository
-    - [ ] GET/PUT `/api/settings` endpoints
-    - [ ] Validation схемы (Zod)
-- [ ] **Settings Schema**
-    - [ ] `trainingStartHour` (8 по умолчанию)
-    - [ ] `trainingEndHour` (22 по умолчанию)
-    - [ ] `minTimeBeforeEnd` (4 часа по умолчанию)
-    - [ ] `notificationsEnabled` (boolean)
-- [ ] **Frontend Settings**
-    - [ ] SettingsPage UI
-    - [ ] Time picker компоненты
-    - [ ] Сохранение настроек
-
-### Настройки курса (индивидуальные)
-
-- [ ] **Backend**
-    - [ ] Миграция для таблицы course_settings
-    - [ ] CourseSettings Repository
-    - [ ] API endpoints для настроек курса
-    - [ ] Наследование из глобальных настроек
-- [ ] **Frontend**
-    - [ ] Course Settings UI
-    - [ ] Переключатель "Use global settings"
-    - [ ] Индивидуальные настройки для курса
-
-## Фаза 5: Системная интеграция
+## Фаза 5: Системная интеграция (Запланировано)
 
 ### Система уведомлений
 
 - [ ] **Backend Notifications Service**
     - [ ] Проверка due cards каждый час
-    - [ ] Фильтрация по времени тренировок (trainingStartHour/trainingEndHour)
+    - [ ] Фильтрация по времени тренировок
     - [ ] Проверка "не предлагать новые карточки если до конца дня < 4 часов"
     - [ ] Electron Notification API integration
+
 - [ ] **Electron Main Process**
     - [ ] IPC handlers для уведомлений
     - [ ] Системные уведомления Windows/Linux/macOS
-    - [ ] Click handlers для уведомлений (открыть тренировку)
+
 - [ ] **Frontend**
     - [ ] Настройка частоты уведомлений в Settings
     - [ ] Тест уведомлений из UI
@@ -129,58 +134,51 @@
 - [ ] **Electron Main Process**
     - [ ] Создание Tray icon
     - [ ] Tray menu (Открыть, Выход)
-    - [ ] Click handlers для tray
     - [ ] Изменение window-close: hide вместо quit
     - [ ] Показ окна из трея
-- [ ] **Frontend**
-    - [ ] Кнопка "Свернуть" в title bar
-    - [ ] Визуальная обратная связь при сворачивании
 
-## Фаза 6: Расширенный функционал (опционально)
+---
+
+## Фаза 6: Расширенный функционал (Опционально)
 
 - [ ] **Статистика прогресса обучения**
     - [ ] Backend: API для статистики
     - [ ] Frontend: Dashboard страница с графиками
-    - [ ] Отображение прогресса по дням/неделям
 
 - [ ] **Импорт/Экспорт курсов**
     - [ ] Backend: JSON export/import endpoints
     - [ ] Frontend: UI для импорта/экспорта
-    - [ ] Формат файлов (совместимость с Anki?)
 
 - [ ] **Медиа в карточках**
     - [ ] Backend: File upload endpoints
     - [ ] Database: media_files таблица
     - [ ] Frontend: Image/Audio upload компоненты
-    - [ ] Отображение медиа в тренировках
 
 - [ ] **Поиск по карточкам**
     - [ ] Backend: Full-text search API
     - [ ] Frontend: SearchBar компонент
-    - [ ] Фильтрация результатов
 
 - [ ] **Теги и категории**
     - [ ] Database: tags таблица, card_tags связь
     - [ ] Backend: Tags API
     - [ ] Frontend: Tag management UI
-    - [ ] Фильтрация по тегам
-
-## Фаза 7: Тестирование и полировка
-
-- [ ] Тестирование основных сценариев
-- [ ] Проверка работы в production build
-- [ ] Проверка установщика на разных ОС
-- [ ] E2E тесты с Playwright
 
 ---
 
 ## Текущий статус
 
-**✅ Завершено**: Frontend integration для управления курсами (CRUD операции проверены)
+**✅ Завершено:** Backend реализация Cards и FSRS
 
-**📋 Документация**:
+- Database schema (3 новые таблицы)
+- FSRS Service с learning steps
+- 13 API endpoints
+- TypeScript компиляция успешна  
+- Code formatting применен
 
-- [`Walkthrough_Frontend_Courses.md`](file:///e:/Develop/anki-tiny/docs/Walkthrough_Frontend_Courses.md)
-- [`Frontend_Integration_Plan.md`](file:///e:/Develop/anki-tiny/docs/Frontend_Integration_Plan.md)
+**📋 Документация:**
 
-**⏭️ Следующий шаг**: Реализация Cards API (backend) и frontend интеграция для работы с карточками
+- [Backend_Cards_FSRS_Walkthrough.md](file:///e:/Develop/anki-tiny/docs/Backend_Cards_FSRS_Walkthrough.md)
+- [Cards_FSRS_Implementation_Plan.md](file:///e:/Develop/anki-tiny/docs/Cards_FSRS_Implementation_Plan.md)
+- [Cards_FSRS_Architecture.md](file:///e:/Develop/anki-tiny/docs/Cards_FSRS_Architecture.md)
+
+**⏭️ Следующий шаг:** Frontend интеграция - Entity layer, Widgets и Pages для работы с карточками

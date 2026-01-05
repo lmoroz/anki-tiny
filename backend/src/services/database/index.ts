@@ -1,7 +1,7 @@
 import SQLite from 'better-sqlite3';
 import { Kysely, SqliteDialect } from 'kysely';
 import { Database } from './schema';
-import { up } from './migrations';
+import { runMigrations } from './migrations';
 import { config } from '../../config';
 import path from 'path';
 import fs from 'fs';
@@ -19,8 +19,6 @@ export async function initializeDatabase(): Promise<Kysely<Database>> {
     fs.mkdirSync(dbDir, { recursive: true });
   }
 
-  const isNewDatabase = !fs.existsSync(config.DATABASE_PATH);
-
   const dialect = new SqliteDialect({
     database: new SQLite(config.DATABASE_PATH),
   });
@@ -29,13 +27,9 @@ export async function initializeDatabase(): Promise<Kysely<Database>> {
     dialect,
   });
 
-  // Применить миграции для новой БД
-  if (isNewDatabase) {
-    console.log('📦 Creating new database at:', config.DATABASE_PATH);
-    await up(dbInstance);
-  } else {
-    console.log('📦 Using existing database at:', config.DATABASE_PATH);
-  }
+  // Применить миграции (как для новой, так и для существующей БД)
+  console.log('📦 Database at:', config.DATABASE_PATH);
+  await runMigrations(dbInstance);
 
   return dbInstance;
 }
@@ -46,6 +40,16 @@ export function getDatabase(): Kysely<Database> {
   }
   return dbInstance;
 }
+
+// Экспорт для удобного использования в repositories
+export const db = new Proxy({} as Kysely<Database>, {
+  get(target, prop) {
+    const instance = getDatabase();
+    return typeof instance[prop as keyof Kysely<Database>] === 'function'
+      ? (instance[prop as keyof Kysely<Database>] as any).bind(instance)
+      : instance[prop as keyof Kysely<Database>];
+  },
+});
 
 export async function closeDatabase(): Promise<void> {
   if (dbInstance) {

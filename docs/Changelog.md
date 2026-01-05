@@ -5,6 +5,122 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/),
 и проект придерживается [Semantic Versioning](https://semver.org/lang/ru/).
 
+## [0.2.0] - 2026-01-05 21:35
+
+### Added
+
+#### Backend: Cards и FSRS система
+
+- **Database Schema расширена для FSRS**
+    - `CardsTable` — карточки с полным набором FSRS полей:
+        - `due`, `stability`, `difficulty`, `elapsedDays`, `scheduledDays`
+        - `reps`, `lapses`, `state`, `lastReview`, `stepIndex`
+    - `SettingsTable` — глобальные настройки приложения
+    - `CourseSettingsTable` — индивидуальные настройки курсов
+    - Индексы для оптимизации: `courseId`, `due`, `state`
+
+- **Migration System с отслеживанием**
+    - Таблица `_migrations` для учета примененных миграций
+    - 4 отдельные миграции: courses, cards, settings, courseSettings
+    - Функция `runMigrations()` — автоматическое применение недостающих миграций
+    - Идемпотентность: `.ifNotExists()` для всех `createTable()` и `createIndex()`
+    - Логирование процесса применения миграций
+
+- **FSRS Service (`services/fsrs/index.ts`)**
+    - Интеграция библиотеки `ts-fsrs` для spaced repetition
+    - Кастомные Learning Steps: 10 минут → 4 часа → REVIEW
+    - State Machine: NEW → LEARNING → REVIEW → RELEARNING
+    - `calculateNextReview()` — расчет интервалов с учетом Rating
+    - `canShowNewCards()` — проверка временных ограничений (4 часа до конца дня)
+    - `initializeNewCard()` — создание карточки с дефолтными FSRS значениями
+
+- **Repositories**
+    - `CardRepository` — CRUD + getDueCards + getCourseStats
+    - `SettingsRepository` — глобальные + курса + getEffectiveSettings
+    - Singleton instances для удобного использования
+
+- **Validation Schemas (Zod)**
+    - `schemas/card.ts`: CreateCard, UpdateCard, ReviewCard (Rating 1-4)
+    - `schemas/settings.ts`: GlobalSettings, CourseSettings с валидацией JSON
+
+- **REST API Endpoints (13 endpoints)**
+    - **Cards API** (`routes/cards.ts`):
+        - `GET /api/courses/:courseId/cards` — список карточек
+        - `POST /api/courses/:courseId/cards` — создание
+        - `GET /api/cards/:id` — получение
+        - `PUT /api/cards/:id` — обновление
+        - `DELETE /api/cards/:id` — удаление
+        - `GET /api/courses/:courseId/stats` — статистика
+    - **Training API** (`routes/training.ts`):
+        - `GET /api/courses/:courseId/due-cards` — карточки для повторения
+        - `POST /api/training/review` — отправка результата review
+    - **Settings API** (`routes/settings.ts`):
+        - `GET /api/settings` — глобальные настройки
+        - `PUT /api/settings` — обновление глобальных
+        - `GET /api/courses/:courseId/settings` — настройки курса
+        - `PUT /api/courses/:courseId/settings` — обновление настроек курса
+        - `DELETE /api/courses/:courseId/settings` — сброс к глобальным
+
+### Changed
+
+- **backend/src/services/database/index.ts**
+    - Изменена логика инициализации БД: миграции применяются всегда, не только для новой БД
+    - Замена `up(dbInstance)` на `runMigrations(dbInstance)`
+
+- **backend/src/services/database/migrations.ts**
+    - Полный переход на систему отслеживания миграций
+    - Разбиение на отдельные миграции вместо одной монолитной функции `up()`
+    - Добавлена функция `rollbackAllMigrations()` для тестирования
+
+- **backend/src/routes/index.ts**
+    - Зарегистрированы новые роуты: cards, training, settings
+
+### Fixed
+
+- **TypeScript ошибки**
+    - FSRS импорты: использование `Rating` enum из ts-fsrs (с type cast `as any` для совместимости)
+    - Zod schema syntax: исправлен `ReviewCardSchema` (убран `errorMap`, использован `message`)
+    - ZodError обработка: замена `.errors` на `.issues` во всех routes
+    - Удалены неиспользуемые импорты (`NewCard` в cardRepository)
+
+- **Code Formatting**
+    - Применен prettier ко всем backend файлам
+    - Исправлены line breaks и отступы
+
+### Documentation
+
+- **Backend_Cards_FSRS_Walkthrough.md** — comprehensive walkthrough реализации
+    - Обзор всех созданных файлов
+    - 13 API endpoints с примерами
+    - Database schema с FSRS полями
+    - Детальное описание FSRS State Machine
+    - Результаты верификации и компиляции
+
+- **Migration_System_Walkthrough.md** — детальная документация migration system
+    - Архитектура tracking system
+    - Список миграций и их содержимое
+    - Исправленные проблемы (ifNotExists)
+    - Результаты тестирования на существующей БД
+    - Руководство по добавлению новых миграций
+
+- **Cards_FSRS_Implementation_Plan.md** — технический план реализации
+- **Cards_FSRS_Architecture.md** — Mermaid диаграммы архитектуры
+- **Cards_FSRS_Tasks.md** — детальный чеклист задач
+- **docs/Task.md** — обновлен прогресс (Фаза 4 Backend завершена)
+
+### Verified
+
+- ✅ TypeScript компиляция без ошибок
+- ✅ Prettier форматирование применен
+- ✅ Migration system работает на существующей БД (4 миграции применились успешно)
+- ✅ Server запускается и слушает на динамическом порту
+- ✅ Таблицы созданы: `_migrations`, `courses`, `cards`, `settings`, `courseSettings`
+- ✅ Индексы созданы для всех необходимых полей
+
+### Dependencies
+
+- Добавлена зависимость: `ts-fsrs` (TypeScript FSRS library)
+
 ## [0.1.0] - 2026-01-05 18:52
 
 ### Fixed
