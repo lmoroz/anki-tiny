@@ -5,6 +5,79 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/),
 и проект придерживается [Semantic Versioning](https://semver.org/lang/ru/).
 
+## [0.2.0] - 2026-01-05 23:04
+
+### Added
+
+#### Frontend: Batch-добавление карточек (Batch Card Import)
+
+- **QuickAddCard Component Enhancement**
+    - Добавлен переключатель режимов: "Одна карточка" / "Массовое добавление"
+    - Режим массового добавления через textarea
+    - Формат ввода: `вопрос | ответ` (каждая строка — новая карточка)
+    - Парсинг и валидация batch-данных:
+        - Проверка наличия разделителя `|`
+        - Проверка корректности формата (ровно 1 разделитель на строку)
+        - Проверка на пустые значения front/back
+        - Информативные сообщения об ошибках с номером строки
+    - Последовательная отправка карточек через существующий emit механизм
+    - Задержка 50ms между карточками для плавности
+    - Автоочистка textarea после успешного добавления
+
+- **Premium UI Design**
+    - Премиальный редизайн компонента QuickAddCard
+    - Насыщенный glassmorphism эффект (backdrop-filter: blur(16px))
+    - Многослойные box-shadows для глубины и объёма
+    - Увеличенная типографика: заголовок 20px (было 16px), font-weight 700
+    - Светящиеся иконки с drop-shadow эффектом (#60a5fa)
+    - Премиальные toggle-кнопки с gradient background (135deg, #3b82f6 → #2563eb)
+    - Плавные анимации с cubic-bezier timing function
+    - Transform эффекты на hover (translateY + scale)
+    - Увеличенные отступы: padding 32px (было 20px), border-radius 16px (было 12px)
+    - Элегантная информационная панель с gradient background
+    - Стилизованный code element с monospace шрифтом и border
+    - Responsive design с адаптивными падингами для мобильных
+
+### Documentation
+
+- **docs/features/batch-add-cards.md** — полная документация функциональности:
+    - Обзор возможностей batch-импорта
+    - Формат ввода и примеры использования
+    - Технические детали реализации
+    - Описание функций парсинга и валидации
+    - Преимущества и совместимость
+
+- **docs/features/ui-improvements.md** — детальное описание UI улучшений:
+    - Сравнение "до" и "после" для всех элементов
+    - CSS техники и эффекты
+    - Цветовая палитра и spacing
+    - Производительность и accessibility
+
+### Technical Details
+
+- **Новые функции в QuickAddCard.vue**:
+    - `parseBatchInput(text)` — парсинг textarea в массив `{front, back}[]`
+    - `validateBatchInput()` — валидация batch-данных с детальными ошибками
+    - `handleBatchAdd()` — последовательная отправка карточек
+    - `switchMode(newMode)` — переключение режимов с очисткой ошибок
+
+- **CSS улучшения**:
+    - Multi-layered box-shadows
+    - Advanced gradients (145deg angle)
+    - Filter effects (drop-shadow для glow)
+    - Transform animations (GPU-accelerated)
+    - Inset shadows для depth
+    - Improved color contrasts (#60a5fa, #cbd5e1, #f1f5f9)
+
+### Verified
+
+- ✅ ESLint frontend проверка пройдена (Exit code: 0)
+- ✅ Markdownlint проверка документации пройдена
+- ✅ Компонент полностью обратно совместим
+- ✅ Не требуется изменений в backend
+
+---
+
 ## [0.2.0] - 2026-01-05 22:34
 
 ### Added
