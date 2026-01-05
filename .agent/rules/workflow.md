@@ -27,17 +27,23 @@ Execute the following actions strictly in order:
 1. **Environment Scan:** Run `git status` to detect any manual changes I made personally.
 2. **Integration:** Incorporate these manual changes into `Walkthrough.md` so the documentation remains consistent with the actual code on disk.
 
-### Phase C: Version Control Maintenance
+### Phase C: Code Quality Assurance
+
+1. **Linting:** Run the linting script (e.g., `npm run lint`, `yarn lint`, or backend equivalent) in the active directories (`frontend/` and/or `backend/`).
+2. **Auto-fix:** Apply automatic fixes provided by the linter.
+3. **Resolution:** If there are TypeScript errors or logical linting issues that auto-fix cannot resolve, **fix them immediately**. Do not proceed to commit with broken types or lint errors.
+
+### Phase D: Version Control Maintenance
 
 1. **Check Scope:** Analyze if the changes in this session warrant a version bump.
 2. **Update Versions:** If applicable, increment the `version` field in:
     * `frontend/package.json`
     * `backend/package.json` (if a `package.json` or `composer.json` exists)
-3. Follow **SemVer** principles.
+3. Follow **SemVer** principles (patch for fixes, minor for features).
 
-### Phase D: Git Commit
+### Phase E: Git Commit
 
-1. **Staging:** Stage (`git add`) all changed code files, updated `package.json` files, and the `./docs/` directory.
+1. **Staging:** Stage (`git add`) all changed code files (including lint fixes), updated `package.json` files, and the `./docs/` directory.
 2. **Commit Message:** Generate a semantic commit message (`type(scope): subject`).
     * Explicitly mention Vue 3/TS or Docker infrastructure changes if applicable.
     * Use `chore: bump version` logic if the version was updated.
