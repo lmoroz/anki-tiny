@@ -5,6 +5,36 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/),
 и проект придерживается [Semantic Versioning](https://semver.org/lang/ru/).
 
+## [0.1.0] - 2026-01-05 16:50
+
+### Added
+
+#### Development Experience
+
+- **Hot-Reload для фронтенда в режиме разработки**
+  - Electron теперь загружает фронтенд с Vite dev server (`http://localhost:5173`) в dev режиме
+  - Все изменения во фронтенде видны мгновенно без перезапуска приложения
+  - DevTools открываются автоматически в режиме разработки
+  - Установлен пакет `concurrently` для параллельного запуска процессов
+  - Команды `npm run dev` и `npm run electron:dev` запускают фронтенд и бэкенд одновременно
+  - Цветная консоль для разделения логов (фронтенд - синий, бэкенд - зелёный)
+
+### Changed
+
+- **backend/src/electron/main.ts**
+  - Изменён импорт Electron на namespace import для совместимости
+  - Добавлена логика загрузки с Vite dev server в development режиме
+  - Регистрация кастомного протокола `lmorozanki://` только для production
+  - Разрешена навигация по localhost в dev режиме
+
+- **backend/package.json**
+  - Обновлены команды `dev` и `electron:dev` для параллельного запуска
+  - Добавлена зависимость `concurrently`
+
+### Fixed
+
+- **backend/src/config/index.ts** — исправлена ESLint ошибка с форматированием тернарного оператора
+
 ## [0.1.0] - 2026-01-05 16:11
 
 ### Added
