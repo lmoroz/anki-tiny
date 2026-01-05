@@ -15,30 +15,30 @@ API сервис для работы с курсами, использующий
 import api from './client';
 
 export const coursesApi = {
-  async getAll() {
-    const response = await api.get('/courses');
-    return response.data;
-  },
+    async getAll () {
+        const response = await api.get('/courses');
+        return response.data;
+    },
 
-  async getById(id) {
-    const response = await api.get(`/courses/${id}`);
-    return response.data;
-  },
+    async getById (id) {
+        const response = await api.get(`/courses/${ id }`);
+        return response.data;
+    },
 
-  async create(data) {
-    const response = await api.post('/courses', data);
-    return response.data;
-  },
+    async create (data) {
+        const response = await api.post('/courses', data);
+        return response.data;
+    },
 
-  async update(id, data) {
-    const response = await api.put(`/courses/${id}`, data);
-    return response.data;
-  },
+    async update (id, data) {
+        const response = await api.put(`/courses/${ id }`, data);
+        return response.data;
+    },
 
-  async delete(id) {
-    const response = await api.delete(`/courses/${id}`);
-    return response.data;
-  }
+    async delete (id) {
+        const response = await api.delete(`/courses/${ id }`);
+        return response.data;
+    }
 };
 ```
 
@@ -160,8 +160,8 @@ Widget для отображения списка курсов:
 
 - Режимы: create / edit
 - Форма с полями:
-  - Name (обязательное)
-  - Description (опциональное)
+    - Name (обязательное)
+    - Description (опциональное)
 - Валидация на клиенте (min length для name)
 - Обработка ошибок от API
 - Кнопки: Save, Cancel
@@ -243,8 +243,8 @@ npm run electron:dev
 2. HomePage отображается корректно
 3. Если курсов нет → отображается Empty State с кнопкой "Создать первый курс"
 4. Открыть DevTools (F12) и проверить:
-   - Console: нет ошибок загрузки API
-   - Network: запрос `GET http://localhost:3000/api/courses` выполняется успешно
+    - Console: нет ошибок загрузки API
+    - Network: запрос `GET http://localhost:3000/api/courses` выполняется успешно
 
 **Ожидаемый результат:** Empty state отображается, API запрос выполняется без ошибок.
 
@@ -257,12 +257,12 @@ npm run electron:dev
 1. Нажать кнопку "Создать курс"
 2. Модальное окно открывается
 3. Заполнить форму:
-   - Name: "Английский язык"
-   - Description: "Базовая лексика"
+    - Name: "Английский язык"
+    - Description: "Базовая лексика"
 4. Нажать "Сохранить"
 5. Проверить в DevTools:
-   - Network: `POST http://localhost:3000/api/courses` возвращает 201
-   - Console: нет ошибок
+    - Network: `POST http://localhost:3000/api/courses` возвращает 201
+    - Console: нет ошибок
 6. Модальное окно закрывается
 7. Новый курс появляется в списке
 
@@ -280,7 +280,7 @@ npm run electron:dev
 4. Изменить название на "English Language"
 5. Нажать "Сохранить"
 6. Проверить в DevTools:
-   - Network: `PUT http://localhost:3000/api/courses/1` возвращает 200
+    - Network: `PUT http://localhost:3000/api/courses/1` возвращает 200
 7. Карточка курса обновляется с новым названием
 
 **Ожидаемый результат:** Курс обновляется, изменения отображаются.
@@ -296,7 +296,7 @@ npm run electron:dev
 3. Появляется confirm dialog с предупреждением
 4. Подтвердить удаление
 5. Проверить в DevTools:
-   - Network: `DELETE http://localhost:3000/api/courses/1` возвращает 200
+    - Network: `DELETE http://localhost:3000/api/courses/1` возвращает 200
 6. Курс исчезает из списка
 7. Если это был последний курс → отображается Empty State
 
@@ -311,9 +311,9 @@ npm run electron:dev
 1. Остановить backend сервер
 2. Попытаться создать новый курс
 3. Проверить, что:
-   - Отображается сообщение об ошибке
-   - Модальное окно не закрывается
-   - Пользователь может повторить попытку
+    - Отображается сообщение об ошибке
+    - Модальное окно не закрывается
+    - Пользователь может повторить попытку
 
 **Ожидаемый результат:** Ошибки обрабатываются корректно, пользователю показывается понятное сообщение.
 
@@ -326,9 +326,9 @@ npm run electron:dev
 1. Открыть модальное окно создания курса
 2. Попытаться сохранить с пустым полем Name
 3. Проверить, что:
-   - Отображается ошибка валидации
-   - Запрос на backend не отправляется
-   - Кнопка "Сохранить" disabled или показывает ошибку
+    - Отображается ошибка валидации
+    - Запрос на backend не отправляется
+    - Кнопка "Сохранить" disabled или показывает ошибку
 
 **Ожидаемый результат:** Форма валидируется на клиенте.
 

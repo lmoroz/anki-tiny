@@ -146,12 +146,12 @@ Widget списка курсов:
 ### Fixes от пользователя
 
 1. **Backend port transmission** ([main.js](file:///e:/Develop/anki-tiny/frontend/src/app/main.js)):
-   - Приложение инициализируется только после получения backend порта
-   - Глобальная переменная `window.__BACKEND_URL__` для динамического URL
+    - Приложение инициализируется только после получения backend порта
+    - Глобальная переменная `window.__BACKEND_URL__` для динамического URL
 
 2. **Code formatting** ([CourseEditorModal.vue](file:///e:/Develop/anki-tiny/frontend/src/widgets/course-editor/CourseEditorModal.vue)):
-   - Консистентное форматирование кода
-   - Улучшенная читаемость
+    - Консистентное форматирование кода
+    - Улучшенная читаемость
 
 ---
 
