@@ -1,7 +1,7 @@
 {
   "name": "anki-tiny",
   "version": "0.1.0",
-  "description": "Anki Tiny - Desktop application for language learning",
+  "description": "Anki Tiny - Desktop application for interval method learning",
   "author": "Morozhnikova Larisa",
   "private": true,
   "workspaces": [

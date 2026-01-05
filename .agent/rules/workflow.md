@@ -40,6 +40,7 @@ Execute the following actions strictly in order:
 
 1. **Check Scope:** Analyze if the changes in this session warrant a version bump.
 2. **Update Versions:** If applicable, increment the `version` field in:
+    * `./package.json`
     * `frontend/package.json`
     * `backend/package.json` (if a `package.json` or `composer.json` exists)
 3. Follow **SemVer** principles.
