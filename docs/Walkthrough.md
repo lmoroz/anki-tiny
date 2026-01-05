@@ -9,7 +9,7 @@
 Создан [`config/index.ts`](file:///e:/Develop/anki-tiny/backend/src/config/index.ts):
 - PORT для Express сервера (auto-assign с 0)
 - DEBUG_PERF для отладки производительности
-- DATABASE_PATH - путь к SQLite БД в `userData/anki.db`
+- DATABASE_PATH - путь к SQLite БД в `userData/repetitio.db`
 
 #### ✅ Database Schema
 
@@ -183,11 +183,83 @@ npm run dev
 ---
 
 ## Что протестировать
-   - Создание БД в `userData/anki.db`
+
+1. **Database Layer**:
+   - Создание БД в `userData/repetitio.db`
    - Работу CRUD API через DevTools Console
    - Персистентность данных после перезапуска
 
-3. **Frontend Integration** (следующая фаза):
+2. **Frontend Integration** (завершено):
    - API client в `frontend/src/shared/api/client.js`
    - CourseList widget
    - HomePage с управлением курсами
+
+---
+
+## Следующие этапы реализации
+
+### 1. Работа с карточками (Cards API)
+
+- Backend: миграция для таблицы `cards`, Card Repository, API routes
+- Frontend: Pinia store для карточек, CardList widget, CoursePage
+- **Фича**: Быстрое добавление карточек (QuickAddCard компонент)
+
+### 2. Настройки приложения
+
+#### Глобальные настройки
+
+- Backend: таблица `settings` с полями:
+  - `trainingStartHour` (начало дня для тренировок, по умолчанию 8)
+  - `trainingEndHour` (конец дня для тренировок, по умолчанию 22)
+  - `minTimeBeforeEnd` (минимальное время до конца дня, 4 часа)
+  - `notificationsEnabled` (включены ли уведомления)
+- Frontend: SettingsPage с time picker компонентами
+
+#### Настройки курса (индивидуальные)
+
+- Backend: таблица `course_settings` с наследованием из глобальных
+- Frontend: Course Settings UI с переключателем "Use global settings"
+
+### 3. Система интервального повторения (Spaced Repetition)
+
+- Backend: реализация SM-2 алгоритма в `services/spaced-repetition.ts`
+- API endpoints для тренировок и отправки результатов повторения
+- Frontend: TrainingPage с flip-анимацией и кнопками оценки (Again, Hard, Good, Easy)
+
+### 4. Система уведомлений
+
+> [!IMPORTANT]
+> Приложение должно учитывать время дня для тренировок:
+> - Проверять настройки `trainingStartHour` и `trainingEndHour`
+> - **НЕ предлагать новые карточки, если до конца дня осталось меньше 4 часов** (первый шаг интервального повторения = 4 часа)
+
+- Backend: `services/notifications.ts` с периодической проверкой (каждый час)
+- Electron: IPC handlers для системных уведомлений
+- Frontend: настройки уведомлений, тест уведомлений
+
+### 5. Tray Integration
+
+> [!IMPORTANT]
+> При клике на кнопку "Close" в title bar приложение должно **сворачиваться в трей**, а не закрываться.
+
+- Electron: создание Tray icon, контекстное меню, обработка кликов
+- Изменение поведения `window-close`: `hide()` вместо `quit()`
+- Показ окна из трея по клику на иконку
+
+### 6. Расширенный функционал (опционально)
+
+- **Статистика прогресса обучения**: Dashboard с графиками, история по дням
+- **Импорт/Экспорт курсов**: JSON формат, совместимость с Anki (опционально)
+- **Медиа в карточках**: загрузка изображений и аудио
+- **Поиск по карточкам**: full-text search API
+- **Теги и категории**: управление тегами, фильтрация
+
+---
+
+## Обновления документации
+
+Все недостающие пункты из раздела "Technical Specifications" в README добавлены в:
+
+- [`Implementation_Plan.md`](file:///e:/Develop/anki-tiny/docs/Implementation_Plan.md)
+- [`Task.md`](file:///e:/Develop/anki-tiny/docs/Task.md)
+- [`Walkthrough.md`](file:///e:/Develop/anki-tiny/docs/Walkthrough.md)

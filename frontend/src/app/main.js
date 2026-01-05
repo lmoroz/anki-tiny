@@ -21,4 +21,4 @@ else {
   startApp()
 }
 
-console.log('[App] Anki Tiny initialized')
+console.log('[App] Repetitio initialized')

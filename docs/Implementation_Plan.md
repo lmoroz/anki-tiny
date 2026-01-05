@@ -1,4 +1,4 @@
-# План реализации Anki Tiny
+# План реализации Repetitio
 
 Electron-приложение для обучения с помощью карточек и интервального повторения на базе Vue 3, TypeScript, Tailwind CSS и Express backend.
 
@@ -236,6 +236,16 @@ export {};
 
 - `GET /api/settings` - получение глобальных настроек
 - `PUT /api/settings` - обновление настроек
+  - `trainingStartHour`: начало дня для тренировок (по умолчанию 8)
+  - `trainingEndHour`: конец дня для тренировок (по умолчанию 22)
+  - `minTimeBeforeEnd`: минимальное время до конца дня (4 часа)
+  - `notificationsEnabled`: включены ли уведомления
+
+##### [NEW] [routes/course-settings.ts](file:///e:/Develop/anki-tiny/backend/src/routes/course-settings.ts)
+
+- `GET /api/courses/:courseId/settings` - получение настроек курса
+- `PUT /api/courses/:courseId/settings` - обновление настроек курса
+- `DELETE /api/courses/:courseId/settings` - сброс к глобальным настройкам
 
 ---
 
@@ -261,8 +271,18 @@ export {};
 Сервис для системных уведомлений:
 
 - Проверка наличия карточек для повторения
+- Фильтрация по времени тренировок (`trainingStartHour` / `trainingEndHour`)
+- **Важно**: Не предлагать новые карточки, если до конца дня осталось меньше 4 часов (первый шаг интервального повторения = 4 часа)
 - Отправка Electron Notification
-- Интеграция с настройками времени тренировок
+- Периодическая проверка (каждый час)
+
+##### [NEW] [services/statistics.ts](file:///e:/Develop/anki-tiny/backend/src/services/statistics.ts)
+
+Сервис для статистики прогресса:
+
+- Расчет статистики по курсу (всего карточек, изучено, осталось)
+- История обучения по дням
+- Точность ответов (Again/Hard/Good/Easy)
 
 ---
 
@@ -285,7 +305,7 @@ function createTray() {
     { label: 'Выход', click: () => app.quit() }
   ]);
   
-  tray.setToolTip('Anki Tiny');
+  tray.setToolTip('Repetitio');
   tray.setContextMenu(contextMenu);
   
   tray.on('click', () => {
@@ -296,7 +316,13 @@ function createTray() {
 // Изменить поведение window-close
 ipcMain.on('window-close', (event) => {
   const win = BrowserWindow.fromWebContents(event.sender);
-  win?.hide(); // Скрыть вместо закрытия
+  win?.hide(); // Скрыть вместо закрытия (свернуть в трей)
+  event.preventDefault(); // Предотвратить закрытие
+});
+
+// Обработка quit из трея
+app.on('before-quit', () => {
+  // Cleanup
 });
 ```
 
@@ -339,7 +365,7 @@ CSP политика уже настроена корректно для про�
 Обновить title:
 
 ```html
-<title>Anki Tiny</title>
+<title>Repetitio</title>
 ```
 
 Обновить путь к main.js:
@@ -447,6 +473,110 @@ npm run bundle
 
 ---
 
+## Расширенный функционал (опционально)
+
+### Статистика прогресса обучения
+
+##### [NEW] [routes/statistics.ts](file:///e:/Develop/anki-tiny/backend/src/routes/statistics.ts)
+
+- `GET /api/courses/:courseId/statistics` - статистика по курсу
+- `GET /api/statistics/daily` - статистика по дням
+
+##### [NEW] [pages/statistics/StatisticsPage.vue](file:///e:/Develop/anki-tiny/frontend/src/pages/statistics/StatisticsPage.vue)
+
+- Dashboard с графиками прогресса
+- Отображение количества изученных карточек по дням/неделям
+- Точность ответов
+
+---
+
+### Импорт/Экспорт курсов
+
+##### [NEW] [routes/export.ts](file:///e:/Develop/anki-tiny/backend/src/routes/export.ts)
+
+- `GET /api/courses/:courseId/export` - экспорт курса в JSON
+- `POST /api/courses/import` - импорт курса из JSON
+
+##### [NEW] [features/import-export/](file:///e:/Develop/anki-tiny/frontend/src/features/import-export/)
+
+- Кнопки Export/Import в UI
+- File picker для импорта
+- Формат: совместимость с Anki (опционально)
+
+---
+
+### Медиа в карточках
+
+##### [NEW] Database Schema для media_files
+
+```typescript
+interface MediaFilesTable {
+  id: string;
+  cardId: string;
+  type: 'image' | 'audio';
+  fileName: string;
+  filePath: string;
+  createdAt: Date;
+}
+```
+
+##### [NEW] [routes/media.ts](file:///e:/Develop/anki-tiny/backend/src/routes/media.ts)
+
+- `POST /api/cards/:cardId/media` - upload медиа файла
+- `GET /api/media/:id` - получение медиа файла
+- `DELETE /api/media/:id` - удаление медиа
+
+##### [MODIFY] [CardEditor.vue](file:///e:/Develop/anki-tiny/frontend/src/widgets/card-editor/CardEditor.vue)
+
+- Добавить поддержку загрузки изображений/аудио
+- Превью медиа в редакторе
+
+---
+
+### Поиск по карточкам
+
+##### [NEW] [routes/search.ts](file:///e:/Develop/anki-tiny/backend/src/routes/search.ts)
+
+- `GET /api/search?q=query` - full-text search по карточкам
+
+##### [NEW] [widgets/search-bar/SearchBar.vue](file:///e:/Develop/anki-tiny/frontend/src/widgets/search-bar/SearchBar.vue)
+
+- Строка поиска с автодополнением
+- Фильтрация результатов
+
+---
+
+### Теги и категории
+
+##### [NEW] Database Schema для tags
+
+```typescript
+interface TagsTable {
+  id: string;
+  name: string;
+  color: string;
+  createdAt: Date;
+}
+
+interface CardTagsTable {
+  cardId: string;
+  tagId: string;
+}
+```
+
+##### [NEW] [routes/tags.ts](file:///e:/Develop/anki-tiny/backend/src/routes/tags.ts)
+
+- `GET /api/tags` - список тегов
+- `POST /api/tags` - создание тега
+- `POST /api/cards/:cardId/tags` - добавление тега к карточке
+
+##### [NEW] [features/tags/](file:///e:/Develop/anki-tiny/frontend/src/features/tags/)
+
+- Tag management UI
+- Фильтрация карточек по тегам
+
+---
+
 ## Риски и ограничения
 
 > [!CAUTION]
@@ -455,5 +585,8 @@ npm run bundle
 > [!WARNING]
 > **Безопасность IPC** - все IPC handlers должны валидировать входящие данные, чтобы избежать XSS и других атак.
 
+> [!WARNING]
+> **Система уведомлений** - необходимо корректно обрабатывать временные зоны и настройки пользователя. Не предлагать новые карточки, если до конца дня осталось меньше 4 часов.
+
 > [!NOTE]
-> **База данных** - на начальном этапе можно использовать JSON файлы для простоты. В будущем рекомендуется миграция на SQLite для производительности.
+> **База данных** - используется SQLite через `better-sqlite3` и Kysely для типобезопасности.

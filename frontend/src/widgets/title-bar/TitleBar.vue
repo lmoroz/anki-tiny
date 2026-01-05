@@ -27,7 +27,7 @@ onMounted(() => {
       <div class="title-bar-icon">
         <i class="bi bi-journal-bookmark-fill"/>
       </div>
-      <div class="title-bar-title">Anki Tiny</div>
+      <div class="title-bar-title">Repetitio</div>
     </div>
     <div class="title-bar-controls">
       <button 

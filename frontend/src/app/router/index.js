@@ -33,7 +33,7 @@ const router = createRouter({
 });
 
 router.afterEach((to) => {
-  document.title = `Anki Tiny - ${to.meta.title || 'Приложение'}`;
+  document.title = `Repetitio - ${to.meta.title || 'Приложение'}`;
 });
 
 export default router;

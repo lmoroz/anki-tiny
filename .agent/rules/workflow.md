@@ -19,7 +19,7 @@ Execute the following actions strictly in order:
 1. Ensure files in `./docs/` reflect the final state of the session.
 2. **Update History:**
     * **Mandatory:** Append a summary of this session's work to `./docs/Changelog.md` (create the file if it doesn't exist).
-    * Format: `## [YYYY-MM-DD] HH:MM\n- Change 1\n- Change 2`.
+    * Format: `## [__version__] YYYY-MM-DD HH:MM\n- Change 1\n- Change 2`.
     * **Cleanup:** Only IF the task is fully completed, clear or reset `Task.md` for the next sprint.
 
 ### Phase B: Code & State Analysis

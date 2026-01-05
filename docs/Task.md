@@ -1,4 +1,4 @@
-# Задачи реализации Anki Tiny
+# Задачи реализации Repetitio
 
 ## Фаза 1: Архитектура и настройка ✅
 
@@ -60,7 +60,7 @@
   - [ ] CardList widget
   - [ ] CardItem компонент
   - [ ] CardEditorModal
-  - [ ] QuickAddCard компонент
+  - [ ] QuickAddCard компонент (быстрое добавление карточек)
 - [ ] **Pages**
   - [ ] CoursePage с управлением карточками
   
@@ -78,19 +78,99 @@
 
 ## Фаза 4: Настройки
 
-- [ ] Глобальные настройки приложения
-- [ ] Настройки курса
+### Глобальные настройки
+
+- [ ] **Backend Settings API**
+  - [ ] Миграция для таблицы settings
+  - [ ] Settings Repository
+  - [ ] GET/PUT `/api/settings` endpoints
+  - [ ] Validation схемы (Zod)
+- [ ] **Settings Schema**
+  - [ ] `trainingStartHour` (8 по умолчанию)
+  - [ ] `trainingEndHour` (22 по умолчанию)
+  - [ ] `minTimeBeforeEnd` (4 часа по умолчанию)
+  - [ ] `notificationsEnabled` (boolean)
+- [ ] **Frontend Settings**
+  - [ ] SettingsPage UI
+  - [ ] Time picker компоненты
+  - [ ] Сохранение настроек
+
+### Настройки курса (индивидуальные)
+
+- [ ] **Backend**
+  - [ ] Миграция для таблицы course_settings
+  - [ ] CourseSettings Repository
+  - [ ] API endpoints для настроек курса
+  - [ ] Наследование из глобальных настроек
+- [ ] **Frontend**
+  - [ ] Course Settings UI
+  - [ ] Переключатель "Use global settings"
+  - [ ] Индивидуальные настройки для курса
 
 ## Фаза 5: Системная интеграция
 
-- [ ] Реализовать системные уведомления
-- [ ] Реализовать сворачивание в трей
+### Система уведомлений
 
-## Фаза 6: Тестирование и полировка
+- [ ] **Backend Notifications Service**
+  - [ ] Проверка due cards каждый час
+  - [ ] Фильтрация по времени тренировок (trainingStartHour/trainingEndHour)
+  - [ ] Проверка "не предлагать новые карточки если до конца дня < 4 часов"
+  - [ ] Electron Notification API integration
+- [ ] **Electron Main Process**
+  - [ ] IPC handlers для уведомлений
+  - [ ] Системные уведомления Windows/Linux/macOS
+  - [ ] Click handlers для уведомлений (открыть тренировку)
+- [ ] **Frontend**
+  - [ ] Настройка частоты уведомлений в Settings
+  - [ ] Тест уведомлений из UI
+
+### Tray Integration
+
+- [ ] **Electron Main Process**
+  - [ ] Создание Tray icon
+  - [ ] Tray menu (Открыть, Выход)
+  - [ ] Click handlers для tray
+  - [ ] Изменение window-close: hide вместо quit
+  - [ ] Показ окна из трея
+- [ ] **Frontend**
+  - [ ] Кнопка "Свернуть" в title bar
+  - [ ] Визуальная обратная связь при сворачивании
+
+## Фаза 6: Расширенный функционал (опционально)
+
+- [ ] **Статистика прогресса обучения**
+  - [ ] Backend: API для статистики
+  - [ ] Frontend: Dashboard страница с графиками
+  - [ ] Отображение прогресса по дням/неделям
+
+- [ ] **Импорт/Экспорт курсов**
+  - [ ] Backend: JSON export/import endpoints
+  - [ ] Frontend: UI для импорта/экспорта
+  - [ ] Формат файлов (совместимость с Anki?)
+
+- [ ] **Медиа в карточках**
+  - [ ] Backend: File upload endpoints
+  - [ ] Database: media_files таблица
+  - [ ] Frontend: Image/Audio upload компоненты
+  - [ ] Отображение медиа в тренировках
+
+- [ ] **Поиск по карточкам**
+  - [ ] Backend: Full-text search API
+  - [ ] Frontend: SearchBar компонент
+  - [ ] Фильтрация результатов
+
+- [ ] **Теги и категории**
+  - [ ] Database: tags таблица, card_tags связь
+  - [ ] Backend: Tags API
+  - [ ] Frontend: Tag management UI
+  - [ ] Фильтрация по тегам
+
+## Фаза 7: Тестирование и полировка
 
 - [ ] Тестирование основных сценариев
 - [ ] Проверка работы в production build
 - [ ] Проверка установщика на разных ОС
+- [ ] E2E тесты с Playwright
 
 ---
 

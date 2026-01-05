@@ -1,7 +1,7 @@
 {
-  "name": "anki-tiny",
+  "name": "repetitio",
   "version": "0.1.0",
-  "description": "Anki Tiny - Desktop application for interval method learning",
+  "description": "Repetitio - Desktop application for spaced repetition learning",
   "author": "Morozhnikova Larisa",
   "private": true,
   "workspaces": [

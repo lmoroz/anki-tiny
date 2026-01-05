@@ -1,8 +1,8 @@
 {
-  "name": "anki-tiny-frontend",
+  "name": "repetitio-frontend",
   "private": true,
   "version": "0.1.0",
-  "description": "Fontend for Anki Tiny",
+  "description": "Frontend for Repetitio",
   "author": "Morozhnikova Larisa",
   "type": "module",
   "scripts": {
