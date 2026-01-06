@@ -5,6 +5,142 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.4.2] - 2026-01-06 23:26 (AMENDED)
+
+### Added
+
+#### OpenSpec: Replace Time Selects Proposal (UPDATED)
+
+**Amendment**: Расширен scope для поддержки **часов И минут** (вместо только часов)
+
+- **OpenSpec Change Updated**: `replace-time-selects`
+  - **ИЗМЕНЕНИЕ**: Универсальный `ScrollTimePicker` компонент (hours + minutes)
+    - Props: `min`, `max`, `step`, `suffix`, `formatDigits` для гибкости
+    - Использование: часы (0-23), минуты с шагом (0,15,30,45), минуты все (0-59)
+  - **ИЗМЕНЕНИЕ**: `TimeRangePicker` теперь использует **4 scroll picker'а** (hours+minutes x2)
+    - Start Hours + Start Minutes
+    - End Hours + End Minutes
+  - **ИЗМЕНЕНИЕ**: Формат данных — время в **минутах с начала дня** (0-1439)
+    - Вместо `trainingStartHour`/`trainingEndHour` → `trainingStartTime`/`trainingEndTime`
+  - **ДОБАВЛЕНО в scope**: Backend изменения
+    - Database migration для конвертации часов в минуты
+    - Zod schema updates (validation 0-1439 minutes)
+    - API endpoints updates
+
+- **Proposal Structure** (updated)
+  - **proposal.md** (9 KB → updated)
+    - Implementation Approach: добавлен backend migration step
+    - User Value: добавлена "Точность выбора времени" (15-минутный шаг)
+    - In Scope: добавлены backend changes (БД, schemas, API)
+    - Out of Scope: уточнён (no data migration, пользователи пересохранят настройки)
+  - **tasks.md** (3.5 KB → updated, **9 tasks** instead of 8)
+    - Task 2: Universal ScrollTimePicker (generic для hours/minutes)
+    - **Task 3: Backend migration (NEW)**
+    - Tasks 4-9: renumbered
+  - **design.md** (11.6 KB → 14+ KB)
+    - Updated ScrollTimePicker implementation (min/max/step props)
+    - Updated TimeRangePicker (4 pickers, internal state conversion)
+    - Added Breaking Change note (API теперь в минутах)
+    - Visual Range calculation для минут
+  - **specs/settings-ui/spec.md** (unchanged)
+
+- **Breaking Changes Documented**
+  - TimeRangePicker API: props теперь в minutes вместо hours
+  - Backend: Database schema change (trainingStartTime/trainingEndTime)
+  - Migration strategy: users must re-save settings
+
+### Technical Details
+
+- **OpenSpec Validation**: ✅ Passed `npx @fission-ai/openspec validate replace-time-selects --strict` (after amendment)
+- **Change Status**: 0/9 tasks (proposal stage, ready for implementation)
+- **Files Modified**: 3
+  - `openspec/changes/replace-time-selects/proposal.md` (updated scope)
+  - `openspec/changes/replace-time-selects/tasks.md` (added Task 3 for backend)
+  - `openspec/changes/replace-time-selects/design.md` (major updates for 4 pickers)
+- **Scope Change**: Medium → Large (добавлены backend changes)
+- **Timeline**: Остался прежним (~2 hours) — backend migration простая
+
+### User Value Improvements
+
+- **Точность**: 15-минутный шаг вместо 1 час
+- **Гибкость**: Можно легко изменить шаг минут (5, 10, 15, 30)
+- **Универсальность**: Один компонент для всех use cases
+
+## [0.4.2] - 2026-01-06 23:17
+
+### Added
+
+#### OpenSpec: Replace Time Selects Proposal
+
+- **OpenSpec Change Created**: `replace-time-selects`
+  - Comprehensive proposal for replacing HTML `<select>` elements in `TimeRangePicker` component
+  - Migration to `vue-scroll-picker` library for iOS-style scroll picker UI
+  - Motivation: improved UX, mobile-friendly interaction, premium UI quality
+
+- **Documentation Research**
+  - Studied official `vue-scroll-picker` documentation and API
+  - Analyzed GitHub examples (ExampleMultiple.vue)
+  - Identified correct API usage pattern with `options` array format
+  - Found critical requirement: CSS import (`vue-scroll-picker/style.css`) is mandatory
+
+- **Proposal Structure** (`openspec/changes/replace-time-selects/`)
+  - **proposal.md** (9 KB)
+    - Problem statement with 4 identified issues
+    - Why section: UX enhancement, design system alignment, future-proofing
+    - Proposed solution with `vue-scroll-picker` integration
+    - Scope (in/out), dependencies, risks & mitigations
+    - Success criteria (7 points), timeline estimate (1-2 hours)
+  - **tasks.md** (3.5 KB, 8 tasks)
+    - Task 1: Install dependency with CSS import note
+    - Task 2: Create `ScrollTimePicker.vue` wrapper with concrete code examples
+    - Tasks 3-8: Integration, testing, cleanup
+    - Each task includes validation criteria
+  - **design.md** (11.6 KB)
+    - Complete architecture with component hierarchy
+    - DetailedScrollTimePicker.vue` implementation (imports, API, template)
+    - Correct `vue-scroll-picker` API usage with options format
+    - UI/UX design with visual mockups
+    - Technical decisions (why vue-scroll-picker, wrapper pattern justification)
+    - Performance considerations, testing approach, migration strategy
+  - **specs/settings-ui/spec.md** — spec delta with modified requirements
+    - 5 scenarios for scroll picker behavior
+    - Design rationale, backward compatibility guarantee
+    - Testing strategy
+
+- **Implementation Details Documented**
+  - Correct imports: `import { VueScrollPicker } from 'vue-scroll-picker'`
+  - CSS requirement: `import 'vue-scroll-picker/style.css'` (CRITICAL)
+  - Options format:
+    ```js
+    const options = computed(() =>
+      Array.from({ length: 24 }, (_, i) => ({
+        name: i.toString().padStart(2, '0') + ':00',
+        value: i
+      }))
+    );
+    ```
+  - V-model binding via `modelValue` and `update:modelValue` event
+
+### Technical Details
+
+- **OpenSpec Validation**: ✅ Passed `npx @fission-ai/openspec validate replace-time-selects --strict`
+- **Change Status**: 0/8 tasks (proposal stage, ready for implementation)
+- **Files Created**: 4
+  - `openspec/changes/replace-time-selects/proposal.md`
+  - `openspec/changes/replace-time-selects/tasks.md`
+  - `openspec/changes/replace-time-selects/design.md`
+  - `openspec/changes/replace-time-selects/specs/settings-ui/spec.md`
+- **Markdown Linting**: Warnings present (line length, list formatting) but not blocking
+- **No Code Changes**: Pure documentation/proposal phase
+
+### Next Steps
+
+- Review and approve proposal
+- Implementation via `/openspec-apply` workflow
+- Create `ScrollTimePicker.vue` wrapper component
+- Refactor `TimeRangePicker.vue` to use scroll pickers
+- Integration testing in SettingsForm and CourseSettingsModal
+
 ## [0.4.2] - 2026-01-06 23:01
 
 ### Added
