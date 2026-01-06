@@ -5,6 +5,49 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/),
 и проект придерживается [Semantic Versioning](https://semver.org/lang/ru/).
 
+## [0.4.0] - 2026-01-06 20:49
+
+### Changed
+
+#### OpenSpec: Архивирование изменения add-settings-page
+
+- **Архивирование завершено**
+    - Изменение `add-settings-page` успешно заархивировано как `2026-01-06-add-settings-page`
+    - Статус изменения перед архивированием: ✓ Complete
+    - Все задачи завершены, код реализован и протестирован
+
+- **Создание спецификаций**
+    - Автоматически созданы 3 новые спецификации из delta-секций:
+        - `settings-ui` (7 требований) — UI компоненты и страница настроек
+        - `settings-course-management` (6 требований) — управление настройками курса
+        - `settings-global-management` (5 требований) — глобальные настройки приложения
+    - Всего добавлено **18 новых требований** в базу знаний проекта
+
+- **Структура спецификаций**
+    - Каждая спецификация содержит Requirements в Given/When/Then формате
+    - Покрыты сценарии: загрузка данных, валидация, модальные окна, клавиатурная навигация
+    - Включены требования по адаптивности и уведомлениям
+
+### Documentation
+
+- **Обновлены OpenSpec specs**
+    - `openspec/specs/settings-ui/spec.md` (172 строки, 7 требований)
+    - `openspec/specs/settings-course-management/spec.md` (6 требований)
+    - `openspec/specs/settings-global-management/spec.md` (5 требований)
+
+### Technical Details
+
+- **Текущее состояние спецификаций**: 4 активных specs
+    - `styling-system` (6 требований)
+    - `settings-ui` (7 требований)
+    - `settings-course-management` (6 требований)
+    - `settings-global-management` (5 требований)
+
+- **OpenSpec CLI команды использованы**:
+    - `npx @fission-ai/openspec list` — проверка статуса
+    - `npx @fission-ai/openspec archive add-settings-page --yes` — архивирование
+    - `npx @fission-ai/openspec list --specs` — подтверждение создания specs
+
 ## [0.4.0] - 2026-01-06 20:45
 
 ### Added

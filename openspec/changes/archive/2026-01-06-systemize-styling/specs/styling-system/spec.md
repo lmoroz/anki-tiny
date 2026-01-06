@@ -50,8 +50,6 @@ When refactored to use the spacing system
 Then it MUST use Tailwind utilities like `p-6` (24px)
 And NO manual `padding:` declarations should exist in `<style scoped>`.
 
-
-
 ### Requirement: Shared UI Component Styling
 
 Shared UI components (`shared/ui/*`) MUST be refactored to eliminate hardcoded styles and use the unified styling system.

@@ -112,10 +112,12 @@
 ## Фаза 5: Страница настроек (SettingsPage) ✅
 
 ### Backend ✅
+
 - [x] API Ecdpoints (GET/PUT Settings, Course Settings)
 - [x] Validation (Zod schemas)
 
 ### Frontend ✅
+
 - [x] **Entity Layer**
     - [x] Settings API Client
     - [x] Pinia Store (Inheritance logic)

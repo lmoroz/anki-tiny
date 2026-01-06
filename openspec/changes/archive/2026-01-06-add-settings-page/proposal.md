@@ -8,18 +8,21 @@ Implement comprehensive settings management functionality to allow users to conf
 
 **Problem:**
 Currently, there is no user-facing interface to configure critical application behaviors:
+
 - Training time windows (when cards can be studied)
 - Minimum time before end-of-day for new cards (4-hour FSRS requirement)
 - Notification preferences
 - Course-specific settings overrides
 
 Without this functionality:
+
 - All users are locked to default settings
 - Cannot optimize training schedules for individual routines
 - Cannot customize FSRS behavior per course
 - Cannot enable/disable notifications
 
 **User Impact:**
+
 - Users cannot adapt the app to their daily schedule
 - Power users cannot fine-tune learning parameters
 - System behaves identically for all courses (no specialization)
@@ -34,6 +37,7 @@ Create a **SettingsPage** with two main sections:
 2. **Course-Specific Settings** — overrides for individual courses (optional)
 
 Settings inherit from global to course-specific using a **fallback pattern**:
+
 ```
 effectiveSettings = courseSettings || globalSettings
 ```
@@ -47,6 +51,7 @@ effectiveSettings = courseSettings || globalSettings
 ### Architecture
 
 **Frontend (Feature-Sliced Design):**
+
 ```
 frontend/src/
 ├── entities/settings/
@@ -63,6 +68,7 @@ frontend/src/
 ```
 
 **Backend (Already implemented):**
+
 - API endpoints exist: `/api/settings`, `/api/courses/:id/settings`
 - Validation schemas exist (Zod)
 - Repository layer exists
@@ -79,6 +85,7 @@ interface GlobalSettings {
 ```
 
 **Validation Rules:**
+
 - `trainingStartHour < trainingEndHour`
 - `minTimeBeforeEnd` between 1-12 hours
 - Training window duration >= `minTimeBeforeEnd`
@@ -86,21 +93,25 @@ interface GlobalSettings {
 ## User Stories
 
 ### US-1: Configure Global Training Window
+
 **As a** user  
 **I want** to set my training time window (e.g., 9:00-21:00)  
 **So that** the app only shows me cards during my preferred study hours
 
 ### US-2: Set Minimum Time Before Day End
+
 **As a** user  
 **I want** to configure minimum time required before end-of-day  
 **So that** I'm not shown new cards when I don't have enough time to complete the first review cycle
 
 ### US-3: Customize Course Settings
+
 **As a** power user  
 **I want** different training schedules for different courses  
 **So that** I can study language cards in the morning and technical cards in the evening
 
 ### US-4: Reset Course to Global Settings
+
 **As a** user  
 **I want** to remove custom course settings and revert to global defaults  
 **So that** I can experiment with settings without permanent changes
@@ -108,14 +119,17 @@ interface GlobalSettings {
 ## Risks and Mitigations
 
 ### Risk: Complex Validation Logic
+
 **Impact:** Invalid settings could break FSRS scheduling  
 **Mitigation:** Real-time client-side validation + server-side enforcement
 
 ### Risk: Settings Inheritance Confusion
+
 **Impact:** Users don't understand when course settings override global  
 **Mitigation:** Clear UI indicators (badges: "Global" vs "Custom")
 
 ### Risk: Backend API Already Exists
+
 **Impact:** Need to verify compatibility with existing implementation  
 **Mitigation:** Test all endpoints before frontend integration
 
@@ -140,9 +154,9 @@ interface GlobalSettings {
 
 - **Planning:** ~1 hour (this proposal)
 - **Implementation:** ~4-6 hours
-  - Entity Layer: ~1.5 hours
-  - Widgets: ~2 hours
-  - Integration & Testing: ~1.5 hours
+    - Entity Layer: ~1.5 hours
+    - Widgets: ~2 hours
+    - Integration & Testing: ~1.5 hours
 - **Documentation:** ~0.5 hours
 
 **Total:** ~5-7 hours of development work

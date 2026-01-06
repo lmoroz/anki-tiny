@@ -1,8 +1,11 @@
 # styling-system Specification
 
 ## Purpose
+
 TBD - created by archiving change systemize-styling. Update Purpose after archive.
+
 ## Requirements
+
 ### Requirement: Unified Color System
 
 The application MUST use a centralized color system defined in CSS variables and exposed through Tailwind configuration.
@@ -123,4 +126,3 @@ When I inspect spinner styles
 Then hardcoded `border-color: #1a73e8` MUST be removed
 And a reusable `Spinner` component or utility class MUST be created
 And it MUST use `--color-primary` for the accent color.
-

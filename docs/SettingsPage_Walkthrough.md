@@ -32,16 +32,19 @@ API клиент для взаимодействия с backend endpoints:
 State management с логикой наследования настроек:
 
 **State:**
+
 - `globalSettings` — глобальные настройки приложения
 - `courseSettings` — Map<courseId, CourseSettings> для индивидуальных настроек
 - `loading` — флаг загрузки
 - `error` — ошибки
 
 **Getters:**
+
 - `getEffectiveSettings(courseId)` — возвращает настройки курса или глобальные (fallback)
 - `hasCustomSettings(courseId)` — проверяет наличие индивидуальных настроек
 
 **Actions:**
+
 - `fetchGlobalSettings()`, `updateGlobalSettings()`
 - `fetchCourseSettings(courseId)`, `updateCourseSettings()`
 - `resetCourseSettings(courseId)` — удаление индивидуальных настроек
@@ -65,20 +68,23 @@ State management с логикой наследования настроек:
 Форма редактирования настроек с real-time validation:
 
 **Features:**
+
 - Интеграция TimeRangePicker для временного диапазона
 - Input для minTimeBeforeEnd (1-12 часов)
 - Checkbox для уведомлений
 - Preview секция с расчетом эффективного расписания
 - Real-time валидация:
-  - `trainingStartHour < trainingEndHour`
-  - `minTimeBeforeEnd` от 1 до 12 часов
-  - Диапазон тренировок >= minTimeBeforeEnd
+    - `trainingStartHour < trainingEndHour`
+    - `minTimeBeforeEnd` от 1 до 12 часов
+    - Диапазон тренировок >= minTimeBeforeEnd
 
 **Props:**
+
 - `modelValue` — текущие настройки
 - `readonly` — режим только для чтения
 
 **Events:**
+
 - `update:modelValue` — синхронизация изменений
 - `save` — сохранение валидных настроек
 
@@ -87,12 +93,14 @@ State management с логикой наследования настроек:
 Модальное окно для настроек курса:
 
 **Features:**
+
 - Переключатель: "Глобальные" / "Индивидуальные"
 - Интеграция SettingsForm (readonly в режиме глобальных)
 - Кнопка "Сбросить к глобальным" (если есть индивидуальные)
 - Modal footer с кнопками "Отмена" / "Сохранить"
 
 **Logic:**
+
 - При переключении на глобальные → поля становятся readonly, показывают глобальные значения
 - При переключении на индивидуальные → поля становятся editable
 - Reset удаляет индивидуальные настройки курса
@@ -104,16 +112,19 @@ State management с логикой наследования настроек:
 Главная страница настроек с двумя секциями:
 
 **Section 1: Глобальные настройки**
+
 - Card с SettingsForm
 - Сохранение через `handleSaveGlobal()`
 
 **Section 2: Настройки курсов**
+
 - Список всех курсов с badges:
-  - "Индивидуальные" (синий) — если курс имеет custom settings
-  - "Глобальные" (серый) — если использует fallback
+    - "Индивидуальные" (синий) — если курс имеет custom settings
+    - "Глобальные" (серый) — если использует fallback
 - Кнопка "Настроить" для каждого курса
 
 **Integration:**
+
 - Загрузка данных через `settingsStore.fetchGlobalSettings()` и `courseStore.fetchCourses()`
 - Определение эффективных настроек через `settingsStore.hasCustomSettings()`
 
@@ -138,6 +149,7 @@ getEffectiveSettings: (state) => (courseId) => {
 ```
 
 Паттерн обеспечивает:
+
 - Курсы по умолчанию используют глобальные настройки
 - Индивидуальные настройки переопределяют глобальные
 - Простой способ проверки: `hasCustomSettings(courseId)`
@@ -164,6 +176,7 @@ const validation = computed(() => {
 ## Testing Summary
 
 ### Code Quality
+
 - ✅ ESLint passed (`npm run lint --workspace=frontend`)
 - ✅ No TypeScript compilation errors
 - ✅ All imports use `@` alias (no relative paths)
@@ -172,6 +185,7 @@ const validation = computed(() => {
 ### Manual Testing Checklist
 
 **Backend API** (to be tested):
+
 - [ ] GET `/api/settings` — returns global settings
 - [ ] PUT `/api/settings` — updates global settings
 - [ ] GET `/api/courses/:id/settings` — returns course settings or 404
@@ -179,6 +193,7 @@ const validation = computed(() => {
 - [ ] DELETE `/api/courses/:id/settings` — removes course settings
 
 **Frontend Flows** (to be tested):
+
 - [ ] SettingsPage displays global settings
 - [ ] Can edit and save global settings
 - [ ] Course list shows correct badges (Global/Custom)
