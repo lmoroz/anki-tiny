@@ -1,5 +1,5 @@
 ---
-trigger: always_on
+description: Rules and stages for completing a session
 ---
 
 # Workflow Rule: Project Context & Sync
