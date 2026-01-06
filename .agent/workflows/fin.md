@@ -13,7 +13,7 @@ trigger: always_on
 * **Naming:** Do not generate files with hashes or timestamps. Use fixed filenames: `Task.md`, `Walkthrough.md`,
   `Implementation_Plan.md`. Overwrite their content.
 
-## 2. Session Wrap-up (Trigger: "Summarize session" or "Подытожь" or "Подытожь сессию" or "Заверши сессию")
+## 2. Session Wrap-up
 
 Execute the following actions strictly in order:
 
