@@ -165,7 +165,7 @@ export async function runMigrations(db: Kysely<Database>): Promise<void> {
   const pendingMigrations = migrations.filter((m) => !appliedMigrations.includes(m.id));
 
   if (pendingMigrations.length === 0) {
-    console.log('✅ All migrations are up to date');
+    console.log('✅  All migrations are up to date');
     return;
   }
 
