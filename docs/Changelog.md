@@ -5,6 +5,43 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.4.2] - 2026-01-06 23:01
+
+### Added
+
+#### Settings: Enable Fuzz Parameter in UI
+
+- **Frontend Enhancement**
+    - Added `enableFuzz` checkbox to `SettingsForm.vue`
+    - User-facing label: "Включить размытие интервалов (fuzz)"
+    - Help text: "Добавляет случайную вариацию к интервалам повторения для более естественного
+      распределения карточек"
+    - Available in both global settings page and course settings modal
+
+- **Backend Support**
+    - Parameter `enableFuzz` already existed in backend:
+        - Database schema (SettingsTable, CourseSettingsTable)
+        - Zod validation schemas
+        - Settings repository
+        - FSRS integration
+    - Default value: `true` (enabled)
+
+### Fixed
+
+- **Code Quality**
+    - Removed duplicate comment in `CourseSettingsModal.vue`
+    - Removed duplicate CSS rule `.radio-label input[type='radio']` in `CourseSettingsModal.vue`
+
+### Technical Details
+
+- **Files Modified**: 2
+    - `frontend/src/widgets/settings-form/SettingsForm.vue` (+12 lines)
+    - `frontend/src/widgets/course-settings-modal/CourseSettingsModal.vue` (-7 lines cleanup)
+- **User Experience**:
+    - ✅ Global settings — checkbox on /settings page
+    - ✅ Course settings — checkbox in modal window
+    - ✅ Save/load works automatically via existing API
+
 ## [0.4.2] - 2026-01-06 22:45
 
 ### Documentation

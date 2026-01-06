@@ -129,7 +129,6 @@ function toggleCustomSettings(value) {
         @save="handleSave" />
 
       <!-- Кнопка сброса -->
-      <!-- Кнопка сброса -->
       <Button
         v-if="hasCustom"
         variant="danger"
@@ -179,12 +178,6 @@ function toggleCustomSettings(value) {
   cursor: pointer;
   font-size: var(--text-body-md-size);
   color: var(--color-text-primary);
-}
-
-.radio-label input[type='radio'] {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
 }
 
 .radio-label input[type='radio'] {

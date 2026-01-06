@@ -111,6 +111,18 @@
       </label>
     </div>
 
+    <!-- Enable Fuzz -->
+    <div class="form-section">
+      <label class="checkbox-label">
+        <input
+          v-model="localSettings.enableFuzz"
+          type="checkbox"
+          :disabled="readonly" />
+        <span>Включить размытие интервалов (fuzz)</span>
+      </label>
+      <p class="help-text">Добавляет случайную вариацию к интервалам повторения для более естественного распределения карточек</p>
+    </div>
+
     <!-- Preview текущего расписания -->
     <div class="form-section preview bg-gray-500/20 border border-white/30 backdrop-blur-md bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.15)_0%,transparent_50%)] p-4 rounded-xl shadow-lg">
       <h4>Текущее расписание</h4>
