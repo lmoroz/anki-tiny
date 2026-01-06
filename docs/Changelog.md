@@ -5,6 +5,46 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/),
 и проект придерживается [Semantic Versioning](https://semver.org/lang/ru/).
 
+## [0.3.0] - 2026-01-06 18:14
+
+### Fixed
+
+#### Frontend: Tailwind CSS v4 Theme Configuration
+
+- **Проблема с классами `rounded-*`**
+    - Диагностирована причина неработающих классов `rounded-xl` в Button.vue и Card.vue
+    - Корневая проблема: отсутствие CSS-переменной `--radius-xl` в теме Tailwind CSS v4
+    - Динамическая генерация классов через строковую интерполяцию `` `rounded-${props.rounded}` ``
+      не обнаруживалась статическим анализом Tailwind
+
+- **Решение 1: Определение темы через `@theme` блок**
+    - Создан блок `@theme` в `frontend/src/app/assets/css/styles.css`
+    - Определены все переменные радиусов: sm, md, lg, xl, 2xl, 3xl, full
+    - `--radius-xl: 0.75rem` (12px) для корректного скругления углов
+    - **Важно**: в Tailwind v4 блок `@theme` должен находиться в том же файле, где `@import 'tailwindcss'`
+
+- **Решение 2: Safelist для динамических классов**
+    - Создан `frontend/tailwind.config.js` с safelist массивом
+    - Явно указаны все классы `rounded-*` для гарантированной генерации
+    - Необходимость: Tailwind v4 не обнаруживает классы из строковых интерполяций
+
+### Added
+
+- **frontend/tailwind.config.js** — конфигурация с safelist для динамически генерируемых классов
+- **@theme блок** в styles.css с полным набором `--radius-*` переменных (7 значений)
+
+### Technical Details
+
+- **Верификация**:
+    - ✅ `rounded-xl` применяется с `border-radius: 12px`
+    - ✅ CSS-переменная `--radius-xl: 0.75rem` доступна в документе
+    - ✅ Все компоненты (Button, Card) корректно отображают скругленные углы
+    - ✅ Dev server перезапущен для применения изменений
+
+- **Файлы**:
+    - Изменено: `frontend/src/app/assets/css/styles.css` (+10 строк @theme)
+    - Создано: `frontend/tailwind.config.js` (15 строк)
+
 ## [0.3.0] - 2026-01-06 17:40
 
 ### Added

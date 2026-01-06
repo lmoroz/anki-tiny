@@ -1,6 +1,17 @@
 @import url('../fonts/Roboto/css2.css');
 @import 'tailwindcss';
 
+@theme {
+  /* Border radius tokens */
+  --radius-sm: 0.25rem;   /* 4px - Small radius */
+  --radius-md: 0.375rem;  /* 6px - Medium radius */
+  --radius-lg: 0.5rem;    /* 8px - Large radius */
+  --radius-xl: 0.75rem;   /* 12px - Extra large radius */
+  --radius-2xl: 1rem;     /* 16px - 2X large radius */
+  --radius-3xl: 1.5rem;   /* 24px - 3X large radius */
+  --radius-full: 9999px;  /* Full circle/pill shape */
+}
+
 :root {
     font-family: 'Inter',
     Roboto,
