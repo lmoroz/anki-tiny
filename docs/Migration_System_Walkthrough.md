@@ -53,15 +53,19 @@ CREATE TABLE _migrations (
 **Ключевые функции:**
 
 #### `createMigrationsTable()`
+
 Создает таблицу `_migrations` если её нет (с `.ifNotExists()`).
 
 #### `getAppliedMigrations()`
+
 Возвращает список ID примененных миграций из таблицы `_migrations`.
 
 #### `markMigrationAsApplied()`
+
 Вставляет запись в `_migrations` после успешного применения.
 
 #### `runMigrations()` ⭐
+
 **Основная функция:**
 
 ```typescript
@@ -260,12 +264,14 @@ const migrations: Migration[] = [
 ## Следующие шаги
 
 ✅ **Backend полностью готов:**
+
 - Database schema с FSRS
 - Система миграций работает
 - 13 API endpoints
 - TypeScript компиляция успешна
 
 **⏭️ Следующий этап:** Frontend integration
+
 - Entity layer (API, Store, Types)
 - Widgets (CardList, CardEditor)
 - Pages (CoursePage, TrainingPage)

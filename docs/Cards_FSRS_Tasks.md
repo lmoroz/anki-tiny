@@ -3,317 +3,317 @@
 ## Этап 1: Подготовка и Database Schema
 
 - [ ] **Database: Cards Table Schema**
-  - [ ] Создать интерфейс `CardsTable` в `schema.ts`
-  - [ ] Определить все FSRS-специфичные поля
-  - [ ] Добавить экспорт типов `Card`, `NewCard`, `CardUpdate`
-  - [ ] Обновить интерфейс `Database`
+    - [ ] Создать интерфейс `CardsTable` в `schema.ts`
+    - [ ] Определить все FSRS-специфичные поля
+    - [ ] Добавить экспорт типов `Card`, `NewCard`, `CardUpdate`
+    - [ ] Обновить интерфейс `Database`
 
 - [ ] **Database: Migrations для Cards**
-  - [ ] Создать миграцию `002_create_cards_table.sql`
-  - [ ] Определить структуру таблицы с FSRS полями
-  - [ ] Настроить индексы (course_id, due, state)
-  - [ ] Добавить foreign key на courses
-  - [ ] Зарегистрировать миграцию в `migrations.ts`
+    - [ ] Создать миграцию `002_create_cards_table.sql`
+    - [ ] Определить структуру таблицы с FSRS полями
+    - [ ] Настроить индексы (course_id, due, state)
+    - [ ] Добавить foreign key на courses
+    - [ ] Зарегистрировать миграцию в `migrations.ts`
 
 - [ ] **Database: Settings Tables**
-  - [ ] Создать интерфейсы `SettingsTable` и `CourseSettingsTable`
-  - [ ] Создать миграцию `003_create_settings_table.sql`
-  - [ ] Создать миграцию `004_create_course_settings_table.sql`
-  - [ ] Добавить поддержку FSRS параметров
+    - [ ] Создать интерфейсы `SettingsTable` и `CourseSettingsTable`
+    - [ ] Создать миграцию `003_create_settings_table.sql`
+    - [ ] Создать миграцию `004_create_course_settings_table.sql`
+    - [ ] Добавить поддержку FSRS параметров
 
 ---
 
 ## Этап 2: Backend - FSRS Library Integration
 
 - [ ] **Установка зависимости ts-fsrs**
-  - [ ] Установить пакет `ts-fsrs`
-  - [ ] Обновить TypeScript типы
+    - [ ] Установить пакет `ts-fsrs`
+    - [ ] Обновить TypeScript типы
 
 - [ ] **FSRS Service: Core Logic**
-  - [ ] Создать `services/fsrs/index.ts`
-  - [ ] Реализовать инициализацию FSRS с параметрами
-  - [ ] Создать функцию `calculateNextReview(card, rating)`
-  - [ ] Реализовать поддержку `enable_fuzz`
-  - [ ] Реализовать Learning Steps логику
+    - [ ] Создать `services/fsrs/index.ts`
+    - [ ] Реализовать инициализацию FSRS с параметрами
+    - [ ] Создать функцию `calculateNextReview(card, rating)`
+    - [ ] Реализовать поддержку `enable_fuzz`
+    - [ ] Реализовать Learning Steps логику
 
 - [ ] **FSRS Service: Learning Steps**
-  - [ ] Реализовать логику для состояния NEW
-  - [ ] Реализовать логику для состояния LEARNING
-  - [ ] Реализовать переход в REVIEW после завершения шагов
-  - [ ] Реализовать обработку RELEARNING (lapses)
+    - [ ] Реализовать логику для состояния NEW
+    - [ ] Реализовать логику для состояния LEARNING
+    - [ ] Реализовать переход в REVIEW после завершения шагов
+    - [ ] Реализовать обработку RELEARNING (lapses)
 
 - [ ] **FSRS Service: Due Cards Selection**
-  - [ ] Создать функцию `getDueCards(courseId, settings)`
-  - [ ] Реализовать фильтрацию по времени тренировок
-  - [ ] Реализовать проверку "4 часа до конца дня"
-  - [ ] Учесть настройки курса и глобальные настройки
+    - [ ] Создать функцию `getDueCards(courseId, settings)`
+    - [ ] Реализовать фильтрацию по времени тренировок
+    - [ ] Реализовать проверку "4 часа до конца дня"
+    - [ ] Учесть настройки курса и глобальные настройки
 
 ---
 
 ## Этап 3: Backend - Cards API
 
 - [ ] **Card Repository**
-  - [ ] Создать `repositories/cardRepository.ts`
-  - [ ] Реализовать `getCardsByCourseId()`
-  - [ ] Реализовать `getCardById()`
-  - [ ] Реализовать `createCard()`
-  - [ ] Реализовать `updateCard()`
-  - [ ] Реализовать `deleteCard()`
-  - [ ] Реализовать `getDueCards(courseId, settings)`
+    - [ ] Создать `repositories/cardRepository.ts`
+    - [ ] Реализовать `getCardsByCourseId()`
+    - [ ] Реализовать `getCardById()`
+    - [ ] Реализовать `createCard()`
+    - [ ] Реализовать `updateCard()`
+    - [ ] Реализовать `deleteCard()`
+    - [ ] Реализовать `getDueCards(courseId, settings)`
 
 - [ ] **Validation Schemas**
-  - [ ] Создать `schemas/card.ts`
-  - [ ] Определить `CreateCardSchema` (front, back, courseId)
-  - [ ] Определить `UpdateCardSchema`
-  - [ ] Определить `ReviewCardSchema` (cardId, rating)
+    - [ ] Создать `schemas/card.ts`
+    - [ ] Определить `CreateCardSchema` (front, back, courseId)
+    - [ ] Определить `UpdateCardSchema`
+    - [ ] Определить `ReviewCardSchema` (cardId, rating)
 
 - [ ] **Cards Routes**
-  - [ ] Создать `routes/cards.ts`
-  - [ ] `GET /api/courses/:courseId/cards` - список карточек
-  - [ ] `POST /api/courses/:courseId/cards` - создание карточки
-  - [ ] `GET /api/cards/:id` - получение карточки
-  - [ ] `PUT /api/cards/:id` - обновление карточки
-  - [ ] `DELETE /api/cards/:id` - удаление карточки
-  - [ ] Интегрировать валидацию (Zod)
-  - [ ] Зарегистрировать роуты в `routes/index.ts`
+    - [ ] Создать `routes/cards.ts`
+    - [ ] `GET /api/courses/:courseId/cards` - список карточек
+    - [ ] `POST /api/courses/:courseId/cards` - создание карточки
+    - [ ] `GET /api/cards/:id` - получение карточки
+    - [ ] `PUT /api/cards/:id` - обновление карточки
+    - [ ] `DELETE /api/cards/:id` - удаление карточки
+    - [ ] Интегрировать валидацию (Zod)
+    - [ ] Зарегистрировать роуты в `routes/index.ts`
 
 ---
 
 ## Этап 4: Backend - Training API
 
 - [ ] **Training Routes**
-  - [ ] Создать `routes/training.ts`
-  - [ ] `GET /api/courses/:courseId/due-cards` - карточки для повторения
-  - [ ] `POST /api/training/review` - отправка результата повторения (Again/Hard/Good/Easy)
-  - [ ] Валидация входящих данных
-  - [ ] Интеграция с FSRS сервисом
+    - [ ] Создать `routes/training.ts`
+    - [ ] `GET /api/courses/:courseId/due-cards` - карточки для повторения
+    - [ ] `POST /api/training/review` - отправка результата повторения (Again/Hard/Good/Easy)
+    - [ ] Валидация входящих данных
+    - [ ] Интеграция с FSRS сервисом
 
 - [ ] **Training Controller**
-  - [ ] Обработка запроса на получение due cards
-  - [ ] Применение временных ограничений (trainingStartHour/trainingEndHour)
-  - [ ] Обработка review: расчет следующего интервала
-  - [ ] Обновление состояния карточки в БД
-  - [ ] Логирование результатов
+    - [ ] Обработка запроса на получение due cards
+    - [ ] Применение временных ограничений (trainingStartHour/trainingEndHour)
+    - [ ] Обработка review: расчет следующего интервала
+    - [ ] Обновление состояния карточки в БД
+    - [ ] Логирование результатов
 
 ---
 
 ## Этап 5: Backend - Settings API
 
 - [ ] **Settings Repository**
-  - [ ] Создать `repositories/settingsRepository.ts`
-  - [ ] Реализовать `getGlobalSettings()`
-  - [ ] Реализовать `updateGlobalSettings()`
-  - [ ] Реализовать `getCourseSettings(courseId)`
-  - [ ] Реализовать `updateCourseSettings(courseId, settings)`
-  - [ ] Реализовать `deleteCourseSettings(courseId)` (reset to global)
+    - [ ] Создать `repositories/settingsRepository.ts`
+    - [ ] Реализовать `getGlobalSettings()`
+    - [ ] Реализовать `updateGlobalSettings()`
+    - [ ] Реализовать `getCourseSettings(courseId)`
+    - [ ] Реализовать `updateCourseSettings(courseId, settings)`
+    - [ ] Реализовать `deleteCourseSettings(courseId)` (reset to global)
 
 - [ ] **Validation Schemas**
-  - [ ] Создать `schemas/settings.ts`
-  - [ ] Определить `GlobalSettingsSchema`
-  - [ ] Определить `CourseSettingsSchema`
+    - [ ] Создать `schemas/settings.ts`
+    - [ ] Определить `GlobalSettingsSchema`
+    - [ ] Определить `CourseSettingsSchema`
 
 - [ ] **Settings Routes**
-  - [ ] Создать `routes/settings.ts`
-  - [ ] `GET /api/settings` - глобальные настройки
-  - [ ] `PUT /api/settings` - обновление глобальных настроек
-  - [ ] Создать `routes/course-settings.ts`
-  - [ ] `GET /api/courses/:courseId/settings` - настройки курса
-  - [ ] `PUT /api/courses/:courseId/settings` - обновление
-  - [ ] `DELETE /api/courses/:courseId/settings` - сброс
+    - [ ] Создать `routes/settings.ts`
+    - [ ] `GET /api/settings` - глобальные настройки
+    - [ ] `PUT /api/settings` - обновление глобальных настроек
+    - [ ] Создать `routes/course-settings.ts`
+    - [ ] `GET /api/courses/:courseId/settings` - настройки курса
+    - [ ] `PUT /api/courses/:courseId/settings` - обновление
+    - [ ] `DELETE /api/courses/:courseId/settings` - сброс
 
 ---
 
 ## Этап 6: Frontend - Entities Layer
 
 - [ ] **Card Entity Types**
-  - [ ] Создать `entities/card/model/types.ts`
-  - [ ] Определить интерфейс `Card` с FSRS полями
-  - [ ] Определить enum `CardState` (New, Learning, Review, Relearning)
-  - [ ] Определить enum `Rating` (Again, Hard, Good, Easy)
+    - [ ] Создать `entities/card/model/types.ts`
+    - [ ] Определить интерфейс `Card` с FSRS полями
+    - [ ] Определить enum `CardState` (New, Learning, Review, Relearning)
+    - [ ] Определить enum `Rating` (Again, Hard, Good, Easy)
 
 - [ ] **Card API Service**
-  - [ ] Создать `entities/card/api/cardApi.ts`
-  - [ ] Реализовать `fetchCardsByCourseId(courseId)`
-  - [ ] Реализовать `createCard(courseId, data)`
-  - [ ] Реализовать `updateCard(id, data)`
-  - [ ] Реализовать `deleteCard(id)`
+    - [ ] Создать `entities/card/api/cardApi.ts`
+    - [ ] Реализовать `fetchCardsByCourseId(courseId)`
+    - [ ] Реализовать `createCard(courseId, data)`
+    - [ ] Реализовать `updateCard(id, data)`
+    - [ ] Реализовать `deleteCard(id)`
 
 - [ ] **Card Pinia Store**
-  - [ ] Создать `entities/card/model/cardStore.ts`
-  - [ ] Определить state (cards, loading, error)
-  - [ ] Реализовать actions (fetchCards, createCard, updateCard, deleteCard)
-  - [ ] Реализовать getters (getCardsByCourseId, getCardById)
+    - [ ] Создать `entities/card/model/cardStore.ts`
+    - [ ] Определить state (cards, loading, error)
+    - [ ] Реализовать actions (fetchCards, createCard, updateCard, deleteCard)
+    - [ ] Реализовать getters (getCardsByCourseId, getCardById)
 
 ---
 
 ## Этап 7: Frontend - Cards UI Components
 
 - [ ] **Shared Components**
-  - [ ] Создать `shared/ui/Textarea.vue` (для question/answer)
-  - [ ] Создать `shared/ui/Badge.vue` (для отображения state)
-  - [ ] Создать `shared/ui/ConfirmDialog.vue` (для удаления)
+    - [ ] Создать `shared/ui/Textarea.vue` (для question/answer)
+    - [ ] Создать `shared/ui/Badge.vue` (для отображения state)
+    - [ ] Создать `shared/ui/ConfirmDialog.vue` (для удаления)
 
 - [ ] **Card List Widget**
-  - [ ] Создать `widgets/card-list/CardList.vue`
-  - [ ] Отображение списка карточек
-  - [ ] Группировка по состоянию (New, Learning, Review)
-  - [ ] Пагинация или виртуальный скроллинг
-  - [ ] Empty state
+    - [ ] Создать `widgets/card-list/CardList.vue`
+    - [ ] Отображение списка карточек
+    - [ ] Группировка по состоянию (New, Learning, Review)
+    - [ ] Пагинация или виртуальный скроллинг
+    - [ ] Empty state
 
 - [ ] **Card Item Component**
-  - [ ] Создать `widgets/card-list/CardItem.vue`
-  - [ ] Отображение front/back
-  - [ ] Badge со статусом (New, Due, etc.)
-  - [ ] Кнопки Edit/Delete
-  - [ ] Hover эффекты
+    - [ ] Создать `widgets/card-list/CardItem.vue`
+    - [ ] Отображение front/back
+    - [ ] Badge со статусом (New, Due, etc.)
+    - [ ] Кнопки Edit/Delete
+    - [ ] Hover эффекты
 
 - [ ] **Card Editor Modal**
-  - [ ] Создать `widgets/card-editor/CardEditor.vue`
-  - [ ] Форма с полями Front, Back
-  - [ ] Валидация (обязательные поля)
-  - [ ] Поддержка создания и редактирования
-  - [ ] Отображение ошибок
+    - [ ] Создать `widgets/card-editor/CardEditor.vue`
+    - [ ] Форма с полями Front, Back
+    - [ ] Валидация (обязательные поля)
+    - [ ] Поддержка создания и редактирования
+    - [ ] Отображение ошибок
 
 - [ ] **Quick Add Card**
-  - [ ] Создать `widgets/card-editor/QuickAddCard.vue`
-  - [ ] Компактная форма для быстрого добавления
-  - [ ] Enter для сохранения
-  - [ ] Очистка формы после добавления
+    - [ ] Создать `widgets/card-editor/QuickAddCard.vue`
+    - [ ] Компактная форма для быстрого добавления
+    - [ ] Enter для сохранения
+    - [ ] Очистка формы после добавления
 
 ---
 
 ## Этап 8: Frontend - Course Page Integration
 
 - [ ] **Course Page: Layout**
-  - [ ] Обновить `pages/course/CoursePage.vue`
-  - [ ] Добавить header с названием курса
-  - [ ] Добавить кнопку "Начать тренировку"
-  - [ ] Добавить кнопку "Настройки курса"
+    - [ ] Обновить `pages/course/CoursePage.vue`
+    - [ ] Добавить header с названием курса
+    - [ ] Добавить кнопку "Начать тренировку"
+    - [ ] Добавить кнопку "Настройки курса"
 
 - [ ] **Course Page: Cards Management**
-  - [ ] Интегрировать `CardList` widget
-  - [ ] Интегрировать `QuickAddCard` widget
-  - [ ] Добавить кнопку "Добавить карточку" (открывает редактор)
-  - [ ] Реализовать обработчики создания/редактирования/удаления
-  - [ ] Загрузка карточек при открытии страницы
+    - [ ] Интегрировать `CardList` widget
+    - [ ] Интегрировать `QuickAddCard` widget
+    - [ ] Добавить кнопку "Добавить карточку" (открывает редактор)
+    - [ ] Реализовать обработчики создания/редактирования/удаления
+    - [ ] Загрузка карточек при открытии страницы
 
 - [ ] **Course Page: Statistics Section**
-  - [ ] Отображение общего количества карточек
-  - [ ] Отображение карточек на повторение (due cards)
-  - [ ] Отображение новых карточек
-  - [ ] Прогресс-бар или диаграмма
+    - [ ] Отображение общего количества карточек
+    - [ ] Отображение карточек на повторение (due cards)
+    - [ ] Отображение новых карточек
+    - [ ] Прогресс-бар или диаграмма
 
 ---
 
 ## Этап 9: Frontend - Training Page
 
 - [ ] **Training API Service**
-  - [ ] Создать `entities/training/api/trainingApi.ts`
-  - [ ] Реализовать `fetchDueCards(courseId)`
-  - [ ] Реализовать `submitReview(cardId, rating)`
+    - [ ] Создать `entities/training/api/trainingApi.ts`
+    - [ ] Реализовать `fetchDueCards(courseId)`
+    - [ ] Реализовать `submitReview(cardId, rating)`
 
 - [ ] **Training Page: Core UI**
-  - [ ] Обновить `pages/training/TrainingPage.vue`
-  - [ ] Отобразить текущую карточку (front)
-  - [ ] Реализовать flip анимацию (show back)
-  - [ ] Добавить кнопки оценки (Again, Hard, Good, Easy)
+    - [ ] Обновить `pages/training/TrainingPage.vue`
+    - [ ] Отобразить текущую карточку (front)
+    - [ ] Реализовать flip анимацию (show back)
+    - [ ] Добавить кнопки оценки (Again, Hard, Good, Easy)
 
 - [ ] **Training Page: Session Logic**
-  - [ ] Загрузка due cards при старте
-  - [ ] Обработка ответа пользователя
-  - [ ] Переход к следующей карточке
-  - [ ] Отображение прогресса (X из Y)
-  - [ ] Завершение сессии (поздравление)
+    - [ ] Загрузка due cards при старте
+    - [ ] Обработка ответа пользователя
+    - [ ] Переход к следующей карточке
+    - [ ] Отображение прогресса (X из Y)
+    - [ ] Завершение сессии (поздравление)
 
 - [ ] **Training Page: Empty States**
-  - [ ] "Нет карточек для повторения" - поздравление
-  - [ ] "Курс пустой" - предложение добавить карточки
-  - [ ] "Слишком поздно для новых карточек" - объяснение
+    - [ ] "Нет карточек для повторения" - поздравление
+    - [ ] "Курс пустой" - предложение добавить карточки
+    - [ ] "Слишком поздно для новых карточек" - объяснение
 
 ---
 
 ## Этап 10: Frontend - Settings Pages
 
 - [ ] **Settings Entity**
-  - [ ] Создать `entities/settings/model/types.ts`
-  - [ ] Создать `entities/settings/api/settingsApi.ts`
-  - [ ] Создать `entities/settings/model/settingsStore.ts`
+    - [ ] Создать `entities/settings/model/types.ts`
+    - [ ] Создать `entities/settings/api/settingsApi.ts`
+    - [ ] Создать `entities/settings/model/settingsStore.ts`
 
 - [ ] **Global Settings Page**
-  - [ ] Обновить `pages/settings/SettingsPage.vue`
-  - [ ] Time pickers для trainingStartHour/trainingEndHour
-  - [ ] Input для minTimeBeforeEnd
-  - [ ] Toggle для notificationsEnabled
-  - [ ] Кнопка "Сохранить"
+    - [ ] Обновить `pages/settings/SettingsPage.vue`
+    - [ ] Time pickers для trainingStartHour/trainingEndHour
+    - [ ] Input для minTimeBeforeEnd
+    - [ ] Toggle для notificationsEnabled
+    - [ ] Кнопка "Сохранить"
 
 - [ ] **Course Settings Modal**
-  - [ ] Создать `widgets/course-settings/CourseSettingsModal.vue`
-  - [ ] Toggle "Use global settings"
-  - [ ] Отображение унаследованных значений
-  - [ ] Индивидуальные настройки для курса
-  - [ ] Кнопка "Reset to global"
+    - [ ] Создать `widgets/course-settings/CourseSettingsModal.vue`
+    - [ ] Toggle "Use global settings"
+    - [ ] Отображение унаследованных значений
+    - [ ] Индивидуальные настройки для курса
+    - [ ] Кнопка "Reset to global"
 
 ---
 
 ## Этап 11: Backend - Unit Tests
 
 - [ ] **FSRS Service Tests**
-  - [ ] Создать `tests/services/fsrs.test.ts`
-  - [ ] Тест расчета интервала для NEW карточки
-  - [ ] Тест Learning Steps логики
-  - [ ] Тест перехода в REVIEW
-  - [ ] Тест обработки LAPSES
-  - [ ] Тест enable_fuzz
+    - [ ] Создать `tests/services/fsrs.test.ts`
+    - [ ] Тест расчета интервала для NEW карточки
+    - [ ] Тест Learning Steps логики
+    - [ ] Тест перехода в REVIEW
+    - [ ] Тест обработки LAPSES
+    - [ ] Тест enable_fuzz
 
 - [ ] **Card Repository Tests**
-  - [ ] Создать `tests/repositories/cardRepository.test.ts`
-  - [ ] Тест создания карточки
-  - [ ] Тест получения карточек по courseId
-  - [ ] Тест обновления FSRS полей
-  - [ ] Тест getDueCards с фильтрацией
+    - [ ] Создать `tests/repositories/cardRepository.test.ts`
+    - [ ] Тест создания карточки
+    - [ ] Тест получения карточек по courseId
+    - [ ] Тест обновления FSRS полей
+    - [ ] Тест getDueCards с фильтрацией
 
 ---
 
 ## Этап 12: Integration Testing
 
 - [ ] **E2E Tests Setup**
-  - [ ] Установить Playwright (если еще не установлен)
-  - [ ] Настроить тестовое окружение
+    - [ ] Установить Playwright (если еще не установлен)
+    - [ ] Настроить тестовое окружение
 
 - [ ] **E2E: Cards CRUD**
-  - [ ] Тест создания карточки через UI
-  - [ ] Тест редактирования карточки
-  - [ ] Тест удаления карточки
-  - [ ] Тест QuickAddCard
+    - [ ] Тест создания карточки через UI
+    - [ ] Тест редактирования карточки
+    - [ ] Тест удаления карточки
+    - [ ] Тест QuickAddCard
 
 - [ ] **E2E: Training Flow**
-  - [ ] Тест загрузки due cards
-  - [ ] Тест прохождения тренировки
-  - [ ] Тест сохранения прогресса
-  - [ ] Тест завершения сессии
+    - [ ] Тест загрузки due cards
+    - [ ] Тест прохождения тренировки
+    - [ ] Тест сохранения прогресса
+    - [ ] Тест завершения сессии
 
 - [ ] **E2E: Settings**
-  - [ ] Тест изменения глобальных настроек
-  - [ ] Тест индивидуальных настроек курса
-  - [ ] Тест сброса к глобальным
+    - [ ] Тест изменения глобальных настроек
+    - [ ] Тест индивидуальных настроек курса
+    - [ ] Тест сброса к глобальным
 
 ---
 
 ## Этап 13: Верификация и Документация
 
 - [ ] **Manual Testing**
-  - [ ] Проверить создание/редактирование карточек
-  - [ ] Проверить работу FSRS алгоритма
-  - [ ] Проверить временные ограничения
-  - [ ] Проверить настройки (глобальные и курса)
-  - [ ] Проверить корректность расчета due date
+    - [ ] Проверить создание/редактирование карточек
+    - [ ] Проверить работу FSRS алгоритма
+    - [ ] Проверить временные ограничения
+    - [ ] Проверить настройки (глобальные и курса)
+    - [ ] Проверить корректность расчета due date
 
 - [ ] **Documentation**
-  - [ ] Создать Walkthrough.md с результатами
-  - [ ] Добавить скриншоты UI
-  - [ ] Документировать FSRS логику
-  - [ ] Обновить README.md
-  - [ ] Обновить Implementation_Plan.md
+    - [ ] Создать Walkthrough.md с результатами
+    - [ ] Добавить скриншоты UI
+    - [ ] Документировать FSRS логику
+    - [ ] Обновить README.md
+    - [ ] Обновить Implementation_Plan.md
 
 ---
 

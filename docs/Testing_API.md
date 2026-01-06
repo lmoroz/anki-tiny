@@ -9,7 +9,6 @@ npm run electron:dev
 
 После запуска откройте DevTools: **F12** или **Ctrl+Shift+I**
 
-
 ---
 
 ## Тестовые команды для DevTools Console

@@ -107,7 +107,7 @@
 
 ## ⚠️ Проблемы и ошибки TypeScript
 
-### Критические ошибки (требуют исправления):
+### Критические ошибки (требуют исправления)
 
 1. **FSRS Type Compatibility Issue:**
    - `Rating` type из ts-fsrs называется `Grade`
@@ -124,7 +124,7 @@
    - Множественные ошибки форматирования (extra line breaks)
    - Нужно запустить `npm run format` в backend
 
-### Некритические (warning):
+### Некритические (warning)
 
 - Неиспользуемые импорты (`NewCard` в cardRepository)
 - `any` types в Proxy для db экспорта

@@ -4,7 +4,7 @@
 
 Успешно реализован полный backend для системы карточек с алгоритмом FSRS (Free Spaced Repetition Scheduler).
 
-### Что создано:
+### Что создано
 
 - **3 новые таблицы БД** с полной FSRS поддержкой
 - **12 API endpoints** для cards, training и settings
@@ -12,7 +12,7 @@
 - **Repositories** для работы с данными
 - **Validation schemas** (Zod)
 
-### Результаты верификации:
+### Результаты верификации
 
 ✅ TypeScript компиляция: **успешно**  
 ✅ Prettier форматирование: **успешно**  

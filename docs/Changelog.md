@@ -5,6 +5,59 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/),
 и проект придерживается [Semantic Versioning](https://semver.org/lang/ru/).
 
+## [0.2.1] - 2026-01-06 14:30
+
+### Changed
+
+#### Code Style: Масштабный рефакторинг форматирования
+
+- **Новые правила кодирования**
+    - Создан `.agent/rules/CODE_STYLE.md` с обязательными правилами форматирования JS/TS
+    - Стиль условных конструкций: `else` на новой строке, одиночные statements без скобок
+    - Обновлен `.agent/rules/vite-imports-and-components-rule.md`: приоритет `<script setup>` над `<template>`
+    - Обновлен `.agent/rules/workflow.md`: уточнены процедуры подведения итогов сессий
+    - Обновлен `.agent/rules/using-console-commands.md`: правила работы с терминалом
+
+- **Рефакторинг всех Vue компонентов (12 файлов)**
+    - Переупорядочена структура: `<script setup>` теперь всегда первым (было после `<template>`)
+    - Применены новые правила if/else форматирования во всех компонентах
+    - Улучшена читаемость кода через консистентный стиль
+    - Затронутые файлы:
+        - App.vue, HomePage.vue, CoursePage.vue
+        - Button.vue, Card.vue, Input.vue, StackedCardsIcon.vue (новый)
+        - TitleBar.vue, CourseCard.vue, CardItem.vue, QuickAddCard.vue
+
+- **Расширение зависимостей frontend**
+    - Добавлен `markdown-it` для рендеринга Markdown
+    - Добавлен `highlight.js` для подсветки синтаксиса кода
+    - Добавлен `@types/markdown-it` для TypeScript типов
+
+### Removed
+
+- **Очистка устаревших правил**
+    - Удален `.agent/rules/use-vitejs-at-rule.md` (устарел)
+    - Удален `.agent/rules/vue-structure-preference-rule.md` (заменен на vite-imports-and-components-rule)
+    - Удален `docs/Changelog_session.md` (дубликат)
+
+### Fixed
+
+- **Документация**
+    - Исправлены опечатки в `docs/Backend_Cards_FSRS_Progress.md`
+    - Исправлены опечатки в `docs/Backend_Cards_FSRS_Walkthrough.md`
+    - Обновлен `docs/Cards_FSRS_Tasks.md` с актуальным статусом задач
+    - Добавлены пропущенные строки в `docs/Migration_System_Walkthrough.md`
+    - Удалена лишняя пустая строка в `docs/Testing_API.md`
+
+### Technical Details
+
+- **Затронуто файлов**: 29
+- **Изменений в frontend**: ~2,116 вставок, ~1,977 удалений
+- **Новые agent rules**: CODE_STYLE.md (143 строки)
+- **Консистентность**: Все компоненты теперь следуют единому стилю
+- **Семантика**: `<script setup>` первым для лучшей навигации по коду
+
+---
+
 ## [0.2.1] - 2026-01-05 23:44
 
 ### Changed
@@ -65,7 +118,6 @@
 ## [0.2.0] - 2026-01-05 23:04
 
 ### Added
-
 
 #### Frontend: Batch-добавление карточек (Batch Card Import)
 

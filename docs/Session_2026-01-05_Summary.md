@@ -73,6 +73,7 @@
 6. **Backend_Cards_FSRS_Progress.md** — прогресс отчет
 
 Обновлено:
+
 - `docs/Task.md` — Фаза 4 Backend завершена
 - `docs/Changelog.md` — добавлена запись v0.2.0
 - `.agent/rules/workflow.md` — уточнен workflow завершения сессии
@@ -97,6 +98,7 @@ feat(backend): implement Cards API, FSRS algorithm and migration system
 ### Новые файлы (15)
 
 **Backend:**
+
 - `backend/scripts/check-db.js`
 - `backend/src/routes/cards.ts`
 - `backend/src/routes/settings.ts`
@@ -108,6 +110,7 @@ feat(backend): implement Cards API, FSRS algorithm and migration system
 - `backend/src/services/repositories/settingsRepository.ts`
 
 **Documentation:**
+
 - `docs/Backend_Cards_FSRS_Progress.md`
 - `docs/Backend_Cards_FSRS_Walkthrough.md`
 - `docs/Cards_FSRS_Architecture.md`
@@ -187,6 +190,7 @@ npm run format --workspace=backend
 ### ✅ Database Structure
 
 **5 таблиц созданы:**
+
 1. `_migrations` (4 записи)
 2. `courses` (уже существовала)
 3. `cards` (новая, с FSRS полями)
@@ -194,6 +198,7 @@ npm run format --workspace=backend
 5. `courseSettings` (новая)
 
 **5 индексов созданы:**
+
 - courses_name_idx
 - cards_courseId_idx, cards_due_idx, cards_state_idx
 - courseSettings_courseId_idx
@@ -205,6 +210,7 @@ npm run format --workspace=backend
 ### Migration System
 
 **Преимущества:**
+
 - ✅ Отслеживание через таблицу `_migrations`
 - ✅ Идемпотентность (безопасно запускать многократно)
 - ✅ Автоматическое применение на старте
@@ -213,6 +219,7 @@ npm run format --workspace=backend
 ### FSRS Integration
 
 **Особенности реализации:**
+
 - Кастомные Learning Steps перед полным FSRS
 - Временные ограничения для NEW карточек
 - Type cast `as any` для совместимости с ts-fsrs
@@ -221,6 +228,7 @@ npm run format --workspace=backend
 ### API Design
 
 **REST endpoints организованы по доменам:**
+
 - `/api/courses/:courseId/cards` — Cards CRUD
 - `/api/training/*` — Training flow
 - `/api/settings` — Settings management
@@ -261,25 +269,25 @@ npm run format --workspace=backend
 
 ### Short-term
 
-4. **Backend API Testing**
+1. **Backend API Testing**
    - Postman collection для всех endpoints
    - Unit tests для FSRS service
    - Integration tests для repositories
 
-5. **E2E Testing**
+2. **E2E Testing**
    - Создание карточки
    - Прохождение тренировки
    - Проверка FSRS расчетов
 
 ### Medium-term
 
-6. **Расширенный функционал**
+1. **Расширенный функционал**
    - Статистика прогресса
    - Импорт/Экспорт курсов
    - Медиа в карточках
    - Поиск и теги
 
-7. **Система уведомлений**
+2. **Система уведомлений**
    - Backend: проверка due cards
    - Electron: системные уведомления
    - Tray integration
@@ -345,6 +353,7 @@ npm run format --workspace=backend
 **Backend для Cards и FSRS полностью реализован и готов к frontend интеграции.**
 
 Создана профессиональная архитектура с:
+
 - ✅ Полноценной FSRS поддержкой
 - ✅ Migration tracking system
 - ✅ REST API endpoints
@@ -354,6 +363,7 @@ npm run format --workspace=backend
 ### Готовность к следующему этапу
 
 **Frontend integration** может начинаться немедленно:
+
 - API endpoints протестированы и работают
 - Database schema стабильна
 - Migration system production-ready

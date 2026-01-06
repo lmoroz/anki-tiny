@@ -1,6 +1,11 @@
+---
+trigger: always_on
+---
+
 # Terminal Encoding Rule
 
-Before executing the very first command in the PowerShell terminal during a session, you MUST set the output encoding to UTF-8 to ensure Cyrillic characters are displayed correctly.
+Before executing the very first command in the PowerShell terminal during a session, you MUST set the output encoding to
+UTF-8 to ensure Cyrillic characters are displayed correctly.
 
 Protocol:
 
