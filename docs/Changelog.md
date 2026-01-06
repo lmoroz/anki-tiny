@@ -5,6 +5,60 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/),
 и проект придерживается [Semantic Versioning](https://semver.org/lang/ru/).
 
+## [0.2.1] - 2026-01-06 15:49
+
+### Added
+
+#### Documentation: OpenSpec Workflow Guide
+
+- **openspec-workflow.md** — создано полное русскоязычное руководство по OpenSpec методологии
+    - Описание spec-driven development подхода
+    - Три стадии разработки: Proposal → Implementation → Archive
+    - Роли в процессе (разработчик vs AI-агент)
+    - Полезные команды для работы с OpenSpec
+    - Структура директорий `openspec/`
+    - Примеры полного цикла от запроса до архивации
+    - Формат спецификаций с правильными Scenarios
+    - Операции с Requirements: ADDED, MODIFIED, REMOVED, RENAMED
+    - Best Practices: Simplicity First, Complexity Triggers
+    - Troubleshooting для частых ошибок
+    - Дополнительные ресурсы и ссылки
+
+- **openspec/project.md** — заполнен детальной информацией о проекте
+    - Цели проекта (7 ключевых пунктов)
+    - Полный технологический стек (Frontend, Backend, Tooling)
+    - Конвенции кода (форматирование, условные конструкции, импорты)
+    - Архитектурные паттерны (FSD, Layered Architecture)
+    - Тестовая стратегия (текущая и планируемая)
+    - Git Workflow (semantic commits, процесс разработки)
+    - Доменный контекст (FSRS, структуры данных)
+    - Важные ограничения (технические, бизнес-логика, процессные)
+    - Внешние зависимости (MCP серверы, библиотеки, системные интеграции)
+    - Статус проекта (реализовано, в работе, запланировано)
+
+### Changed
+
+- **readme.md** — добавлена секция "Development Workflow" с ссылкой на OpenSpec Workflow Guide
+- **readme.md** — исправлены длинные строки для соответствия markdown линтингу (max 120 символов)
+- **readme.md** — исправлен bare URL для библиотеки ts-fsrs
+
+### Fixed
+
+- **Markdown Linting**
+    - Исправлены все ошибки MD013 (line-length) в readme.md
+    - Исправлена ошибка MD034 (no-bare-urls) в readme.md
+    - Убраны trailing punctuation (двоеточия) из заголовков в openspec-workflow.md (MD026)
+    - Заменены emphasis-заголовки на proper headings в openspec-workflow.md (MD036)
+    - Добавлен язык для code block в openspec/project.md (MD040)
+
+### Technical Details
+
+- **Созданных файлов**: 1 (openspec-workflow.md, 453 строки)
+- **Обновленных файлов**: 3 (openspec/project.md, readme.md, docs/Changelog.md)
+- **Markdown линтинг**: все файлы проходят проверку без ошибок
+
+---
+
 ## [0.2.1] - 2026-01-06 14:30
 
 ### Changed
