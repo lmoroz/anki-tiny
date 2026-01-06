@@ -3,9 +3,7 @@
 ## Purpose
 
 TBD - created by archiving change add-settings-page. Update Purpose after archive.
-
 ## Requirements
-
 ### Requirement: SettingsPage Layout
 
 The system SHALL provide a clear, organized settings interface with global and course-specific sections.
@@ -34,29 +32,48 @@ The system SHALL provide a clear, organized settings interface with global and c
 
 ### Requirement: TimeRangePicker Component
 
-The system SHALL provide an intuitive time range selection interface with visual feedback.
+The system SHALL provide an intuitive time range selection interface with visual feedback using scroll-based picker UI.
 
-#### Scenario: User selects time range
+#### Scenario: User selects time range with scroll picker
 
 - **GIVEN** TimeRangePicker is rendered in SettingsForm
-- **WHEN** user selects start hour from dropdown
-- **THEN** visual timeline updates to show active window
-- **AND** `update:start` event is emitted
+- **WHEN** user scrolls through hour values in start time picker
+- **THEN** visual timeline updates to show active window in real-time
+- **AND** `update:start` event is emitted with selected hour value
+- **AND** scroll animation is smooth and responsive
 
 #### Scenario: Visual timeline representation
 
 - **GIVEN** trainingStartHour = 8, trainingEndHour = 22
 - **WHEN** TimeRangePicker is rendered
-- **THEN** horizontal timeline shows 24-hour scale
-- **AND** active range (8-22) is highlighted in blue
+- **THEN** two scroll picker components show current values (08:00 and 22:00)
+- **AND** horizontal timeline shows 24-hour scale below pickers
+- **AND** active range (8-22) is highlighted in blue on timeline
 - **AND** labels show 0:00, 6:00, 12:00, 18:00, 24:00 marks
 
 #### Scenario: Disabled state
 
 - **GIVEN** TimeRangePicker has `disabled` prop = true
 - **WHEN** component is rendered
-- **THEN** select dropdowns are disabled
-- **AND** visual timeline shows inactive styling
+- **THEN** scroll pickers are disabled and show reduced opacity
+- **AND** scroll interaction is blocked
+- **AND** visual timeline shows inactive styling (gray)
+
+#### Scenario: Touch interaction on scroll pickers
+
+- **GIVEN** user is on touch-enabled device or mobile viewport
+- **WHEN** user swipes vertically on time picker
+- **THEN** hours scroll smoothly with momentum
+- **AND** selected value snaps to center position
+- **AND** visual timeline updates during scroll
+
+#### Scenario: Keyboard navigation support
+
+- **GIVEN** scroll picker has focus
+- **WHEN** user presses Arrow Up/Down keys
+- **THEN** hour value increments/decrements by 1
+- **AND** visual timeline updates accordingly
+- **AND** selection wraps around (23 → 0, 0 → 23)
 
 ### Requirement: SettingsForm Validation Feedback
 
@@ -171,3 +188,4 @@ The system SHALL adapt settings UI for different screen sizes.
 - **WHEN** SettingsPage is rendered
 - **THEN** form uses single-column layout
 - **AND** modal adapts to full-screen width
+
