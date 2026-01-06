@@ -63,14 +63,14 @@ const handleDelete = (course) => {
   justify-content: center;
   padding: 60px 20px;
   gap: 16px;
-  color: #94a3b8;
+  color: var(--color-text-tertiary);
 }
 
 .spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid rgba(148, 163, 184, 0.2);
-  border-top-color: #3b82f6;
+  border: 3px solid var(--spinner-track);
+  border-top-color: var(--spinner-accent);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }

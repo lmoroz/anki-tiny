@@ -36,20 +36,20 @@
   const buttonClasses = computed(() => {
     let additional = ['cursor-pointer', 'outline-none', `rounded-${props.rounded}`]
     if (props.stacked) additional.push(...['relative', 'group'])
-    if (props.variant === 'primary') additional.push('shadow-[0_10px_20px_-5px_rgba(37,99,235,0.6)]')
+    if (props.variant === 'primary') additional.push('shadow-[0_10px_20px_-5px_var(--btn-primary-shadow)]')
     return [...additional]
   })
   const innerClasses = computed(() => {
     let additional = ['btn', `btn-${props.size}`, { 'btn-full-width': props.fullWidth }, { 'btn-disabled': props.disabled }, `rounded-${props.rounded}`]
     if (props.stacked && props.variant === 'primary') {
       additional.push(
-        ...`relative z-20 bg-gradient-to-b from-[#3b82f6] to-[#2563eb] hover:to-[#3b82f6]  py-4 px-12 border-t border-t-white/20 border-b border-b-gray-800/50  shadow-[0_10px_20px_-5px_rgba(37,99,235,0.6),inset_0_1px_0_rgba(255,255,255,0.3)] transition-transform duration-200 group-active:translate-y-[2px]`.split(
+        ...`relative z-20 bg-gradient-to-b from-[var(--btn-primary-gradient-from)] to-[var(--btn-primary-gradient-to)] hover:to-[var(--btn-primary-gradient-from)]  py-4 px-12 border-t border-t-white/20 border-b border-b-gray-800/50  shadow-[0_10px_20px_-5px_var(--btn-primary-shadow),inset_0_1px_0_var(--btn-primary-inner-shadow)] transition-transform duration-200 group-active:translate-y-[2px]`.split(
           ' '
         )
       )
     } else if (props.variant === 'primary') {
       additional.push(
-        'bg-gradient-to-b from-[#3b82f6] to-[#2563eb] shadow-[0_10px_20px_-5px_rgba(37,99,235,0.6),inset_0_1px_0_rgba(255,255,255,0.3)]'.split(' ')
+        'bg-gradient-to-b from-[var(--btn-primary-gradient-from)] to-[var(--btn-primary-gradient-to)] shadow-[0_10px_20px_-5px_var(--btn-primary-shadow),inset_0_1px_0_var(--btn-primary-inner-shadow)]'.split(' ')
       )
     } else additional.push(`btn-${props.variant}`)
     return additional
@@ -72,12 +72,12 @@
       <!-- Stack Layer 2 (Bottom-most - Darkest) -->
       <div
         :class="`rounded-${props.rounded}`"
-        class="absolute inset-0 bg-[#2563eb] translate-y-[12px] scale-x-[0.93] z-0 transition-transform duration-200 group-active:translate-y-[8px] shadow-[0_2px_2px_-1px_rgba(0,0,0,1)] border-b border-b-gray-800/80 opacity-20" />
+        class="absolute inset-0 bg-[var(--btn-primary-gradient-to)] translate-y-[12px] scale-x-[0.93] z-0 transition-transform duration-200 group-active:translate-y-[8px] shadow-[0_2px_2px_-1px_rgba(0,0,0,1)] border-b border-b-gray-800/80 opacity-20" />
 
       <!-- Stack Layer 1 (Middle - Dark) -->
       <div
         :class="`rounded-${props.rounded}`"
-        class="absolute inset-0 bg-[#2563eb] translate-y-[6px] scale-x-[0.965] z-10 transition-transform duration-200 group-active:translate-y-[4px] shadow-[0_2px_2px_-1px_rgba(0,0,0,1)] border-b border-b-gray-800/80 opacity-30" />
+        class="absolute inset-0 bg-[var(--btn-primary-gradient-to)] translate-y-[6px] scale-x-[0.965] z-10 transition-transform duration-200 group-active:translate-y-[4px] shadow-[0_2px_2px_-1px_rgba(0,0,0,1)] border-b border-b-gray-800/80 opacity-30" />
     </template>
 
     <!-- Main Surface (Top - Bright Gradient) -->
@@ -128,35 +128,37 @@
 
   /* Variants */
   .btn-secondary {
-    background: #5f636880;
-    border: 1px solid #dadce080;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    background: var(--action-btn-bg);
+    color: var(--action-btn-text);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 1px 2px var(--btn-secondary-shadow);
   }
 
   .btn-secondary:hover {
-    background: #f8f9fa;
-    border-color: #dadce0;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    background: var(--action-btn-bg-hover);
+    color: var(--action-btn-text-hover);
+    border-color: var(--color-border);
+    box-shadow: 0 1px 3px var(--btn-secondary-shadow-hover);
   }
 
   .btn-danger {
-    background: #d9302580;
+    background: var(--color-danger);
     color: #fff;
-    box-shadow: 0 1px 3px rgba(217, 48, 37, 0.3);
+    box-shadow: 0 1px 3px var(--btn-danger-shadow);
   }
 
   .btn-danger:hover {
-    background: #b31412;
-    box-shadow: 0 2px 8px rgba(217, 48, 37, 0.4);
+    background: var(--btn-danger-bg-hover);
+    box-shadow: 0 2px 8px var(--btn-danger-shadow-hover);
   }
 
   .btn-ghost {
     background: transparent;
-    color: #ffffff80;
+    color: var(--color-text-secondary);
   }
 
   .btn-ghost:hover {
-    color: #ffffff;
+    color: var(--color-text-primary);
   }
 
   /* Modifiers */

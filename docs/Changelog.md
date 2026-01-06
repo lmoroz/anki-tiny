@@ -5,6 +5,32 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/),
 и проект придерживается [Semantic Versioning](https://semver.org/lang/ru/).
 
+## [0.4.0] - 2026-01-06 20:45
+
+### Added
+
+#### Feature: Systemized Styling
+
+- **Unified Styling System**
+    - Внедрена система CSS-переменных для цветов (`--color-primary`, `--color-bg-modal`, etc.)
+    - Внедрена система типографики (`--text-page-title-size`, etc.)
+    - Весь UI переведен на использование этих переменных для полной поддержки тем
+    - Удалены все hardcoded hex цвета (`#1a73e8`, `#e9ecef`) из компонентов
+
+- **Component Refactoring**
+    - `Button.vue`, `Input.vue`, `Modal.vue`, `Card.vue` полностью обновлены
+    - `QuickAddCard.vue`, `CardItem.vue`, `CourseCard.vue` и другие виджеты обновлены
+    - Убраны дублирующиеся стили (например, кнопки в `CourseSettingsModal.vue` теперь используют shared `Button.vue`)
+    - Исправлены проблемы с видимостью текста (dropdowns, buttons) в темной теме
+
+### Fixed
+
+- **UI Consistency Issues**
+    - Исправлена проблема с нечитаемыми опциями в `TimeRangePicker` (белый текст на белом фоне)
+    - Исправлен стиль блока "Текущее расписание" в настройках (теперь соответствует стилю описания курса)
+    - Унифицированы стили кнопок во всех модальных окнах
+    - Исправлена излишняя яркость кнопок действий
+
 ## [0.3.0] - 2026-01-06 18:19
 
 ### Fixed

@@ -1,8 +1,9 @@
 <script setup>
-  defineProps({
+  const props = defineProps({
     padding: {
       type: String,
-      default: 'md'
+      default: 'md',
+      validator: value => ['sm', 'md', 'lg'].includes(value)
     },
     hoverable: {
       type: Boolean,
@@ -18,11 +19,17 @@
       validator: value => ['xl', 'sm', 'md', 'lg', 'full'].includes(value)
     }
   })
+
+  const paddingMap = {
+    sm: 'p-4',
+    md: 'p-6',
+    lg: 'p-8'
+  }
 </script>
 
 <template>
   <div
-    :class="[`rounded-${rounded}`, 'card', `card-padding-${padding}`, { 'card-hoverable': hoverable }, { 'card-highlighted': highlight }]"
+    :class="[`rounded-${rounded}`, paddingMap[padding], { 'card-hoverable': hoverable }, { 'card-highlighted': highlight }]"
     class="relative z-20 w-full shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden border border-white/10 transition-all duration-500">
     <!-- Card Background Layers -->
     <!-- 1. Base dark tint -->
@@ -48,20 +55,8 @@
 </template>
 
 <style scoped>
-  .card-padding-sm {
-    padding: 16px;
-  }
-
-  .card-padding-md {
-    padding: 24px;
-  }
-
-  .card-padding-lg {
-    padding: 32px;
-  }
-
   .card-highlighted {
-    outline: 2px solid #ffffff80;
+    outline: 2px solid var(--card-highlight-border);
     outline-offset: -2px;
   }
 
@@ -70,8 +65,8 @@
   }
 
   .card-hoverable:hover {
-    border-color: #dee2e6;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    border-color: var(--color-border);
+    box-shadow: 0 4px 12px var(--card-shadow-hover);
     transform: translateY(-2px);
   }
 </style>

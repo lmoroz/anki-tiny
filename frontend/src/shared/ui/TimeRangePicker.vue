@@ -103,38 +103,43 @@ const visualRange = computed(() => {
 }
 
 .selector-group label {
-  font-size: 13px;
+  font-size: var(--text-caption-size);
   font-weight: 500;
-  color: #94a3b8;
+  color: var(--color-text-tertiary);
   margin-bottom: 4px;
 }
 
 .selector-group select {
   padding: 10px 14px;
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
-  background: rgba(30, 41, 59, 0.4);
-  color: #e9ecef;
-  font-size: 14px;
+  background: var(--input-bg);
+  color: var(--color-text-primary);
+  font-size: var(--text-body-md-size);
   cursor: pointer;
   transition: all 0.2s ease;
   outline: none;
 }
 
+.selector-group select option {
+  background: var(--input-bg-option);
+  color: var(--color-text-primary);
+}
+
 .selector-group select:hover:not(:disabled) {
-  border-color: rgba(59, 130, 246, 0.5);
+  border-color: var(--color-border-focus);
 }
 
 .selector-group select:focus {
   outline: none;
-  border-color: #1a73e8;
-  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px var(--input-focus-shadow);
 }
 
 .selector-group select:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  background: rgba(30, 41, 59, 0.2);
+  background: var(--color-bg-secondary);
 }
 
 .timeline {
@@ -143,7 +148,7 @@ const visualRange = computed(() => {
 
 .timeline-track {
   height: 8px;
-  background: #e0e0e0;
+  background: var(--spinner-track);
   border-radius: 4px;
   position: relative;
   overflow: hidden;
@@ -152,7 +157,7 @@ const visualRange = computed(() => {
 .timeline-active {
   position: absolute;
   height: 100%;
-  background: #1a73e8;
+  background: var(--color-primary);
   border-radius: 4px;
   transition: all 0.3s ease;
 }
@@ -161,7 +166,7 @@ const visualRange = computed(() => {
   display: flex;
   justify-content: space-between;
   margin-top: 4px;
-  font-size: 12px;
-  color: #94a3b8;
+  font-size: var(--text-caption-size);
+  color: var(--color-text-tertiary);
 }
 </style>

@@ -139,16 +139,16 @@
   }
 
   .page-title {
-    font-size: 32px;
+    font-size: var(--text-page-title-size);
     font-weight: 700;
-    color: #e9ecef;
+    color: var(--color-text-primary);
     margin-bottom: 8px;
     letter-spacing: -0.02em;
   }
 
   .page-subtitle {
-    font-size: 15px;
-    color: #e9ecef88;
+    font-size: var(--text-body-lg-size);
+    color: var(--color-text-tertiary);
   }
 
   .loading-state {
@@ -158,14 +158,14 @@
     justify-content: center;
     padding: 80px 20px;
     gap: 16px;
-    color: #5f6368;
+    color: var(--color-text-muted);
   }
 
   .spinner {
     width: 40px;
     height: 40px;
-    border: 3px solid #e8eaed;
-    border-top-color: #1a73e8;
+    border: 3px solid var(--spinner-track);
+    border-top-color: var(--spinner-accent);
     border-radius: 50%;
     animation: spin 1s linear infinite;
   }
@@ -190,7 +190,7 @@
 
   .empty-state-icon {
     font-size: 64px;
-    color: #1a73e8;
+    color: var(--color-primary);
     margin-bottom: 24px;
     opacity: 0.9;
   }
@@ -198,13 +198,13 @@
   .empty-state-title {
     font-size: 24px;
     font-weight: 600;
-    color: #ffffff;
+    color: var(--color-text-primary);
     margin-bottom: 12px;
   }
 
   .empty-state-text {
-    font-size: 15px;
-    color: #e9ecef;
+    font-size: var(--text-body-lg-size);
+    color: var(--color-text-primary);
     max-width: 400px;
     margin-bottom: 28px;
     line-height: 1.6;

@@ -1,0 +1,11 @@
+- [x] Define Color Variables in `styles.css` <!-- id: 1 -->
+- [x] Define Typography Tokens in `styles.css` <!-- id: 2 -->
+- [x] Refactor `Button.vue` to use new system <!-- id: 3 -->
+- [x] Refactor `Card.vue` to use new system <!-- id: 4 -->
+- [x] Refactor `Input.vue` <!-- id: 5 -->
+- [x] Refactor `Modal.vue` <!-- id: 6 -->
+- [x] Refactor `TimeRangePicker.vue` <!-- id: 7 -->
+- [x] Audit and fix hardcoded styles in `shared/ui/` <!-- id: 8 -->
+- [x] Audit and fix hardcoded styles in `widgets/` <!-- id: 9 -->
+- [x] Audit and fix hardcoded styles in `pages/` <!-- id: 10 -->
+- [x] Verify Light/Dark mode consistency <!-- id: 11 -->

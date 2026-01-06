@@ -11,6 +11,10 @@
     readonly: {
       type: Boolean,
       default: false
+    },
+    showSaveButton: {
+      type: Boolean,
+      default: true
     }
   })
 
@@ -108,7 +112,7 @@
     </div>
 
     <!-- Preview текущего расписания -->
-    <div class="form-section preview">
+    <div class="form-section preview bg-gray-500/20 border border-white/30 backdrop-blur-md bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.15)_0%,transparent_50%)] p-4 rounded-xl shadow-lg">
       <h4>Текущее расписание</h4>
       <p>
         Тренировки доступны с
@@ -124,7 +128,7 @@
 
     <!-- Кнопка сохранить -->
     <div
-      v-if="!readonly"
+      v-if="!readonly && showSaveButton"
       class="form-actions">
       <Button
         :disabled="!validation.isValid"
@@ -150,47 +154,45 @@
 
   .form-section h3 {
     margin: 0;
-    font-size: 16px;
+    font-size: var(--text-section-title-size);
     font-weight: 600;
-    color: #f1f5f9;
+    color: var(--color-text-primary);
   }
 
   .form-section h4 {
     margin: 0;
-    font-size: 14px;
+    font-size: var(--text-body-lg-size);
     font-weight: 600;
-    color: #60a5fa;
+    color: var(--color-text-primary);
   }
 
   .form-section label:not(.checkbox-label) {
-    font-size: 13px;
+    font-size: var(--text-caption-size);
     font-weight: 500;
-    color: #94a3b8;
+    color: var(--color-text-tertiary);
   }
 
   .error-message {
-    color: #fca5a1;
-    font-size: 14px;
+    color: var(--color-danger);
+    font-size: var(--text-body-md-size);
     margin: 0;
   }
 
   .help-text {
-    color: #94a3b8;
-    font-size: 14px;
+    color: var(--color-text-tertiary);
+    font-size: var(--text-body-md-size);
     margin: 0;
   }
 
   .preview {
-    background: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.2);
-    padding: 16px;
-    border-radius: 8px;
+    color: var(--color-text-primary);
   }
 
   .preview p {
     margin: 4px 0;
-    color: #93c5fd;
-    font-size: 14px;
+    color: inherit;
+    font-size: var(--text-body-md-size);
+    opacity: 0.9;
   }
 
   .checkbox-label {
@@ -198,8 +200,8 @@
     align-items: center;
     gap: 8px;
     cursor: pointer;
-    font-size: 14px;
-    color: #e2e8f0;
+    font-size: var(--text-body-md-size);
+    color: var(--color-text-primary);
   }
 
   .checkbox-label input[type='checkbox'] {
@@ -220,19 +222,19 @@
 
   .btn-primary {
     padding: 10px 24px;
-    background: #1a73e8;
+    background: var(--color-primary);
     color: #ffffff;
     border: none;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: var(--text-body-md-size);
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
   }
 
   .btn-primary:hover:not(:disabled) {
-    background: #1557b0;
-    box-shadow: 0 2px 8px rgba(26, 115, 232, 0.3);
+    background: var(--color-primary-hover);
+    box-shadow: 0 2px 8px var(--input-focus-shadow);
   }
 
   .btn-primary:disabled {

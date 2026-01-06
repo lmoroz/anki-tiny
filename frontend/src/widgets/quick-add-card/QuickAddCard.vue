@@ -291,18 +291,10 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    font-size: 20px;
+    font-size: var(--text-section-title-size);
     font-weight: 600;
     margin: 0;
     letter-spacing: -0.01em;
-  }
-
-  .mode-switcher {
-    display: flex;
-    gap: 8px;
-    background: transparent;
-    padding: 0;
-    border-radius: 8px;
   }
 
   .mode-btn {
@@ -311,9 +303,9 @@
     gap: 6px;
     padding: 8px 16px;
     background: transparent;
-    border: 1px solid #dadce0;
+    border: 1px solid var(--mode-switcher-border);
     border-radius: 6px;
-    color: #5f6368;
+    color: var(--mode-switcher-text);
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
@@ -328,8 +320,8 @@
   }
 
   .mode-btn:hover {
-    border-color: #1a73e8;
-    color: #1a73e8;
+    border-color: var(--mode-switcher-border-active);
+    color: var(--mode-switcher-text-active);
   }
 
   .mode-btn:hover i {
@@ -338,13 +330,13 @@
 
   .mode-btn.active {
     background: transparent;
-    color: #1a73e8;
-    border: 2px solid #1a73e8;
+    color: var(--mode-switcher-text-active);
+    border: 2px solid var(--mode-switcher-border-active);
     font-weight: 600;
   }
 
   .mode-btn.active i {
-    color: #1a73e8;
+    color: var(--mode-switcher-text-active);
   }
 
   .quick-form,
@@ -372,7 +364,7 @@
 
   .batch-help .icon {
     font-size: 16px;
-    color: #ffffff;
+    color: var(--color-bg-primary);
     flex-shrink: 0;
     margin-top: 1px;
   }

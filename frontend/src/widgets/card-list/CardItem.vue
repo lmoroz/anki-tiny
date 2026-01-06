@@ -182,35 +182,35 @@
   .state-badge {
     padding: 4px 10px;
     border-radius: 12px;
-    font-size: 11px;
+    font-size: var(--text-label-size);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
 
   .badge-new {
-    background: #e8f0fe;
-    color: #1a73e8;
+    background: var(--badge-new-bg);
+    color: var(--badge-new-text);
   }
 
   .badge-learning {
-    background: #fef7e0;
-    color: #f9ab00;
+    background: var(--badge-learning-bg);
+    color: var(--badge-learning-text);
   }
 
   .badge-review {
-    background: #e6f4ea;
-    color: #0f9d58;
+    background: var(--badge-review-bg);
+    color: var(--badge-review-text);
   }
 
   .badge-relearning {
-    background: #fce8e6;
-    color: #d93025;
+    background: var(--badge-relearning-bg);
+    color: var(--badge-relearning-text);
   }
 
   .back-label {
-    color: #e9ecef55;
-    font-size: 12px;
+    color: var(--color-text-tertiary);
+    font-size: var(--text-caption-size);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -232,8 +232,8 @@
     height: 32px;
     border: none;
     border-radius: 8px;
-    background: #f1f3f4;
-    color: #5f6368;
+    background: var(--action-btn-bg);
+    color: var(--action-btn-text);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -242,16 +242,18 @@
   }
 
   .action-btn:hover {
-    background: #e8eaed;
+    background: var(--action-btn-bg-hover);
+    color: var(--action-btn-text-hover);
     transform: scale(1.05);
   }
 
   .edit-btn:hover {
-    color: #1a73e8;
+    color: var(--color-primary);
   }
 
   .delete-btn:hover {
-    color: #d93025;
+    background: var(--action-btn-delete-bg-hover);
+    color: var(--color-danger);
   }
 
   .card-body {
@@ -260,19 +262,21 @@
   }
 
   .card-text {
-    color: #e9ecef;
-    font-size: 15px;
+    color: var(--color-text-primary);
+    font-size: var(--text-body-lg-size);
     line-height: 1.6;
     margin: 0;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
+    line-clamp: 3;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   .card-back .card-text {
     -webkit-line-clamp: 4;
+    line-clamp: 4;
   }
 
   .card-footer {
@@ -280,7 +284,7 @@
     justify-content: space-between;
     align-items: center;
     padding-top: 12px;
-    border-top: 1px solid #e9ecef;
+    border-top: 1px solid var(--color-border-light);
   }
 
   .due-date,
@@ -288,8 +292,8 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 12px;
-    color: #e9ecefcc;
+    font-size: var(--text-caption-size);
+    color: var(--color-text-secondary);
   }
 
   .due-date i,
@@ -303,6 +307,6 @@
 
   .card-item:hover .flip-hint {
     opacity: 1;
-    color: #e9ecef99;
+    color: var(--color-text-primary);
   }
 </style>

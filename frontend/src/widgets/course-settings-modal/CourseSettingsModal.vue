@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import Modal from '@/shared/ui/Modal.vue'
+import Button from '@/shared/ui/Button.vue'
 import SettingsForm from '@/widgets/settings-form/SettingsForm.vue'
 import { useSettingsStore } from '@/entities/settings/model/useSettingsStore.js'
 
@@ -105,29 +106,32 @@ function toggleCustomSettings(value) {
         v-if="settings"
         v-model="settings"
         :readonly="!useCustomSettings"
+        :show-save-button="false"
         @save="handleSave" />
 
       <!-- Кнопка сброса -->
-      <button
+      <!-- Кнопка сброса -->
+      <Button
         v-if="hasCustom"
-        class="btn-danger"
+        variant="danger"
+        full-width
         @click="handleReset">
         Сбросить к глобальным
-      </button>
+      </Button>
     </div>
 
     <template #footer>
-      <button
-        class="btn-secondary"
+      <Button
+        variant="secondary"
         @click="emit('close')">
         Отмена
-      </button>
-      <button
-        class="btn-primary"
+      </Button>
+      <Button
+        variant="primary"
         :disabled="saving || !useCustomSettings"
         @click="handleSave(settings)">
         {{ saving ? 'Сохранение...' : 'Сохранить' }}
-      </button>
+      </Button>
     </template>
   </Modal>
 </template>
@@ -144,8 +148,9 @@ function toggleCustomSettings(value) {
   flex-direction: column;
   gap: 12px;
   padding: 16px;
-  background: #f8f9fa;
+  background: var(--input-bg);
   border-radius: 8px;
+  border: 1px solid var(--color-border);
 }
 
 .radio-label {
@@ -153,8 +158,8 @@ function toggleCustomSettings(value) {
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  font-size: 14px;
-  color: #202124;
+  font-size: var(--text-body-md-size);
+  color: var(--color-text-primary);
 }
 
 .radio-label input[type='radio'] {
@@ -163,58 +168,9 @@ function toggleCustomSettings(value) {
   cursor: pointer;
 }
 
-.btn-danger {
-  padding: 10px 24px;
-  background: #d93025;
-  color: #ffffff;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
+.radio-label input[type='radio'] {
+  width: 18px;
+  height: 18px;
   cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-danger:hover {
-  background: #b02a21;
-  box-shadow: 0 2px 8px rgba(217, 48, 37, 0.3);
-}
-
-.btn-secondary {
-  padding: 10px 24px;
-  background: #f1f3f4;
-  color: #202124;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-secondary:hover {
-  background: #e8eaed;
-}
-
-.btn-primary {
-  padding: 10px 24px;
-  background: #1a73e8;
-  color: #ffffff;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: #1557b0;
-  box-shadow: 0 2px 8px rgba(26, 115, 232, 0.3);
-}
-
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 </style>

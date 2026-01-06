@@ -78,8 +78,8 @@
 
   .course-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    border-color: #d2e3fc;
+    box-shadow: 0 4px 12px var(--card-shadow-hover);
+    border-color: var(--color-primary-light);
   }
 
   .course-header {
@@ -91,9 +91,9 @@
   }
 
   .course-title {
-    font-size: 18px;
+    font-size: var(--text-section-title-size);
     font-weight: 600;
-    color: #ffffff;
+    color: var(--color-text-primary);
     margin: 0;
     flex: 1;
   }
@@ -116,26 +116,26 @@
     width: 32px;
     height: 32px;
     border: none;
-    background: #f1f3f4;
-    color: #5f6368;
+    background: var(--action-btn-bg);
+    color: var(--action-btn-text);
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease;
   }
 
   .action-btn:hover {
-    background: #e8eaed;
-    color: #202124;
+    background: var(--action-btn-bg-hover);
+    color: var(--action-btn-text-hover);
   }
 
   .action-delete:hover {
-    background: #fce8e6;
-    color: #d93025;
+    background: var(--action-btn-delete-bg-hover);
+    color: var(--color-danger);
   }
 
   .course-description {
-    font-size: 14px;
-    color: #e9ecefee;
+    font-size: var(--text-body-md-size);
+    color: var(--color-text-secondary);
     margin: 0 0 16px 0;
     flex: 1;
     line-height: 1.5;
@@ -149,15 +149,15 @@
   .course-footer {
     margin-top: auto;
     padding-top: 12px;
-    border-top: 1px solid #e9ecef;
+    border-top: 1px solid var(--color-border-light);
   }
 
   .course-meta {
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 13px;
-    color: #e9ecef;
+    font-size: var(--text-body-sm-size);
+    color: var(--color-text-primary);
   }
 
   .course-meta i {

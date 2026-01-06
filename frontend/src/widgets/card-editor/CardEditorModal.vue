@@ -141,9 +141,9 @@ const handleClose = () => {
 <style scoped>
 h2 {
   margin: 0;
-  font-size: 20px;
+  font-size: var(--text-section-title-size);
   font-weight: 600;
-  color: #f1f5f9;
+  color: var(--color-text-primary);
 }
 
 .form-group {
@@ -157,8 +157,8 @@ h2 {
 .char-counter {
   display: flex;
   justify-content: space-between;
-  font-size: 12px;
-  color: #64748b;
+  font-size: var(--text-caption-size);
+  color: var(--color-text-tertiary);
   margin-bottom: 16px;
 }
 

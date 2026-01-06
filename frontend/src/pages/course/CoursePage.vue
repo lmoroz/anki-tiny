@@ -288,8 +288,8 @@
   .spinner {
     width: 40px;
     height: 40px;
-    border: 3px solid #e8eaed;
-    border-top-color: #1a73e8;
+    border: 3px solid var(--spinner-track);
+    border-top-color: var(--spinner-accent);
     border-radius: 50%;
     animation: spin 1s linear infinite;
   }
@@ -303,11 +303,12 @@
   .course-title {
     margin-bottom: 12px;
     letter-spacing: -0.02em;
+    font-size: var(--text-page-title-size);
   }
 
   .course-description {
-    font-size: 15px;
-    color: #e9ecefcc;
+    font-size: var(--text-body-lg-size);
+    color: var(--color-text-secondary);
     margin-bottom: 24px;
     line-height: 1.6;
   }
@@ -330,7 +331,7 @@
 
   .stat-item i {
     font-size: 24px;
-    color: #ffffff;
+    color: var(--color-text-primary);
   }
 
   .stat-content {
@@ -341,19 +342,19 @@
   .stat-value {
     font-size: 20px;
     font-weight: 700;
-    color: #ffffff;
+    color: var(--color-text-primary);
     line-height: 1;
     margin-bottom: 4px;
   }
 
   .stat-label {
-    font-size: 12px;
-    color: #ffffffcc;
+    font-size: var(--text-caption-size);
+    color: var(--color-text-secondary);
   }
 
   .course-actions {
     padding-top: 24px;
-    border-top: 1px solid #e9ecef;
+    border-top: 1px solid var(--color-border-light);
   }
 
   .cards-section {
@@ -368,9 +369,9 @@
   }
 
   .section-title {
-    font-size: 20px;
+    font-size: var(--text-section-title-size);
     font-weight: 600;
-    color: #e9ecef;
+    color: var(--color-text-primary);
     margin: 0;
   }
 </style>

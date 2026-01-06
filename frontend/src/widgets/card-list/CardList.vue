@@ -60,13 +60,7 @@ const handleDelete = (card) => {
 
 .skeleton-card {
   height: 140px;
-  background: linear-gradient(
-    90deg,
-    rgba(30, 41, 59, 0.4) 0%,
-    rgba(51, 65, 85, 0.4) 50%,
-    rgba(30, 41, 59, 0.4) 100%
-  );
-  background-size: 200% 100%;
+  background: var(--color-bg-secondary);
   border-radius: 12px;
   animation: shimmer 1.5s infinite;
 }
@@ -87,20 +81,20 @@ const handleDelete = (card) => {
 
 .empty-state i {
   font-size: 64px;
-  color: #475569;
+  color: var(--color-text-muted);
   margin-bottom: 16px;
 }
 
 .empty-state p {
   font-size: 18px;
   font-weight: 600;
-  color: #cbd5e1;
+  color: var(--color-text-primary);
   margin: 0 0 8px 0;
 }
 
 .empty-state span {
   font-size: 14px;
-  color: #64748b;
+  color: var(--color-text-tertiary);
 }
 
 .cards-grid {

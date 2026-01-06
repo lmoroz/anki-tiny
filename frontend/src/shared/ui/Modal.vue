@@ -71,7 +71,7 @@ onUnmounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--modal-backdrop);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -81,10 +81,10 @@ onUnmounted(() => {
 }
 
 .modal-container {
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: var(--color-bg-modal);
+  border: 1px solid var(--modal-border);
   border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 20px 60px var(--modal-shadow);
   max-width: 600px;
   width: 100%;
   max-height: 90vh;
@@ -97,13 +97,13 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 20px 24px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  border-bottom: 1px solid var(--modal-header-border);
 }
 
 .modal-title {
-  font-size: 20px;
+  font-size: var(--text-section-title-size);
   font-weight: 600;
-  color: #f1f5f9;
+  color: var(--color-text-primary);
   margin: 0;
 }
 
@@ -115,15 +115,15 @@ onUnmounted(() => {
   height: 32px;
   border: none;
   background: transparent;
-  color: #94a3b8;
+  color: var(--color-text-muted);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .modal-close:hover {
-  background: rgba(148, 163, 184, 0.1);
-  color: #f1f5f9;
+  background: var(--modal-header-border);
+  color: var(--color-text-primary);
 }
 
 .modal-body {
@@ -134,7 +134,7 @@ onUnmounted(() => {
 
 .modal-footer {
   padding: 16px 24px;
-  border-top: 1px solid rgba(148, 163, 184, 0.1);
+  border-top: 1px solid var(--modal-header-border);
   display: flex;
   justify-content: flex-end;
   gap: 12px;

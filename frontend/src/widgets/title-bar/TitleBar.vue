@@ -70,9 +70,9 @@
     justify-content: space-between;
     align-items: center;
     height: 36px;
-    background-color: rgba(0, 0, 0, 0.25);
+    background-color: var(--color-bg-modal);
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid #e9ecef55;
+    border-bottom: 1px solid var(--color-border);
     -webkit-app-region: drag;
     user-select: none;
     z-index: 1000;
@@ -89,13 +89,13 @@
 
   .title-bar-icon {
     font-size: 16px;
-    color: #e9ecef;
+    color: var(--color-text-primary);
   }
 
   .title-bar-title {
     font-size: 13px;
     font-weight: 500;
-    color: #e9ecef;
+    color: var(--color-text-primary);
     user-select: none;
   }
 
@@ -112,28 +112,28 @@
     height: 36px;
     border: none;
     background: transparent;
-    color: #e9ecef;
+    color: var(--color-text-primary);
     cursor: pointer;
     transition: all 0.15s ease;
     font-size: 14px;
   }
 
   .title-bar-btn:hover {
-    background: #f1f3f455;
+    background: var(--action-btn-bg-hover);
   }
 
   .title-bar-btn:active {
-    background: #e8eaed;
-    color: #333;
+    background: var(--action-btn-bg);
+    color: var(--action-btn-text);
   }
 
   .close-btn:hover {
-    background: #d93025;
+    background: var(--color-danger);
     color: #fff;
   }
 
   .close-btn:active {
-    background: #b31412;
+    background: var(--btn-danger-bg-hover);
   }
 
   .minimize-btn i {
@@ -156,7 +156,7 @@
     height: 36px;
     border: none;
     background: transparent;
-    color: #e9ecef;
+    color: var(--color-text-primary);
     cursor: pointer;
     transition: all 0.15s ease;
     font-size: 14px;
@@ -165,12 +165,12 @@
   }
 
   .settings-btn:hover {
-    background: #f1f3f455;
-    color: #1a73e8;
+    background: var(--action-btn-bg-hover);
+    color: var(--color-primary);
   }
 
   .settings-btn:active {
-    background: #e8eaed;
-    color: #1557b0;
+    background: var(--action-btn-bg);
+    color: var(--color-primary-hover);
   }
 </style>
