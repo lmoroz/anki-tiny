@@ -8,7 +8,7 @@ import { useSettingsStore } from '@/entities/settings/model/useSettingsStore.js'
 const props = defineProps({
   show: Boolean,
   courseId: {
-    type: String,
+    type: Number,
     required: true
   },
   courseName: String
@@ -30,9 +30,28 @@ const hasCustom = computed(() => {
 })
 
 onMounted(async () => {
+  // Убеждаемся что глобальные настройки загружены
+  if (!settingsStore.globalSettings) {
+    await settingsStore.fetchGlobalSettings()
+  }
+  
+  // Загружаем настройки курса
+  // Store сам определит, есть ли индивидуальные настройки или нет
   await settingsStore.fetchCourseSettings(props.courseId)
+  
+  // Определяем, использует ли курс индивидуальные настройки
   useCustomSettings.value = hasCustom.value
-  settings.value = { ...effectiveSettings.value }
+  
+  // Получаем эффективные настройки (индивидуальные или глобальные)
+  const effective = effectiveSettings.value
+  
+  if (effective) {
+    settings.value = { ...effective }
+  }
+  else {
+    // Фоллбэк
+    settings.value = { ...settingsStore.globalSettings }
+  }
 })
 
 async function handleSave(formSettings) {

@@ -13,7 +13,8 @@ export const useSettingsStore = defineStore('settings', {
     // Получить эффективные настройки для курса (с fallback на глобальные)
     getEffectiveSettings: (state) => (courseId) => {
       if (!courseId) return state.globalSettings
-      return state.courseSettings.get(courseId) || state.globalSettings
+      const customSettings = state.courseSettings.get(courseId)
+      return customSettings || state.globalSettings
     },
 
     // Проверить, использует ли курс индивидуальные настройки
@@ -28,7 +29,8 @@ export const useSettingsStore = defineStore('settings', {
       this.loading = true
       this.error = null
       try {
-        this.globalSettings = await settingsAPI.getGlobalSettings()
+        const response = await settingsAPI.getGlobalSettings()
+        this.globalSettings = response
       }
       catch (error) {
         this.error = error.message
@@ -44,7 +46,9 @@ export const useSettingsStore = defineStore('settings', {
       this.loading = true
       this.error = null
       try {
-        this.globalSettings = await settingsAPI.updateGlobalSettings(settings)
+        const response = await settingsAPI.updateGlobalSettings(settings)
+        // Бэк возвращает данные напрямую
+        this.globalSettings = response
       }
       catch (error) {
         this.error = error.message
@@ -60,8 +64,16 @@ export const useSettingsStore = defineStore('settings', {
       this.loading = true
       this.error = null
       try {
-        const settings = await settingsAPI.getCourseSettings(courseId)
-        this.courseSettings.set(courseId, settings)
+        const response = await settingsAPI.getCourseSettings(courseId)
+        // Бэк возвращает { courseSettings, effectiveSettings }
+        // Если courseSettings !== null, то у курса есть индивидуальные настройки
+        if (response.courseSettings) {
+          this.courseSettings.set(courseId, response.courseSettings)
+        }
+        else {
+          // Если courseSettings === null, то курс использует глобальные
+          this.courseSettings.delete(courseId)
+        }
       }
       catch (error) {
         // 404 означает что курс использует глобальные настройки
@@ -83,8 +95,8 @@ export const useSettingsStore = defineStore('settings', {
       this.loading = true
       this.error = null
       try {
-        const updated = await settingsAPI.updateCourseSettings(courseId, settings)
-        this.courseSettings.set(courseId, updated)
+        const response = await settingsAPI.updateCourseSettings(courseId, settings)
+        this.courseSettings.set(courseId, response)
       }
       catch (error) {
         this.error = error.message

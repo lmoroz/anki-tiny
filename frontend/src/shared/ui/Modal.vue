@@ -45,7 +45,8 @@ onUnmounted(() => {
       <div v-if="show" class="modal-backdrop" @click="handleBackdropClick">
         <div class="modal-container" @click.stop>
           <div class="modal-header">
-            <h2 class="modal-title">{{ title }}</h2>
+            <h2 v-if="title" class="modal-title">{{ title }}</h2>
+            <slot v-else name="header" />
             <button class="modal-close" @click="emit('close')">
               <i class="bi bi-x-lg"/>
             </button>

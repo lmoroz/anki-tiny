@@ -265,7 +265,7 @@
     <CourseSettingsModal
       v-if="course"
       :show="showSettingsModal"
-      :course-id="String(courseId)"
+      :course-id="courseId"
       :course-name="course.name"
       @close="handleCloseSettings"
       @saved="handleSettingsSaved" />

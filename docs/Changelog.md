@@ -5,6 +5,60 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/),
 и проект придерживается [Semantic Versioning](https://semver.org/lang/ru/).
 
+## [0.4.1] - 2026-01-06 21:57
+
+### Fixed
+
+#### Settings Page: Исправление кнопок настройки курсов
+
+- **Проблема**: Кнопки "Настроить" на странице настроек не работали
+    - Функция `openCourseSettings()` была stub-реализацией (только console.log)
+    - Модальное окно `CourseSettingsModal` существовало, но не было подключено к `SettingsPage`
+
+- **Решение**:
+    - Добавлена логика открытия/закрытия модального окна в `SettingsPage.vue`
+    - Реактивные переменные: `showCourseModal`, `selectedCourseId`, `selectedCourse`
+    - Функции: `openCourseSettings()`, `closeCourseModal()`
+    - Подключен существующий компонент `CourseSettingsModal` в template
+
+#### Settings Store: Критическое исправление обработки API ответов
+
+- **Корневая проблема**: Неправильная обработка структуры ответов от бэкенда
+    - Store ожидал обёрнутые данные `{ settings: {...} }`, но API возвращал данные напрямую
+    - `effectiveSettings` возвращал `undefined` из-за попытки обращения к `response.settings`
+    - В модальном окне отображались некорректные значения (":00", "NaN:00")
+
+- **Исправления в `useSettingsStore.js`**:
+    - `fetchGlobalSettings()` — изменено с `response.settings` на `response`
+    - `updateGlobalSettings()` — изменено с `response.settings` на `response`
+    - `fetchCourseSettings()` — корректная обработка `{ courseSettings, effectiveSettings }`
+    - `updateCourseSettings()` — изменено с `response.settings` на `response`
+
+- **Файлы**:
+    - `frontend/src/entities/settings/model/useSettingsStore.js` (4 метода исправлены)
+    - `frontend/src/pages/settings/SettingsPage.vue` (добавлена логика модального окна)
+    - `frontend/src/widgets/course-settings-modal/CourseSettingsModal.vue` (улучшена инициализация)
+
+#### Modal Component: Поддержка slot для заголовка
+
+- **Пользовательские исправления**:
+    - `Modal.vue` — добавлен fallback на slot `header` если prop `title` не задан
+    - `CourseSettingsModal.vue` — изменен тип `courseId` с String на Number
+    - `CoursePage.vue` — удалён `String()` casting для courseId
+
+### Technical Details
+
+- **Верификация**:
+    - ✅ Модальное окно открывается при клике на "Настроить"
+    - ✅ Заголовок отображает название курса
+    - ✅ Правильный radio-button выбран (глобальные/индивидуальные)
+    - ✅ Все поля заполнены корректными значениями
+    - ✅ "Текущее расписание" показывает валидные данные
+
+- **Отладка**:
+    - Временное логирование API ответов помогло выявить несоответствие структуры данных
+    - Весь отладочный код удалён после исправления проблемы
+
 ## [0.4.0] - 2026-01-06 20:49
 
 ### Changed

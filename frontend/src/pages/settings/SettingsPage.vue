@@ -11,6 +11,10 @@
   const globalSettings = ref(null)
   const loading = ref(true)
 
+  // Модальное окно настроек курса
+  const showCourseModal = ref(false)
+  const selectedCourseId = ref(null)
+
   // Дефолтные значения настроек
   const DEFAULT_SETTINGS = {
     trainingStartHour: 8,
@@ -48,11 +52,21 @@
   }
 
   function openCourseSettings(courseId) {
-    // Открыть modal или перейти на страницу курса
-    console.log('Open settings for course:', courseId)
+    selectedCourseId.value = courseId
+    showCourseModal.value = true
+  }
+
+  function closeCourseModal() {
+    showCourseModal.value = false
+    selectedCourseId.value = null
   }
 
   const sortedCourses = computed(() => courseStore.sortedCourses)
+
+  const selectedCourse = computed(() => {
+    if (!selectedCourseId.value) return null
+    return courseStore.getCourseById(selectedCourseId.value)
+  })
 </script>
 
 <template>
@@ -125,6 +139,15 @@
         </Card>
       </section>
     </div>
+
+    <!-- Модальное окно настроек курса -->
+    <CourseSettingsModal
+      v-if="selectedCourse"
+      :show="showCourseModal"
+      :course-id="selectedCourse.id"
+      :course-name="selectedCourse.name"
+      @close="closeCourseModal"
+      @saved="closeCourseModal" />
   </div>
 </template>
 
