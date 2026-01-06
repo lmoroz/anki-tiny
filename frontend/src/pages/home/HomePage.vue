@@ -198,13 +198,13 @@
   .empty-state-title {
     font-size: 24px;
     font-weight: 600;
-    color: #202124;
+    color: #ffffff;
     margin-bottom: 12px;
   }
 
   .empty-state-text {
     font-size: 15px;
-    color: #5f6368;
+    color: #e9ecef;
     max-width: 400px;
     margin-bottom: 28px;
     line-height: 1.6;
