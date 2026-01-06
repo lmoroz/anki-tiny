@@ -1,222 +1,100 @@
-# Repetitio Implementation Tasks
+# Tasks: replace-time-selects
 
-## Phase 1: Architecture and Setup ✅
+## Implementation Checklist
 
-- [x] Create project structure using Feature-Sliced Design
-- [x] Configure routing considering custom protocol `lmorozanki://`
-- [x] Create global types for Electron API
+- [x] **Task 1: Install vue-scroll-picker dependency**
+  - Add `vue-scroll-picker` to `frontend/package.json`
+  - Run `npm install` in frontend workspace
+  - Verify package installation and version compatibility
+  - **Important**: Package includes CSS файл `vue-scroll-picker/style.css` который нужно импортировать
+  - **Validation:** Check `package-lock.json` for correct version
 
-## Phase 2: UI Framework and Custom Title Bar ✅
+- [x] **Task 2: Create ScrollTimePicker wrapper component**
+  - Create `frontend/src/shared/ui/ScrollTimePicker.vue`
+  - Import: `import { VueScrollPicker } from 'vue-scroll-picker'`
+  - Import CSS: `import 'vue-scroll-picker/style.css'`
+  - Implement **universal** wrapper with props: `modelValue`, `min`, `max`, `step`, `suffix`, `formatDigits`, `disabled`
+  - Implement computed `options` array generator:
+    ```js
+    const options = computed(() => {
+      const result = [];
+      for (let i = props.min ?? 0; i <= (props.max ?? 23); i += (props.step ?? 1)) {
+        result.push({
+          name: i.toString().padStart(props.formatDigits ?? 2, '0') + (props.suffix || ''),
+          value: i
+        });
+      }
+      return result;
+    });
+    ```
+  - Test cases: hours (0-23), minutes all (0-59), minutes with step (0, 15, 30, 45)
+  - Apply design system styles using CSS variables
+  - **Validation:** Test with different configurations (hours, minutes with step 5, minutes with step 15)
 
-- [x] Implement custom window title bar
-- [x] Configure basic UI components
+- [x] **Task 3: Backend database migration and API updates**
+  - **Database migration**: Create new migration to alter Settings tables
+    - Add columns: `trainingStartTime INTEGER`, `trainingEndTime INTEGER`
+    - Migrate existing data: `trainingStartTime = trainingStartHour * 60`, `trainingEndTime = trainingEndHour * 60`
+    - Drop old columns: `trainingStartHour`, `trainingEndHour` (after migration)
+  - **Update Zod schemas** (`backend/src/schemas/settings.ts`):
+    - Replace `trainingStartHour: z.number().min(0).max(23)`
+    - With `trainingStartTime: z.number().min(0).max(1439)` (minutes)
+  - **Update TypeScript types** (`SettingsTable` interface)
+  - **Validation:** Run migrations on test database, verify data integrity
 
-## Phase 3: Core Functionality - Courses ✅
+- [x] **Task 4: Refactor TimeRangePicker to use 4 ScrollTimePickers**
+  - Replace `<select>` elements with `<ScrollTimePicker>` in `TimeRangePicker.vue`
+  - Maintain existing props: `start`, `end`, `disabled`
+  - Maintain existing events: `update:start`, `update:end`
+  - Preserve visual timeline component and logic
+  - Update component layout to accommodate new picker UI
+  - **Validation:** Verify API compatibility — component should work as drop-in replacement
 
-### Backend ✅
+- [x] **Task 4: Style integration with design system**
+  - Apply light/dark theme CSS variables to `ScrollTimePicker`
+  - Match visual style with existing Input/Select components
+  - Ensure proper hover, focus, and disabled states
+  - Add smooth transitions for scroll interactions
+  - **Validation:** Test in both light and dark themes in SettingsPage
 
-- [x] **Database Service**
-    - [x] Application configuration
-    - [x] DB schema with Kysely types
-    - [x] Migrations for courses table
-    - [x] Singleton Database Service
-- [x] **Courses API**
-    - [x] Course Repository (CRUD)
-    - [x] Validation schemas (Zod)
-    - [x] API Routes (GET, POST, PUT, DELETE)
-    - [x] Integration into Express server
+- [x] **Task 5: Integration testing in SettingsForm**
+  - Open SettingsPage and test global settings
+  - Verify time selection works correctly
+  - Confirm validation logic still triggers (start < end)
+  - Test visual timeline updates properly
+  - **Validation:** No console errors, all interactions work smoothly
 
-### Frontend - Course Management ✅
+- [x] **Task 6: Integration testing in CourseSettingsModal**
+  - Open course settings modal from CoursePage
+  - Test time selection in custom settings mode
+  - Verify save/cancel functionality
+  - Confirm disabled state works when using global settings
+  - **Validation:** Modal behavior unchanged, settings save correctly
 
-- [x] **Data Layer**
-    - [x] API client with backend port auto-detection
-    - [x] Pinia store for courses
-    - [x] TypeScript types for entities
-- [x] **UI Layer - Shared Components**
-    - [x] Input component (with textarea support)
-    - [x] Modal component
-- [x] **UI Layer - Widgets**
-    - [x] CourseList widget
-    - [x] CourseCard component
-    - [x] CourseEditorModal
-- [x] **Pages**
-    - [x] HomePage with full CRUD functionality
-- [x] **Testing**
-    - [x] Loading course list
-    - [x] Creating a course
+- [x] **Task 7: Cross-browser and responsive testing**
+  - Test on different screen sizes (desktop, tablet, mobile emulation)
+  - Verify touch interactions work properly
+  - Check keyboard navigation (Tab, Arrow keys if supported)
+  - Test in Electron environment
+  - **Validation:** Component works consistently across contexts
 
----
+- [x] **Task 8: Code cleanup and documentation**
+  - Remove unused code from old `<select>` implementation
+  - Add JSDoc comments to `ScrollTimePicker.vue` if needed
+  - Update any relevant inline comments
+  - Run linter and fix any issues
+  - **Validation:** `npm run lint` passes without errors
 
-## Phase 4: Cards and FSRS ✅
+## Dependencies
 
-### Backend (Completed)
+- Task 2 depends on Task 1 (package must be installed first)
+- Task 3 depends on Task 2 (wrapper component must exist)
+- Task 4 can run in parallel with Task 3
+- Tasks 5, 6, 7 depend on Tasks 3 and 4 (implementation complete)
+- Task 8 depends on all previous tasks
 
-- [x] **Database Schema**
-    - [x] Update `schema.ts` with `CardsTable`, `SettingsTable`, `CourseSettingsTable`
-    - [x] Add FSRS-specific fields (stability, difficulty, state, reps, lapses)
-    - [x] Update `Database` interface
+## Parallelization Opportunities
 
-- [x] **Database Migrations**
-    - [x] Create migration `002_create_cards_table.sql`
-    - [x] Create migration `003_create_settings_table.sql`
-    - [x] Create migration `004_create_course_settings_table.sql`
-    - [x] Define indices (courseId, due, state)
-
-- [x] **FSRS Service**
-    - [x] Install `ts-fsrs` package
-    - [x] Create `services/fsrs/index.ts`
-    - [x] Implement `calculateNextReview()`
-    - [x] Implement Learning Steps logic
-    - [x] Implement `canShowNewCards()`
-    - [x] Implement `initializeNewCard()`
-
-- [x] **Repositories**
-    - [x] Card Repository (CRUD + getDueCards + getCourseStats)
-    - [x] Settings Repository (global + course + getEffectiveSettings)
-
-- [x] **Validation Schemas**
-    - [x] Create `schemas/card.ts` (Create, Update, Review)
-    - [x] Create `schemas/settings.ts` (Global, Course)
-
-- [x] **API Routes**
-    - [x] `routes/cards.ts` (6 endpoints)
-    - [x] `routes/training.ts` (2 endpoints)
-    - [x] `routes/settings.ts` (5 endpoints)
-    - [x] Register in `routes/index.ts`
-
-- [x] **Bug Fixes and Formatting**
-    - [x] FSRS Rating types
-    - [x] Zod schema syntax
-    - [x] ZodError handling
-    - [x] Prettier formatting
-    - [x] TypeScript compilation
-
-### Frontend - Cards and Training (In Progress)
-
-- [x] **Entity Layer**
-    - [x] API service for cards (`shared/api/cards.js`)
-    - [x] Pinia store for cards (`entities/card/model/useCardStore.js`)
-    - [x] TypeScript types (`shared/types/card.ts`: CardState enum, Card interface)
-
-- [x] **Widgets**
-    - [x] CardList widget (`widgets/card-list/CardList.vue`)
-    - [x] CardItem component (`widgets/card-list/CardItem.vue`)
-    - [x] CardEditorModal (`widgets/card-editor/CardEditorModal.vue`)
-    - [x] QuickAddCard component (`widgets/quick-add-card/QuickAddCard.vue`)
-
-- [x] **Pages Integration**
-    - [x] CoursePage - card management integration (CRUD operations)
-    - [ ] TrainingPage - training interface with FSRS (next stage)
-- [x] SettingsPage - global and individual settings
-
-## Phase 5: Settings Page (SettingsPage) ✅
-
-### Backend ✅
-
-- [x] API Endpoints (GET/PUT Settings, Course Settings)
-- [x] Validation (Zod schemas)
-
-### Frontend ✅
-
-- [x] **Entity Layer**
-    - [x] Settings API Client
-    - [x] Pinia Store (Inheritance logic)
-    - [x] TypeScript Types
-- [x] **Widgets**
-    - [x] SettingsForm (Validation, Preview)
-    - [x] CourseSettingsModal (Override/Reset)
-    - [x] TimeRangePicker Component
-- [x] **Pages**
-    - [x] SettingsPage (Global & Courses list)
-    - [x] CoursePage Integration (Settings button)
-- [x] **Features**
-    - [x] Dark Theme Adaptation
-    - [x] Time Range Validation
-    - [x] Default Settings Fallback
-
----
-
-## Phase 5: System Integration (Planned)
-
-### Notification System
-
-- [ ] **Backend Notifications Service**
-    - [ ] Check due cards every hour
-    - [ ] Filter by training time
-    - [ ] Check "do not offer new cards if < 4 hours to end of day"
-    - [ ] Electron Notification API integration
-
-- [ ] **Electron Main Process**
-    - [ ] IPC handlers for notifications
-    - [ ] System notifications Windows/Linux/macOS
-
-- [ ] **Frontend**
-    - [ ] Notification frequency settings
-    - [ ] UI notification test
-
-### Tray Integration
-
-- [ ] **Electron Main Process**
-    - [ ] Create Tray icon
-    - [ ] Tray menu (Open, Quit)
-    - [ ] Change window-close: hide instead of quit
-    - [ ] Show window from tray
-
----
-
-## Phase 6: Extended Functionality (Optional)
-
-- [ ] **Learning Progress Statistics**
-    - [ ] Backend: API for statistics
-    - [ ] Frontend: Dashboard page with charts
-
-- [ ] **Course Import/Export**
-    - [ ] Backend: JSON export/import endpoints
-    - [ ] Frontend: Import/export UI
-
-- [ ] **Media in Cards**
-    - [ ] Backend: File upload endpoints
-    - [ ] Database: media_files table
-    - [ ] Frontend: Image/Audio upload components
-
-- [ ] **Card Search**
-    - [ ] Backend: Full-text search API
-    - [ ] Frontend: SearchBar component
-
-- [ ] **Tags and Categories**
-    - [ ] Database: tags table, card_tags relation
-    - [ ] Backend: Tags API
-    - [ ] Frontend: Tag management UI
-
----
-
-## Current Status
-
-**✅ Completed:** Backend Implementation of Cards and FSRS
-
-- Database schema (3 new tables)
-- FSRS Service with learning steps
-- 13 API endpoints
-- TypeScript compilation successful
-- Code formatting applied
-
-**✅ Completed:** Frontend Course Integration (CRUD fully working)
-
-**✅ Completed:** Frontend Cards Integration (Card management in Course)
-
-- Entity Layer: API client, Pinia store, TypeScript types
-- Widgets: CardItem (with flip animation), CardList, CardEditorModal, QuickAddCard
-- CoursePage integration: full CRUD, statistics, validation
-- ESLint check passed
-
-**📋 Documentation:**
-
-- [Backend_Cards_FSRS_Walkthrough.md](Backend_Cards_FSRS_Walkthrough.md)
-- [Cards_FSRS_Implementation_Plan.md](Cards_FSRS_Implementation_Plan.md)
-- [Cards_FSRS_Architecture.md](Cards_FSRS_Architecture.md)
-
-**⏭️ Next Steps:** TrainingPage (training interface with FSRS) → SettingsPage
-
-> [!NOTE]
-> Frontend Vite dev server is running (localhost:5173).
-> Detected Electron backend startup error (import issue in main.js) - requires separate fix.
+- Tasks 1 and 2 can be done sequentially in rapid succession
+- Task 4 (styling) can be started immediately after Task 2 structure is created
+- Tasks 5, 6, 7 (testing) can be executed in any order after implementation complete

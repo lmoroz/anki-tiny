@@ -70,7 +70,7 @@
     justify-content: space-between;
     align-items: center;
     height: 36px;
-    background-color: var(--color-bg-modal);
+    background: var(--color-title);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--color-border);
     -webkit-app-region: drag;

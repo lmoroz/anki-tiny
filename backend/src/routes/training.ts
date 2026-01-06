@@ -24,8 +24,8 @@ router.get('/courses/:courseId/due-cards', async (req: Request, res: Response) =
     const settings = await settingsRepository.getEffectiveSettings(courseId);
 
     // Проверяем время тренировок
-    const currentHour = now.getHours();
-    if (currentHour < settings.trainingStartHour || currentHour >= settings.trainingEndHour) {
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    if (currentMinutes < settings.trainingStartTime || currentMinutes >= settings.trainingEndTime) {
       return res.json({
         cards: [],
         message: 'Outside training hours',

@@ -5,6 +5,25 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.4.3] - 2026-01-07 01:30
+
+### Added
+
+#### OpenSpec: Replace Time Selects Implementation
+
+- **Features**:
+  - Implemented `vue-scroll-picker` for precise time selection (hours and minutes).
+  - Migrated database and API to use minute-based time format (0-1439 minutes) instead of hours.
+  - Redesigned time pickers with a modern, "airy" aesthetic (gradients, horizontal lines).
+  - Updated `SettingsForm` with real-time validation for minute-based ranges.
+  - Full support for 0-59 minutes range with 1-minute step.
+
+- **Backend**:
+  - Added migration `005_convert_time_to_minutes`.
+  - Updated `SettingsTable`, `CourseSettingsTable` schemas.
+  - Updated Zod validation logic.
+  - Updated FSRS time calculation logic.
+
 ## [0.4.2] - 2026-01-06 23:26 (AMENDED)
 
 ### Added

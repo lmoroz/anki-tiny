@@ -30,9 +30,9 @@
     --color-warning: #f9ab00;
 
     /* Background colors */
-    --color-bg-primary: #ffffff;
-    --color-bg-secondary: #f8f9fa;
-    --color-bg-modal: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    --color-bg-secondary: #f8f9fa50;
+    --color-title: linear-gradient(135deg, #1e293b50 0%, #0f172a50 100%);
+    --color-bg-modal: linear-gradient(135deg, #1e293bcc 0%, #0f172acc 100%);
 
     --input-bg: rgba(107, 114, 128, 0.2);
     --input-bg-option: #1f2937;
@@ -40,8 +40,8 @@
     /* Text colors */
     --color-text-primary: #e9ecef;
     --color-text-secondary: #e9ecefcc;
-    --color-text-tertiary: #e9ecef88;
-    --color-text-muted: #5f6368;
+    --color-text-tertiary: #e9ecefcc;
+    --color-text-muted: #e9ecef88;
     --color-text-placeholder: #80868b;
 
     /* Border colors */

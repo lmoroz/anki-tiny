@@ -47,8 +47,10 @@ export type CardUpdate = Updateable<CardsTable>;
 // Таблица settings (глобальные настройки)
 export interface SettingsTable {
   id: Generated<number>;
-  trainingStartHour: number; // 8 по умолчанию
-  trainingEndHour: number; // 22 по умолчанию
+  trainingStartHour: number; // 8 по умолчанию (DEPRECATED: use trainingStartTime)
+  trainingEndHour: number; // 22 по умолчанию (DEPRECATED: use trainingEndTime)
+  trainingStartTime: number; // Minutes from midnight (0-1439), default: 480 (8:00)
+  trainingEndTime: number; // Minutes from midnight (0-1439), default: 1320 (22:00)
   minTimeBeforeEnd: number; // 4 часа
   notificationsEnabled: number; // SQLite boolean (0/1)
   learningSteps: string; // JSON массив, например "[10, 240]" (минуты)
@@ -66,8 +68,10 @@ export type SettingsUpdate = Updateable<SettingsTable>;
 export interface CourseSettingsTable {
   id: Generated<number>;
   courseId: number;
-  trainingStartHour: number | null;
-  trainingEndHour: number | null;
+  trainingStartHour: number | null; // DEPRECATED: use trainingStartTime
+  trainingEndHour: number | null; // DEPRECATED: use trainingEndTime
+  trainingStartTime: number | null; // Minutes from midnight (0-1439)
+  trainingEndTime: number | null; // Minutes from midnight (0-1439)
   minTimeBeforeEnd: number | null;
   notificationsEnabled: number | null;
   learningSteps: string | null;

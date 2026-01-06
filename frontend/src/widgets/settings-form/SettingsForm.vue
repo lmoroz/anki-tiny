@@ -1,7 +1,5 @@
 <script setup>
   import { ref, computed, watch } from 'vue'
-  import TimeRangePicker from '@/shared/ui/TimeRangePicker.vue'
-  import Input from '@/shared/ui/Input.vue'
 
   const props = defineProps({
     modelValue: {
@@ -22,16 +20,24 @@
 
   const localSettings = ref({ ...props.modelValue })
 
+  // Helper function to format minutes to HH:MM
+  function formatTime(minutes) {
+    const hours = Math.floor(minutes / 60)
+    const mins = minutes % 60
+    return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`
+  }
+
   // Validation
   const validation = computed(() => {
     const errors = {}
 
-    if (localSettings.value.trainingStartHour >= localSettings.value.trainingEndHour) {
+    if (localSettings.value.trainingStartTime >= localSettings.value.trainingEndTime) {
       errors.timeRange = 'Начало дня должно быть раньше конца'
     }
 
-    const duration = (localSettings.value.trainingEndHour - localSettings.value.trainingStartHour + 24) % 24
-    if (duration < localSettings.value.minTimeBeforeEnd) {
+    const durationMinutes = localSettings.value.trainingEndTime - localSettings.value.trainingStartTime
+    const durationHours = durationMinutes / 60
+    if (durationHours < localSettings.value.minTimeBeforeEnd) {
       errors.minTime = 'Диапазон тренировок слишком короткий для указанного минимального времени'
     }
 
@@ -73,8 +79,8 @@
     <div class="form-section">
       <h3>Временные рамки тренировок</h3>
       <TimeRangePicker
-        v-model:start="localSettings.trainingStartHour"
-        v-model:end="localSettings.trainingEndHour"
+        v-model:start="localSettings.trainingStartTime"
+        v-model:end="localSettings.trainingEndTime"
         :disabled="readonly" />
       <p
         v-if="validation.errors.timeRange"
@@ -124,17 +130,18 @@
     </div>
 
     <!-- Preview текущего расписания -->
-    <div class="form-section preview bg-gray-500/20 border border-white/30 backdrop-blur-md bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.15)_0%,transparent_50%)] p-4 rounded-xl shadow-lg">
+    <div
+      class="form-section preview bg-gray-500/20 border border-white/30 backdrop-blur-md bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.15)_0%,transparent_50%)] p-4 rounded-xl shadow-lg">
       <h4>Текущее расписание</h4>
       <p>
         Тренировки доступны с
-        <strong>{{ localSettings.trainingStartHour }}:00</strong>
+        <strong>{{ formatTime(localSettings.trainingStartTime) }}</strong>
         до
-        <strong>{{ localSettings.trainingEndHour }}:00</strong>
+        <strong>{{ formatTime(localSettings.trainingEndTime) }}</strong>
       </p>
       <p>
         Новые карточки не показываются после
-        <strong>{{ localSettings.trainingEndHour - localSettings.minTimeBeforeEnd }}:00</strong>
+        <strong>{{ formatTime(localSettings.trainingEndTime - localSettings.minTimeBeforeEnd * 60) }}</strong>
       </p>
     </div>
 

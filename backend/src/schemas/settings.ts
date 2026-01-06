@@ -2,8 +2,10 @@ import { z } from 'zod';
 
 // Схема для глобальных настроек
 export const GlobalSettingsSchema = z.object({
-  trainingStartHour: z.number().int().min(0).max(23).optional(),
-  trainingEndHour: z.number().int().min(0).max(23).optional(),
+  trainingStartHour: z.number().int().min(0).max(23).optional(), // DEPRECATED
+  trainingEndHour: z.number().int().min(0).max(23).optional(), // DEPRECATED
+  trainingStartTime: z.number().int().min(0).max(1439).optional(), // Minutes from midnight
+  trainingEndTime: z.number().int().min(0).max(1439).optional(), // Minutes from midnight
   minTimeBeforeEnd: z.number().int().min(1).max(12).optional(),
   notificationsEnabled: z.boolean().optional(),
   learningSteps: z
@@ -25,8 +27,10 @@ export const GlobalSettingsSchema = z.object({
 
 // Схема для настроек курса (все поля optional, т.к. наследуются из глобальных)
 export const CourseSettingsSchema = z.object({
-  trainingStartHour: z.number().int().min(0).max(23).nullable().optional(),
-  trainingEndHour: z.number().int().min(0).max(23).nullable().optional(),
+  trainingStartHour: z.number().int().min(0).max(23).nullable().optional(), // DEPRECATED
+  trainingEndHour: z.number().int().min(0).max(23).nullable().optional(), // DEPRECATED
+  trainingStartTime: z.number().int().min(0).max(1439).nullable().optional(), // Minutes from midnight
+  trainingEndTime: z.number().int().min(0).max(1439).nullable().optional(), // Minutes from midnight
   minTimeBeforeEnd: z.number().int().min(1).max(12).nullable().optional(),
   notificationsEnabled: z.boolean().nullable().optional(),
   learningSteps: z

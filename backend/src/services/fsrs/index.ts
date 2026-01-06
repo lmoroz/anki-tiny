@@ -1,4 +1,4 @@
-import { Card as FSRSCard, FSRS, Rating, State, generatorParameters } from 'ts-fsrs';
+import { Card as FSRSCard, FSRS, Rating, State, generatorParameters, Grade } from 'ts-fsrs';
 import { Card } from '../database/schema';
 
 /**
@@ -15,9 +15,9 @@ export enum CardState {
  * Настройки для FSRS алгоритма
  */
 export interface FSRSSettings {
-  trainingStartHour: number;
-  trainingEndHour: number;
-  minTimeBeforeEnd: number;
+  trainingStartTime: number; // Minutes from midnight (0-1439)
+  trainingEndTime: number; // Minutes from midnight (0-1439)
+  minTimeBeforeEnd: number; // Hours
   notificationsEnabled: boolean;
   learningSteps: string; // JSON массив, например "[10, 240]" (минуты)
   enableFuzz: boolean;
@@ -126,7 +126,7 @@ function handleLearningSteps(card: Card, rating: Rating, settings: FSRSSettings,
         stepIndex: 0,
       });
 
-      const scheduledCard = fsrs.next(fsrsCard, now, Rating.Good as any);
+      const scheduledCard = fsrs.next(fsrsCard, now, Rating.Good as Grade);
       return fromFSRSCard(scheduledCard.card, card);
     }
 
@@ -170,7 +170,7 @@ export function calculateNextReview(card: Card, rating: Rating, settings: FSRSSe
   if (card.state === CardState.REVIEW || card.state === CardState.RELEARNING) {
     const fsrs = initializeFSRS(settings);
     const fsrsCard = toFSRSCard(card);
-    const scheduledCard = fsrs.next(fsrsCard, now, rating as any);
+    const scheduledCard = fsrs.next(fsrsCard, now, rating as Grade);
 
     return fromFSRSCard(scheduledCard.card, card);
   }
@@ -184,18 +184,14 @@ export function calculateNextReview(card: Card, rating: Rating, settings: FSRSSe
  * (до конца дня должно оставаться минимум minTimeBeforeEnd часов)
  */
 export function canShowNewCards(settings: FSRSSettings, now: Date): boolean {
-  const currentHour = now.getHours();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
   // Проверка времени тренировок
-  if (currentHour < settings.trainingStartHour || currentHour >= settings.trainingEndHour) {
-    return false;
-  }
+  if (currentMinutes < settings.trainingStartTime || currentMinutes >= settings.trainingEndTime) return false;
 
   // Проверка времени до конца дня
-  const endTime = new Date(now);
-  endTime.setHours(settings.trainingEndHour, 0, 0, 0);
-
-  const hoursUntilEnd = (endTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+  const minutesUntilEnd = settings.trainingEndTime - currentMinutes;
+  const hoursUntilEnd = minutesUntilEnd / 60;
 
   return hoursUntilEnd >= settings.minTimeBeforeEnd;
 }

@@ -20,6 +20,8 @@ export class SettingsRepository {
         .values({
           trainingStartHour: 8,
           trainingEndHour: 22,
+          trainingStartTime: 480, // 8:00 in minutes
+          trainingEndTime: 1320, // 22:00 in minutes
           minTimeBeforeEnd: 4,
           notificationsEnabled: 1,
           learningSteps: '[10, 240]',
@@ -112,8 +114,8 @@ export class SettingsRepository {
     if (!courseSettings) {
       // Используем глобальные настройки
       return {
-        trainingStartHour: globalSettings.trainingStartHour,
-        trainingEndHour: globalSettings.trainingEndHour,
+        trainingStartTime: globalSettings.trainingStartTime,
+        trainingEndTime: globalSettings.trainingEndTime,
         minTimeBeforeEnd: globalSettings.minTimeBeforeEnd,
         notificationsEnabled: globalSettings.notificationsEnabled === 1,
         learningSteps: globalSettings.learningSteps,
@@ -123,8 +125,8 @@ export class SettingsRepository {
 
     // Объединяем настройки (приоритет у индивидуальных)
     return {
-      trainingStartHour: courseSettings.trainingStartHour ?? globalSettings.trainingStartHour,
-      trainingEndHour: courseSettings.trainingEndHour ?? globalSettings.trainingEndHour,
+      trainingStartTime: courseSettings.trainingStartTime ?? globalSettings.trainingStartTime,
+      trainingEndTime: courseSettings.trainingEndTime ?? globalSettings.trainingEndTime,
       minTimeBeforeEnd: courseSettings.minTimeBeforeEnd ?? globalSettings.minTimeBeforeEnd,
       notificationsEnabled: (courseSettings.notificationsEnabled ?? globalSettings.notificationsEnabled) === 1,
       learningSteps: courseSettings.learningSteps ?? globalSettings.learningSteps,

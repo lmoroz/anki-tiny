@@ -32,12 +32,14 @@ router.get('/settings', async (req: Request, res: Response) => {
  * Обновить глобальные настройки
  */
 router.put('/settings', async (req: Request, res: Response) => {
+  let validatedData: Record<string, unknown> = {};
+  let updateData: Record<string, unknown> = {};
   try {
     // Валидация
-    const validatedData = GlobalSettingsSchema.parse(req.body);
+    validatedData = GlobalSettingsSchema.parse(req.body);
 
     // Преобразуем boolean в SQLite boolean (0/1)
-    const updateData: Record<string, unknown> = { ...validatedData };
+    updateData = { ...validatedData, enableFuzz: validatedData.enableFuzz ? 1 : 0, notificationsEnabled: validatedData.notificationsEnabled ? 1 : 0 };
 
     const settings = await settingsRepository.updateGlobalSettings(updateData);
 
@@ -51,10 +53,10 @@ router.put('/settings', async (req: Request, res: Response) => {
     res.json(result);
   } catch (error) {
     if (error instanceof ZodError) {
-      return res.status(400).json({ error: 'Validation error', details: error.issues });
+      return res.status(400).json({ error: 'Validation error', validatedData, updateData });
     }
     console.error('Error updating settings:', error);
-    res.status(500).json({ error: 'Failed to update settings' });
+    res.status(500).json({ error: 'Failed to update settings', validatedData, updateData });
   }
 });
 

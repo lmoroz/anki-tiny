@@ -364,7 +364,7 @@
 
   .batch-help .icon {
     font-size: 16px;
-    color: var(--color-bg-primary);
+    color: var(--color-text-primary);
     flex-shrink: 0;
     margin-top: 1px;
   }

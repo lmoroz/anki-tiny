@@ -2,14 +2,14 @@
 
 ## Implementation Checklist
 
-- [ ] **Task 1: Install vue-scroll-picker dependency**
+- [x] **Task 1: Install vue-scroll-picker dependency**
   - Add `vue-scroll-picker` to `frontend/package.json`
   - Run `npm install` in frontend workspace
   - Verify package installation and version compatibility
   - **Important**: Package includes CSS файл `vue-scroll-picker/style.css` который нужно импортировать
   - **Validation:** Check `package-lock.json` for correct version
 
-- [ ] **Task 2: Create ScrollTimePicker wrapper component**
+- [x] **Task 2: Create ScrollTimePicker wrapper component**
   - Create `frontend/src/shared/ui/ScrollTimePicker.vue`
   - Import: `import { VueScrollPicker } from 'vue-scroll-picker'`
   - Import CSS: `import 'vue-scroll-picker/style.css'`
@@ -31,7 +31,7 @@
   - Apply design system styles using CSS variables
   - **Validation:** Test with different configurations (hours, minutes with step 5, minutes with step 15)
 
-- [ ] **Task 3: Backend database migration and API updates**
+- [x] **Task 3: Backend database migration and API updates**
   - **Database migration**: Create new migration to alter Settings tables
     - Add columns: `trainingStartTime INTEGER`, `trainingEndTime INTEGER`
     - Migrate existing data: `trainingStartTime = trainingStartHour * 60`, `trainingEndTime = trainingEndHour * 60`
@@ -42,7 +42,7 @@
   - **Update TypeScript types** (`SettingsTable` interface)
   - **Validation:** Run migrations on test database, verify data integrity
 
-- [ ] **Task 4: Refactor TimeRangePicker to use 4 ScrollTimePickers**
+- [x] **Task 4: Refactor TimeRangePicker to use 4 ScrollTimePickers**
   - Replace `<select>` elements with `<ScrollTimePicker>` in `TimeRangePicker.vue`
   - Maintain existing props: `start`, `end`, `disabled`
   - Maintain existing events: `update:start`, `update:end`
@@ -50,35 +50,35 @@
   - Update component layout to accommodate new picker UI
   - **Validation:** Verify API compatibility — component should work as drop-in replacement
 
-- [ ] **Task 4: Style integration with design system**
+- [x] **Task 4: Style integration with design system**
   - Apply light/dark theme CSS variables to `ScrollTimePicker`
   - Match visual style with existing Input/Select components
   - Ensure proper hover, focus, and disabled states
   - Add smooth transitions for scroll interactions
   - **Validation:** Test in both light and dark themes in SettingsPage
 
-- [ ] **Task 5: Integration testing in SettingsForm**
+- [x] **Task 5: Integration testing in SettingsForm**
   - Open SettingsPage and test global settings
   - Verify time selection works correctly
   - Confirm validation logic still triggers (start < end)
   - Test visual timeline updates properly
   - **Validation:** No console errors, all interactions work smoothly
 
-- [ ] **Task 6: Integration testing in CourseSettingsModal**
+- [x] **Task 6: Integration testing in CourseSettingsModal**
   - Open course settings modal from CoursePage
   - Test time selection in custom settings mode
   - Verify save/cancel functionality
   - Confirm disabled state works when using global settings
   - **Validation:** Modal behavior unchanged, settings save correctly
 
-- [ ] **Task 7: Cross-browser and responsive testing**
+- [x] **Task 7: Cross-browser and responsive testing**
   - Test on different screen sizes (desktop, tablet, mobile emulation)
   - Verify touch interactions work properly
   - Check keyboard navigation (Tab, Arrow keys if supported)
   - Test in Electron environment
   - **Validation:** Component works consistently across contexts
 
-- [ ] **Task 8: Code cleanup and documentation**
+- [x] **Task 8: Code cleanup and documentation**
   - Remove unused code from old `<select>` implementation
   - Add JSDoc comments to `ScrollTimePicker.vue` if needed
   - Update any relevant inline comments

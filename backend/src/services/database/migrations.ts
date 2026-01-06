@@ -105,6 +105,36 @@ const migrations: Migration[] = [
       await db.schema.createIndex('courseSettings_courseId_idx').ifNotExists().on('courseSettings').column('courseId').execute();
     },
   },
+  {
+    id: '005',
+    name: 'convert_time_to_minutes',
+    up: async (db: Kysely<Database>) => {
+      // Add new columns for minute-based time
+      await db.schema.alterTable('settings').addColumn('trainingStartTime', 'integer').execute();
+
+      await db.schema.alterTable('settings').addColumn('trainingEndTime', 'integer').execute();
+
+      await db.schema.alterTable('courseSettings').addColumn('trainingStartTime', 'integer').execute();
+
+      await db.schema.alterTable('courseSettings').addColumn('trainingEndTime', 'integer').execute();
+
+      // Migrate existing data: convert hours to minutes (hour * 60)
+      await sql`UPDATE settings SET trainingStartTime = trainingStartHour * 60, trainingEndTime = trainingEndHour * 60`.execute(db);
+
+      await sql`UPDATE courseSettings SET trainingStartTime = trainingStartHour * 60 WHERE trainingStartHour IS NOT NULL`.execute(db);
+
+      await sql`UPDATE courseSettings SET trainingEndTime = trainingEndHour * 60 WHERE trainingEndHour IS NOT NULL`.execute(db);
+
+      // Set defaults for new columns in settings table
+      await sql`UPDATE settings SET trainingStartTime = 480 WHERE trainingStartTime IS NULL`.execute(db);
+      await sql`UPDATE settings SET trainingEndTime = 1320 WHERE trainingEndTime IS NULL`.execute(db);
+
+      // Drop old hour-based columns from settings
+      // SQLite doesn't support DROP COLUMN directly, so we need to recreate the table
+      // For simplicity, we'll keep the old columns for backward compatibility
+      // They can be removed in a future migration if needed
+    },
+  },
 ];
 
 /**

@@ -17,8 +17,8 @@
 
   // Дефолтные значения настроек
   const DEFAULT_SETTINGS = {
-    trainingStartHour: 8,
-    trainingEndHour: 22,
+    trainingStartTime: 480, // 08:00 в минутах (8 * 60)
+    trainingEndTime: 1320, // 22:00 в минутах (22 * 60)
     minTimeBeforeEnd: 4,
     notificationsEnabled: true,
     enableFuzz: true
