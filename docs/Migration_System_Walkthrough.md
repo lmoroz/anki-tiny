@@ -1,31 +1,31 @@
-# Migration System - Реализация и Тестирование ✅
+# Migration System - Implementation and Testing ✅
 
-## Проблема
+## Problem
 
-БД `repetitio.db` уже существовала с таблицей `courses`, созданной ранее (05.01.2026 18:00). Старый код применял миграции **только для новой БД**:
+The database `repetitio.db` already existed with the `courses` table created earlier (05.01.2026 18:00). The old code applied migrations **only for a new DB**:
 
 ```typescript
 if (isNewDatabase) {
-  await up(dbInstance);  // Миграции применяются только здесь!
+  await up(dbInstance);  // Migrations applied only here!
 }
 ```
 
-**Результат:** Новые таблицы (`cards`, `settings`, `courseSettings`) не создавались при запуске приложения.
+**Result:** New tables (`cards`, `settings`, `courseSettings`) were not created when the app started.
 
 ---
 
-## Решение: Migration Tracking System
+## Solution: Migration Tracking System
 
-### Архитектура
+### Architecture
 
-Создана профессиональная система отслеживания миграций:
+Created a professional migration tracking system:
 
-1. **Таблица `_migrations`** — хранит список примененных миграций
-2. **Миграции разбиты на отдельные шаги** (001, 002, 003, 004)
-3. **Автоматическое применение** недостающих миграций при старте
-4. **Идемпотентность** — безопасно запускать многократно
+1. **Table `_migrations`** — stores list of applied migrations.
+2. **Migrations split into steps** (001, 002, 003, 004).
+3. **Automatic application** of missing migrations on startup.
+4. **Idempotency** — safe to run multiple times.
 
-### Структура таблицы _migrations
+### Structure of `_migrations` table
 
 ```sql
 CREATE TABLE _migrations (
@@ -35,38 +35,38 @@ CREATE TABLE _migrations (
 );
 ```
 
-### Список миграций
+### Migrations List
 
-| ID  | Name                          | Описание                          |
+| ID  | Name                          | Description                       |
 |-----|-------------------------------|-----------------------------------|
-| 001 | create_courses_table          | Таблица courses + индекс         |
-| 002 | create_cards_table            | Таблица cards + 3 индекса FSRS   |
-| 003 | create_settings_table         | Глобальные настройки             |
-| 004 | create_course_settings_table  | Индивидуальные настройки курсов  |
+| 001 | create_courses_table          | Table courses + index             |
+| 002 | create_cards_table            | Table cards + 3 FSRS indices      |
+| 003 | create_settings_table         | Global settings                   |
+| 004 | create_course_settings_table  | Individual course settings        |
 
 ---
 
-## Реализация
+## Implementation
 
-### Файл: [migrations.ts](file:///e:/Develop/anki-tiny/backend/src/services/database/migrations.ts)
+### File: [migrations.ts](file:///e:/Develop/anki-tiny/backend/src/services/database/migrations.ts)
 
-**Ключевые функции:**
+**Key functions:**
 
 #### `createMigrationsTable()`
 
-Создает таблицу `_migrations` если её нет (с `.ifNotExists()`).
+Creates `_migrations` table if it doesn't exist (with `.ifNotExists()`).
 
 #### `getAppliedMigrations()`
 
-Возвращает список ID примененных миграций из таблицы `_migrations`.
+Returns list of applied migration IDs from `_migrations` table.
 
 #### `markMigrationAsApplied()`
 
-Вставляет запись в `_migrations` после успешного применения.
+Inserts record into `_migrations` after successful application.
 
 #### `runMigrations()` ⭐
 
-**Основная функция:**
+**Main function:**
 
 ```typescript
 export async function runMigrations(db: Kysely<Database>): Promise<void> {
@@ -95,51 +95,51 @@ export async function runMigrations(db: Kysely<Database>): Promise<void> {
 }
 ```
 
-### Файл: [database/index.ts](file:///e:/Develop/anki-tiny/backend/src/services/database/index.ts)
+### File: [database/index.ts](file:///e:/Develop/anki-tiny/backend/src/services/database/index.ts)
 
-**Изменения:**
+**Changes:**
 
 ```typescript
-// Было:
+// Was:
 if (isNewDatabase) {
   await up(dbInstance);
 } else {
   console.log('Using existing database');
 }
 
-// Стало:
+// Became:
 console.log('📦 Database at:', config.DATABASE_PATH);
-await runMigrations(dbInstance);  // Всегда проверяем и применяем
+await runMigrations(dbInstance);  // Always check and apply
 ```
 
 ---
 
-## Исправления
+## Fixes
 
-### Проблема 1: `table courses already exists`
+### Issue 1: `table courses already exists`
 
-**Ошибка:** Миграции пытались создать уже существующую таблицу.
+**Error:** Migrations tried to create an already existing table.
 
-**Решение:** Добавлен `.ifNotExists()` ко всем `createTable()`:
+**Solution:** Added `.ifNotExists()` to all `createTable()`:
 
 ```typescript
 await db.schema
   .createTable('courses')
-  .ifNotExists()  // ← Добавлено
+  .ifNotExists()  // ← Added
   .addColumn(...)
   .execute();
 ```
 
-### Проблема 2: `index courses_name_idx already exists`
+### Issue 2: `index courses_name_idx already exists`
 
-**Ошибка:** Индексы тоже пытались создаться повторно.
+**Error:** Indices also tried to be recreated.
 
-**Решение:** Добавлен `.ifNotExists()` ко всем `createIndex()`:
+**Solution:** Added `.ifNotExists()` to all `createIndex()`:
 
 ```typescript
 await db.schema
   .createIndex('courses_name_idx')
-  .ifNotExists()  // ← Добавлено
+  .ifNotExists()  // ← Added
   .on('courses')
   .column('name')
   .execute();
@@ -147,9 +147,9 @@ await db.schema
 
 ---
 
-## Результаты тестирования
+## Testing Results
 
-### ✅ Запуск на существующей БД
+### ✅ Run on existing DB
 
 ```
 📦 Database at: E:\Develop\anki-tiny\backend\repetitio.db
@@ -168,7 +168,7 @@ await db.schema
 🚀 Server running on port 1095
 ```
 
-### ✅ Повторный запуск (миграции уже применены)
+### ✅ Second run (migrations already applied)
 
 ```
 📦 Database at: E:\Develop\anki-tiny\backend\repetitio.db
@@ -178,48 +178,48 @@ await db.schema
 🚀 Server running on port 1095
 ```
 
-**Идемпотентность подтверждена!** ✨
+**Idempotency confirmed!** ✨
 
 ---
 
-## Структура БД после миграций
+## DB Structure after Migrations
 
-### Таблицы
+### Tables
 
-1. **`_migrations`** — отслеживание миграций (4 записи)
-2. **`courses`** — курсы (уже существовала)
-3. **`cards`** — карточки с FSRS полями (создана)
-4. **`settings`** — глобальные настройки (создана)
-5. **`courseSettings`** — индивидуальные настройки (создана)
+1. **`_migrations`** — migration tracking (4 records)
+2. **`courses`** — courses (already existed)
+3. **`cards`** — cards with FSRS fields (created)
+4. **`settings`** — global settings (created)
+5. **`courseSettings`** — individual settings (created)
 
-### Индексы
+### Indices
 
 - `courses_name_idx` (courses.name)
 - `cards_courseId_idx` (cards.courseId)
-- `cards_due_idx` (cards.due) — для FSRS
-- `cards_state_idx` (cards.state) — для FSRS
+- `cards_due_idx` (cards.due) — for FSRS
+- `cards_state_idx` (cards.state) — for FSRS
 - `courseSettings_courseId_idx` (courseSettings.courseId)
 
 ---
 
-## Преимущества реализации
+## Implementation Benefits
 
-✅ **Отслеживание:** Каждая миграция применяется только один раз  
-✅ **Идемпотентность:** Безопасно запускать многократно  
-✅ **Логирование:** Понятные сообщения о процессе  
-✅ **Rollback support:** Функция `rollbackAllMigrations()` для тестирования  
-✅ **Расширяемость:** Легко добавлять новые миграции  
-✅ **Production-ready:** Профессиональный подход
+✅ **Tracking:** Each migration applied only once  
+✅ **Idempotency:** Safe to run multiple times  
+✅ **Logging:** Clear process messages  
+✅ **Rollback support:** `rollbackAllMigrations()` function for testing  
+✅ **Extensibility:** Easy to add new migrations  
+✅ **Production-ready:** Professional approach
 
 ---
 
-## Добавление новых миграций
+## Adding New Migrations
 
-Пример добавления новой миграции `005`:
+Example of adding new migration `005`:
 
 ```typescript
 const migrations: Migration[] = [
-  // ... существующие миграции ...
+  // ... existing migrations ...
   {
     id: '005',
     name: 'add_tags_table',
@@ -235,42 +235,42 @@ const migrations: Migration[] = [
 ];
 ```
 
-**Автоматически применится** при следующем запуске приложения!
+**Automatically applied** on next app launch!
 
 ---
 
-## Архитектурные решения
+## Architectural Decisions
 
-### Почему таблица _migrations, а не migrations_history?
+### Why `_migrations` table and not `migrations_history`?
 
-- Префикс `_` обозначает системную таблицу
-- Короткое имя
-- Стандарт в индустрии (аналогично Laravel, TypeORM)
+- Prefix `_` denotes system table
+- Short name
+- Industry standard (similar to Laravel, TypeORM)
 
-### Почему строковые ID ('001'), а не числовые?
+### Why string IDs ('001') and not numbers?
 
-- Более читаемый порядок сортировки  
-- Легко добавлять миграции между существующими (001a, 001b)
-- Имя миграции включает ID + название: `001_create_courses_table`
+- More readable sort order
+- Easy to add migrations between existing ones (001a, 001b)
+- Migration name includes ID + name: `001_create_courses_table`
 
-### Почему миграции в одном файле?
+### Why migrations in one file?
 
-- Для небольших проектов удобнее
-- Все миграции видны в одном месте
-- При необходимости легко разбить на отдельные файлы
+- More convenient for small projects
+- All migrations visible in one place
+- Can be split into files if needed
 
 ---
 
-## Следующие шаги
+## Next Steps
 
-✅ **Backend полностью готов:**
+✅ **Backend fully ready:**
 
-- Database schema с FSRS
-- Система миграций работает
+- Database schema with FSRS
+- Migration system working
 - 13 API endpoints
-- TypeScript компиляция успешна
+- TypeScript compilation successful
 
-**⏭️ Следующий этап:** Frontend integration
+**⏭️ Next Stage:** Frontend integration
 
 - Entity layer (API, Store, Types)
 - Widgets (CardList, CardEditor)

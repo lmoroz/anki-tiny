@@ -1,106 +1,123 @@
 # Changelog
 
-Все значимые изменения в проекте Repetitio документируются в этом файле.
+All notable changes to the Repetitio project will be documented in this file.
 
-Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/),
-и проект придерживается [Semantic Versioning](https://semver.org/lang/ru/).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/).
+
+## [0.4.2] - 2026-01-06 22:45
+
+### Documentation
+
+- **Internationalization (i18n)**
+    - Full translation of project documentation from Russian to English.
+    - Updated `readme.md`, `openspec` docs, and all files in `docs/`.
+    - Maintained original formatting, diagrams, and code blocks.
+
+- **Readme Updates**
+    - Actualized Architecture, Features, and Current Status sections.
+    - Fixed Installation and Development Mode instructions based on actual `package.json` scripts.
+
+### Technical Details
+
+- **Version Bump**: 0.4.1 → 0.4.2 across all workspaces.
 
 ## [0.4.1] - 2026-01-06 21:57
 
 ### Fixed
 
-#### Settings Page: Исправление кнопок настройки курсов
+#### Settings Page: Fix course settings buttons
 
-- **Проблема**: Кнопки "Настроить" на странице настроек не работали
-    - Функция `openCourseSettings()` была stub-реализацией (только console.log)
-    - Модальное окно `CourseSettingsModal` существовало, но не было подключено к `SettingsPage`
+- **Issue**: "Configure" buttons on the settings page were not working
+    - `openCourseSettings()` function was a stub implementation (console.log only)
+    - `CourseSettingsModal` existed but was not connected to `SettingsPage`
 
-- **Решение**:
-    - Добавлена логика открытия/закрытия модального окна в `SettingsPage.vue`
-    - Реактивные переменные: `showCourseModal`, `selectedCourseId`, `selectedCourse`
-    - Функции: `openCourseSettings()`, `closeCourseModal()`
-    - Подключен существующий компонент `CourseSettingsModal` в template
+- **Solution**:
+    - Added modal open/close logic to `SettingsPage.vue`
+    - Reactive variables: `showCourseModal`, `selectedCourseId`, `selectedCourse`
+    - Functions: `openCourseSettings()`, `closeCourseModal()`
+    - Connected existing `CourseSettingsModal` component in template
 
-#### Settings Store: Критическое исправление обработки API ответов
+#### Settings Store: Critical fix for API response handling
 
-- **Корневая проблема**: Неправильная обработка структуры ответов от бэкенда
-    - Store ожидал обёрнутые данные `{ settings: {...} }`, но API возвращал данные напрямую
-    - `effectiveSettings` возвращал `undefined` из-за попытки обращения к `response.settings`
-    - В модальном окне отображались некорректные значения (":00", "NaN:00")
+- **Root Cause**: Incorrect handling of backend response structure
+    - Store expected wrapped data `{ settings: {...} }`, but API returned data directly
+    - `effectiveSettings` returned `undefined` due to accessing `response.settings`
+    - Modal displayed incorrect values (":00", "NaN:00")
 
-- **Исправления в `useSettingsStore.js`**:
-    - `fetchGlobalSettings()` — изменено с `response.settings` на `response`
-    - `updateGlobalSettings()` — изменено с `response.settings` на `response`
-    - `fetchCourseSettings()` — корректная обработка `{ courseSettings, effectiveSettings }`
-    - `updateCourseSettings()` — изменено с `response.settings` на `response`
+- **Fixes in `useSettingsStore.js`**:
+    - `fetchGlobalSettings()` — changed from `response.settings` to `response`
+    - `updateGlobalSettings()` — changed from `response.settings` to `response`
+    - `fetchCourseSettings()` — correct handling of `{ courseSettings, effectiveSettings }`
+    - `updateCourseSettings()` — changed from `response.settings` to `response`
 
-- **Файлы**:
-    - `frontend/src/entities/settings/model/useSettingsStore.js` (4 метода исправлены)
-    - `frontend/src/pages/settings/SettingsPage.vue` (добавлена логика модального окна)
-    - `frontend/src/widgets/course-settings-modal/CourseSettingsModal.vue` (улучшена инициализация)
+- **Files**:
+    - `frontend/src/entities/settings/model/useSettingsStore.js` (4 methods fixed)
+    - `frontend/src/pages/settings/SettingsPage.vue` (added modal logic)
+    - `frontend/src/widgets/course-settings-modal/CourseSettingsModal.vue` (improved initialization)
 
-#### Modal Component: Поддержка slot для заголовка
+#### Modal Component: Slot support for header
 
-- **Пользовательские исправления**:
-    - `Modal.vue` — добавлен fallback на slot `header` если prop `title` не задан
-    - `CourseSettingsModal.vue` — изменен тип `courseId` с String на Number
-    - `CoursePage.vue` — удалён `String()` casting для courseId
+- **User Fixes**:
+    - `Modal.vue` — added fallback to `header` slot if `title` prop is not set
+    - `CourseSettingsModal.vue` — changed `courseId` type from String to Number
+    - `CoursePage.vue` — removed `String()` casting for courseId
 
 ### Technical Details
 
-- **Верификация**:
-    - ✅ Модальное окно открывается при клике на "Настроить"
-    - ✅ Заголовок отображает название курса
-    - ✅ Правильный radio-button выбран (глобальные/индивидуальные)
-    - ✅ Все поля заполнены корректными значениями
-    - ✅ "Текущее расписание" показывает валидные данные
+- **Verification**:
+    - ✅ Modal opens when clicking "Configure"
+    - ✅ Header displays course name
+    - ✅ Correct radio button selected (Global/Custom)
+    - ✅ All fields populated with correct values
+    - ✅ "Current Schedule" shows valid data
 
-- **Отладка**:
-    - Временное логирование API ответов помогло выявить несоответствие структуры данных
-    - Весь отладочный код удалён после исправления проблемы
+- **Debugging**:
+    - Temporary logging of API responses helped identify data structure mismatch
+    - All debug code removed after fixing the issue
 
 ## [0.4.0] - 2026-01-06 20:49
 
 ### Changed
 
-#### OpenSpec: Архивирование изменения add-settings-page
+#### OpenSpec: Archiving add-settings-page change
 
-- **Архивирование завершено**
-    - Изменение `add-settings-page` успешно заархивировано как `2026-01-06-add-settings-page`
-    - Статус изменения перед архивированием: ✓ Complete
-    - Все задачи завершены, код реализован и протестирован
+- **Archiving completed**
+    - `add-settings-page` change successfully archived as `2026-01-06-add-settings-page`
+    - Change status before archiving: ✓ Complete
+    - All tasks completed, code implemented and tested
 
-- **Создание спецификаций**
-    - Автоматически созданы 3 новые спецификации из delta-секций:
-        - `settings-ui` (7 требований) — UI компоненты и страница настроек
-        - `settings-course-management` (6 требований) — управление настройками курса
-        - `settings-global-management` (5 требований) — глобальные настройки приложения
-    - Всего добавлено **18 новых требований** в базу знаний проекта
+- **Spec Creation**
+    - Automatically created 3 new specs from delta sections:
+        - `settings-ui` (7 requirements) — UI components and settings page
+        - `settings-course-management` (6 requirements) — course settings management
+        - `settings-global-management` (5 requirements) — global application settings
+    - Total **18 new requirements** added to project knowledge base
 
-- **Структура спецификаций**
-    - Каждая спецификация содержит Requirements в Given/When/Then формате
-    - Покрыты сценарии: загрузка данных, валидация, модальные окна, клавиатурная навигация
-    - Включены требования по адаптивности и уведомлениям
+- **Spec Structure**
+    - Each spec contains Requirements in Given/When/Then format
+    - Covered scenarios: data loading, validation, modals, keyboard navigation
+    - Includes requirements for responsiveness and notifications
 
 ### Documentation
 
-- **Обновлены OpenSpec specs**
-    - `openspec/specs/settings-ui/spec.md` (172 строки, 7 требований)
-    - `openspec/specs/settings-course-management/spec.md` (6 требований)
-    - `openspec/specs/settings-global-management/spec.md` (5 требований)
+- **Updated OpenSpec specs**
+    - `openspec/specs/settings-ui/spec.md` (172 lines, 7 requirements)
+    - `openspec/specs/settings-course-management/spec.md` (6 requirements)
+    - `openspec/specs/settings-global-management/spec.md` (5 requirements)
 
 ### Technical Details
 
-- **Текущее состояние спецификаций**: 4 активных specs
-    - `styling-system` (6 требований)
-    - `settings-ui` (7 требований)
-    - `settings-course-management` (6 требований)
-    - `settings-global-management` (5 требований)
+- **Current Specs State**: 4 active specs
+    - `styling-system` (6 requirements)
+    - `settings-ui` (7 requirements)
+    - `settings-course-management` (6 requirements)
+    - `settings-global-management` (5 requirements)
 
-- **OpenSpec CLI команды использованы**:
-    - `npx @fission-ai/openspec list` — проверка статуса
-    - `npx @fission-ai/openspec archive add-settings-page --yes` — архивирование
-    - `npx @fission-ai/openspec list --specs` — подтверждение создания specs
+- **OpenSpec CLI commands used**:
+    - `npx @fission-ai/openspec list` — check status
+    - `npx @fission-ai/openspec archive add-settings-page --yes` — archive
+    - `npx @fission-ai/openspec list --specs` — confirm spec creation
 
 ## [0.4.0] - 2026-01-06 20:45
 
@@ -109,48 +126,48 @@
 #### Feature: Systemized Styling
 
 - **Unified Styling System**
-    - Внедрена система CSS-переменных для цветов (`--color-primary`, `--color-bg-modal`, etc.)
-    - Внедрена система типографики (`--text-page-title-size`, etc.)
-    - Весь UI переведен на использование этих переменных для полной поддержки тем
-    - Удалены все hardcoded hex цвета (`#1a73e8`, `#e9ecef`) из компонентов
+    - Implemented CSS variables system for colors (`--color-primary`, `--color-bg-modal`, etc.)
+    - Implemented typography system (`--text-page-title-size`, etc.)
+    - Entire UI migrated to use these variables for full theme support
+    - Removed all hardcoded hex colors (`#1a73e8`, `#e9ecef`) from components
 
 - **Component Refactoring**
-    - `Button.vue`, `Input.vue`, `Modal.vue`, `Card.vue` полностью обновлены
-    - `QuickAddCard.vue`, `CardItem.vue`, `CourseCard.vue` и другие виджеты обновлены
-    - Убраны дублирующиеся стили (например, кнопки в `CourseSettingsModal.vue` теперь используют shared `Button.vue`)
-    - Исправлены проблемы с видимостью текста (dropdowns, buttons) в темной теме
+    - `Button.vue`, `Input.vue`, `Modal.vue`, `Card.vue` fully updated
+    - `QuickAddCard.vue`, `CardItem.vue`, `CourseCard.vue` and other widgets updated
+    - Removed duplicate styles (e.g., buttons in `CourseSettingsModal.vue` now use shared `Button.vue`)
+    - Fixed visibility issues (dropdowns, buttons) in dark theme
 
 ### Fixed
 
 - **UI Consistency Issues**
-    - Исправлена проблема с нечитаемыми опциями в `TimeRangePicker` (белый текст на белом фоне)
-    - Исправлен стиль блока "Текущее расписание" в настройках (теперь соответствует стилю описания курса)
-    - Унифицированы стили кнопок во всех модальных окнах
-    - Исправлена излишняя яркость кнопок действий
+    - Fixed unreadable options in `TimeRangePicker` (white text on white background)
+    - Fixed style of "Current Schedule" block in settings (now matches course description style)
+    - Unified button styles across all modal windows
+    - Fixed excessive brightness of action buttons
 
 ## [0.3.0] - 2026-01-06 18:19
 
 ### Fixed
 
-#### Frontend: Контрастность текста на главной странице
+#### Frontend: Text Contrast on Home Page
 
-- **Проблема**: Текст в empty state компоненте был нечитаем на сине-голубом фоне карточки
-    - `.empty-state-title` использовал тёмный цвет `#202124`
-    - `.empty-state-text` использовал тёмный цвет `#5f6368`
-    - Текст "Нет курсов" и описание были практически невидимы на синем фоне
+- **Issue**: Text in empty state component was unreadable on blue card background
+    - `.empty-state-title` used dark color `#202124`
+    - `.empty-state-text` used dark color `#5f6368`
+    - "No courses" text and description were practically invisible on blue background
 
-- **Решение**:
-    - Заголовок `.empty-state-title` изменен на белый: `#ffffff`
-    - Описание `.empty-state-text` изменено на светло-серый: `#e9ecef`
-    - Обеспечен отличный контраст с синим фоном карточки
+- **Solution**:
+    - `.empty-state-title` changed to white: `#ffffff`
+    - `.empty-state-text` changed to light gray: `#e9ecef`
+    - Excellent contrast ensured against blue card background
 
-- **Файлы**:
-    - Изменено: `frontend/src/pages/home/HomePage.vue` (2 строки CSS)
+- **Files**:
+    - Changed: `frontend/src/pages/home/HomePage.vue` (2 CSS lines)
 
-- **Верификация**:
-    - ✅ Текст "Нет курсов" отображается белым цветом
-    - ✅ Описание читаемо на синем фоне
-    - ✅ Контраст соответствует accessibility требованиям
+- **Verification**:
+    - ✅ "No courses" text displays in white
+    - ✅ Description is readable on blue background
+    - ✅ Contrast meets accessibility requirements
 
 ## [0.3.0] - 2026-01-06 18:14
 
@@ -158,39 +175,39 @@
 
 #### Frontend: Tailwind CSS v4 Theme Configuration
 
-- **Проблема с классами `rounded-*`**
-    - Диагностирована причина неработающих классов `rounded-xl` в Button.vue и Card.vue
-    - Корневая проблема: отсутствие CSS-переменной `--radius-xl` в теме Tailwind CSS v4
-    - Динамическая генерация классов через строковую интерполяцию `` `rounded-${props.rounded}` ``
-      не обнаруживалась статическим анализом Tailwind
+- **Issue with `rounded-*` classes**
+    - Diagnosed reason for non-working `rounded-xl` classes in Button.vue and Card.vue
+    - Root cause: missing `--radius-xl` CSS variable in Tailwind CSS v4 theme
+    - Dynamic class generation via string interpolation `` `rounded-${props.rounded}` ``
+      was not detected by Tailwind static analysis
 
-- **Решение 1: Определение темы через `@theme` блок**
-    - Создан блок `@theme` в `frontend/src/app/assets/css/styles.css`
-    - Определены все переменные радиусов: sm, md, lg, xl, 2xl, 3xl, full
-    - `--radius-xl: 0.75rem` (12px) для корректного скругления углов
-    - **Важно**: в Tailwind v4 блок `@theme` должен находиться в том же файле, где `@import 'tailwindcss'`
+- **Solution 1: Theme Definition via `@theme` block**
+    - Created `@theme` block in `frontend/src/app/assets/css/styles.css`
+    - Defined all radius variables: sm, md, lg, xl, 2xl, 3xl, full
+    - `--radius-xl: 0.75rem` (12px) for correct corner rounding
+    - **Important**: in Tailwind v4, `@theme` block must be in the same file as `@import 'tailwindcss'`
 
-- **Решение 2: Safelist для динамических классов**
-    - Создан `frontend/tailwind.config.js` с safelist массивом
-    - Явно указаны все классы `rounded-*` для гарантированной генерации
-    - Необходимость: Tailwind v4 не обнаруживает классы из строковых интерполяций
+- **Solution 2: Safelist for Dynamic Classes**
+    - Created `frontend/tailwind.config.js` with safelist array
+    - Explicitly specified all `rounded-*` classes to guarantee generation
+    - Necessity: Tailwind v4 does not detect classes from string interpolations
 
 ### Added
 
-- **frontend/tailwind.config.js** — конфигурация с safelist для динамически генерируемых классов
-- **@theme блок** в styles.css с полным набором `--radius-*` переменных (7 значений)
+- **frontend/tailwind.config.js** — configuration with safelist for dynamically generated classes
+- **@theme block** in styles.css with full set of `--radius-*` variables (7 values)
 
 ### Technical Details
 
-- **Верификация**:
-    - ✅ `rounded-xl` применяется с `border-radius: 12px`
-    - ✅ CSS-переменная `--radius-xl: 0.75rem` доступна в документе
-    - ✅ Все компоненты (Button, Card) корректно отображают скругленные углы
-    - ✅ Dev server перезапущен для применения изменений
+- **Verification**:
+    - ✅ `rounded-xl` applies `border-radius: 12px`
+    - ✅ CSS variable `--radius-xl: 0.75rem` available in document
+    - ✅ All components (Button, Card) correctly display rounded corners
+    - ✅ Dev server restarted to apply changes
 
-- **Файлы**:
-    - Изменено: `frontend/src/app/assets/css/styles.css` (+10 строк @theme)
-    - Создано: `frontend/tailwind.config.js` (15 строк)
+- **Files**:
+    - Changed: `frontend/src/app/assets/css/styles.css` (+10 lines @theme)
+    - Created: `frontend/tailwind.config.js` (15 lines)
 
 ## [0.3.0] - 2026-01-06 17:40
 
@@ -203,49 +220,49 @@
 - `frontend/src/shared/api/settings.js` — API client for settings endpoints
     - `getGlobalSettings()`, `updateGlobalSettings()`
     - `getCourseSettings()`, `updateCourseSettings()`, `resetCourseSettings()`
-- `frontend/src/shared/types/settings.ts` — TypeScript interfaces для настроек
+- `frontend/src/shared/types/settings.ts` — TypeScript interfaces for settings
     - GlobalSettings, CourseSettings, UpdateSettingsDTO, SettingsValidation
-- `frontend/src/entities/settings/model/useSettingsStore.js` — Pinia store с логикой наследования
+- `frontend/src/entities/settings/model/useSettingsStore.js` — Pinia store with inheritance logic
     - State: globalSettings, courseSettings (Map)
     - Getters: getEffectiveSettings(), hasCustomSettings()
-    - Actions: fetch/update/reset для global и course настроек
-    - Fallback pattern: курсы используют глобальные настройки по умолчанию
+    - Actions: fetch/update/reset for global and course settings
+    - Fallback pattern: courses use global settings by default
 
 **UI Components:**
 
-- `frontend/src/shared/ui/TimeRangePicker.vue` — компонент выбора временного диапазона
-    - Два селектора (начало/конец дня) 0-23 часа
-    - Визуальная timeline шкала с активным диапазоном
-    - Метки времени: 0:00, 6:00, 12:00, 18:00, 24:00
+- `frontend/src/shared/ui/TimeRangePicker.vue` — time range selection component
+    - Two selectors (start/end of day) 0-23 hours
+    - Visual timeline scale with active range
+    - Time labels: 0:00, 6:00, 12:00, 18:00, 24:00
 
 **Widgets:**
 
-- `frontend/src/widgets/settings-form/SettingsForm.vue` — форма редактирования настроек
-    - Интеграция TimeRangePicker
-    - Real-time валидация временных диапазонов
-    - Input для minTimeBeforeEnd (1-12 часов)
-    - Checkbox для системных уведомлений
-    - Preview секция с расчетом эффективного расписания
-- `frontend/src/widgets/course-settings-modal/CourseSettingsModal.vue` — модал настроек курса
-    - Переключатель: "Глобальные" / "Индивидуальные"
-    - Интеграция SettingsForm (readonly в режиме глобальных)
-    - Кнопка "Сбросить к глобальным"
+- `frontend/src/widgets/settings-form/SettingsForm.vue` — settings edit form
+    - TimeRangePicker integration
+    - Real-time validation of time ranges
+    - Input for minTimeBeforeEnd (1-12 hours)
+    - Checkbox for system notifications
+    - Preview section with effective schedule calculation
+- `frontend/src/widgets/course-settings-modal/CourseSettingsModal.vue` — course settings modal
+    - Switch: "Global" / "Individual"
+    - SettingsForm integration (readonly in global mode)
+    - "Reset to global" button
 
 **Pages:**
 
-- `frontend/src/pages/settings/SettingsPage.vue` — главная страница настроек
-    - Секция глобальных настроек с SettingsForm
-    - Список курсов с badges (Global/Custom)
-    - Кнопка "Настроить" для каждого курса
-    - Loading states и error handling
+- `frontend/src/pages/settings/SettingsPage.vue` — main settings page
+    - Global settings section with SettingsForm
+    - Course list with badges (Global/Custom)
+    - "Configure" button for each course
+    - Loading states and error handling
 
 ### Changed
 
-- `frontend/src/pages/course/CoursePage.vue` — добавлена интеграция настроек курса
-    - Кнопка "Настройки курса" в header рядом с "Назад"
-    - Интеграция CourseSettingsModal
+- `frontend/src/pages/course/CoursePage.vue` — added course settings integration
+    - "Course Settings" button in header next to "Back"
+    - CourseSettingsModal integration
     - Handlers: handleOpenSettings(), handleCloseSettings(), handleSettingsSaved()
-    - Updated page-header styles для flex layout
+    - Updated page-header styles for flex layout
 
 ### Documentation
 
@@ -262,8 +279,8 @@
 **Validation Rules:**
 
 - `trainingStartHour` < `trainingEndHour`
-- `minTimeBeforeEnd` от 1 до 12 часов
-- Диапазон тренировок >= `minTimeBeforeEnd`
+- `minTimeBeforeEnd` from 1 to 12 hours
+- Training range >= `minTimeBeforeEnd`
 
 **Settings Inheritance Pattern:**
 
@@ -287,51 +304,51 @@ getEffectiveSettings: (state) => (courseId) => {
 
 #### Documentation: OpenSpec Workflow Guide
 
-- **openspec-workflow.md** — создано полное русскоязычное руководство по OpenSpec методологии
-    - Описание spec-driven development подхода
-    - Три стадии разработки: Proposal → Implementation → Archive
-    - Роли в процессе (разработчик vs AI-агент)
-    - Полезные команды для работы с OpenSpec
-    - Структура директорий `openspec/`
-    - Примеры полного цикла от запроса до архивации
-    - Формат спецификаций с правильными Scenarios
-    - Операции с Requirements: ADDED, MODIFIED, REMOVED, RENAMED
+- **openspec-workflow.md** — created full guide on OpenSpec methodology
+    - Description of spec-driven development approach
+    - Three development stages: Proposal → Implementation → Archive
+    - Roles in process (developer vs AI agent)
+    - Useful commands for working with OpenSpec
+    - `openspec/` directory structure
+    - Examples of full cycle from request to archiving
+    - Spec format with proper Scenarios
+    - Operations with Requirements: ADDED, MODIFIED, REMOVED, RENAMED
     - Best Practices: Simplicity First, Complexity Triggers
-    - Troubleshooting для частых ошибок
-    - Дополнительные ресурсы и ссылки
+    - Troubleshooting for common errors
+    - Additional resources and links
 
-- **openspec/project.md** — заполнен детальной информацией о проекте
-    - Цели проекта (7 ключевых пунктов)
-    - Полный технологический стек (Frontend, Backend, Tooling)
-    - Конвенции кода (форматирование, условные конструкции, импорты)
-    - Архитектурные паттерны (FSD, Layered Architecture)
-    - Тестовая стратегия (текущая и планируемая)
-    - Git Workflow (semantic commits, процесс разработки)
-    - Доменный контекст (FSRS, структуры данных)
-    - Важные ограничения (технические, бизнес-логика, процессные)
-    - Внешние зависимости (MCP серверы, библиотеки, системные интеграции)
-    - Статус проекта (реализовано, в работе, запланировано)
+- **openspec/project.md** — filled with detailed project information
+    - Project goals (7 key points)
+    - Full technology stack (Frontend, Backend, Tooling)
+    - Code conventions (formatting, conditionals, imports)
+    - Architectural patterns (FSD, Layered Architecture)
+    - Testing strategy (current and planned)
+    - Git Workflow (semantic commits, development process)
+    - Domain context (FSRS, data structures)
+    - Key constraints (technical, business logic, process)
+    - External dependencies (MCP servers, libraries, system integrations)
+    - Project status (implemented, in progress, planned)
 
 ### Changed
 
-- **readme.md** — добавлена секция "Development Workflow" с ссылкой на OpenSpec Workflow Guide
-- **readme.md** — исправлены длинные строки для соответствия markdown линтингу (max 120 символов)
-- **readme.md** — исправлен bare URL для библиотеки ts-fsrs
+- **readme.md** — added "Development Workflow" section with link to OpenSpec Workflow Guide
+- **readme.md** — fixed long lines to comply with markdown linting (max 120 chars)
+- **readme.md** — fixed bare URL for ts-fsrs library
 
 ### Fixed
 
 - **Markdown Linting**
-    - Исправлены все ошибки MD013 (line-length) в readme.md
-    - Исправлена ошибка MD034 (no-bare-urls) в readme.md
-    - Убраны trailing punctuation (двоеточия) из заголовков в openspec-workflow.md (MD026)
-    - Заменены emphasis-заголовки на proper headings в openspec-workflow.md (MD036)
-    - Добавлен язык для code block в openspec/project.md (MD040)
+    - Fixed all MD013 (line-length) errors in readme.md
+    - Fixed MD034 (no-bare-urls) error in readme.md
+    - Removed trailing punctuation (colons) from headers in openspec-workflow.md (MD026)
+    - Replaced emphasis-headers with proper headings in openspec-workflow.md (MD036)
+    - Added language for code block in openspec/project.md (MD040)
 
 ### Technical Details
 
-- **Созданных файлов**: 1 (openspec-workflow.md, 453 строки)
-- **Обновленных файлов**: 3 (openspec/project.md, readme.md, docs/Changelog.md)
-- **Markdown линтинг**: все файлы проходят проверку без ошибок
+- **Files created**: 1 (openspec-workflow.md, 453 lines)
+- **Files updated**: 3 (openspec/project.md, readme.md, docs/Changelog.md)
+- **Markdown linting**: all files pass check without errors
 
 ---
 
@@ -339,49 +356,49 @@ getEffectiveSettings: (state) => (courseId) => {
 
 ### Changed
 
-#### Code Style: Масштабный рефакторинг UI и форматирования
+#### Code Style: Large-scale refactoring of UI and formatting
 
-- **Новые правила кодирования**
-    - Создан `.agent/rules/CODE_STYLE.md` с обязательными правилами форматирования JS/TS
-    - Стиль условных конструкций: `else` на новой строке, одиночные statements без скобок
-    - Обновлен `.agent/rules/vite-imports-and-components-rule.md`: приоритет `<script setup>` над `<template>`
-    - Обновлен `.agent/rules/workflow.md`: уточнены процедуры подведения итогов сессий
-    - Обновлен `.agent/rules/using-console-commands.md`: правила работы с терминалом
+- **New Coding Rules**
+    - Created `.agent/rules/CODE_STYLE.md` with mandatory JS/TS formatting rules
+    - Conditional style: `else` on new line, single statements without braces
+    - Updated `.agent/rules/vite-imports-and-components-rule.md`: priority of `<script setup>` over `<template>`
+    - Updated `.agent/rules/workflow.md`: clarified session summary procedures
+    - Updated `.agent/rules/using-console-commands.md`: terminal operation rules
 
-- **Рефакторинг UI (12 файлов)**
-    - Затронутые файлы:
+- **UI Refactoring (12 files)**
+    - Affected files:
         - App.vue, HomePage.vue, CoursePage.vue
-        - Button.vue, Card.vue, Input.vue, StackedCardsIcon.vue (новый)
+        - Button.vue, Card.vue, Input.vue, StackedCardsIcon.vue (new)
         - TitleBar.vue, CourseCard.vue, CardItem.vue, QuickAddCard.vue
 
-- **Расширение зависимостей frontend**
-    - Добавлен `markdown-it` для рендеринга Markdown
-    - Добавлен `highlight.js` для подсветки синтаксиса кода
-    - Добавлен `@types/markdown-it` для TypeScript типов
+- **Frontend Dependencies Expansion**
+    - Added `markdown-it` for Markdown rendering
+    - Added `highlight.js` for syntax highlighting
+    - Added `@types/markdown-it` for TypeScript types
 
 ### Removed
 
-- **Очистка устаревших правил**
-    - Удален `.agent/rules/use-vitejs-at-rule.md` (устарел)
-    - Удален `.agent/rules/vue-structure-preference-rule.md` (заменен на vite-imports-and-components-rule)
-    - Удален `docs/Changelog_session.md` (дубликат)
+- **Old Rules Cleanup**
+    - Removed `.agent/rules/use-vitejs-at-rule.md` (obsolete)
+    - Removed `.agent/rules/vue-structure-preference-rule.md` (replaced by vite-imports-and-components-rule)
+    - Removed `docs/Changelog_session.md` (duplicate)
 
 ### Fixed
 
-- **Документация**
-    - Исправлены опечатки в `docs/Backend_Cards_FSRS_Progress.md`
-    - Исправлены опечатки в `docs/Backend_Cards_FSRS_Walkthrough.md`
-    - Обновлен `docs/Cards_FSRS_Tasks.md` с актуальным статусом задач
-    - Добавлены пропущенные строки в `docs/Migration_System_Walkthrough.md`
-    - Удалена лишняя пустая строка в `docs/Testing_API.md`
+- **Documentation**
+    - Fixed typos in `docs/Backend_Cards_FSRS_Progress.md`
+    - Fixed typos in `docs/Backend_Cards_FSRS_Walkthrough.md`
+    - Updated `docs/Cards_FSRS_Tasks.md` with actual task status
+    - Added missing lines in `docs/Migration_System_Walkthrough.md`
+    - Removed extra empty line in `docs/Testing_API.md`
 
 ### Technical Details
 
-- **Затронуто файлов**: 29
-- **Изменений в frontend**: ~2,116 вставок, ~1,977 удалений
-- **Новые agent rules**: CODE_STYLE.md (143 строки)
-- **Консистентность**: Все компоненты теперь следуют единому стилю
-- **Семантика**: `<script setup>` первым для лучшей навигации по коду
+- **Files affected**: 29
+- **Frontend changes**: ~2,116 insertions, ~1,977 deletions
+- **New agent rules**: CODE_STYLE.md (143 lines)
+- **Consistency**: All components now follow unified style
+- **Semantics**: `<script setup>` first for better code navigation
 
 ---
 
@@ -389,45 +406,45 @@ getEffectiveSettings: (state) => (courseId) => {
 
 ### Changed
 
-#### UI: Редизайн на светлую тему
+#### UI: Light Theme Redesign
 
-- **Глобальная цветовая схема**
-    - Переход с тёмной темы на светлую
-    - Фон приложения: `#fafbfc` (почти белый)
-    - Основной цвет текста: `#202124` (тёмно-серый)
-    - Акцентный цвет: `#1a73e8` (Google Blue)
-    - Вторичный текст: `#5f6368` (средне-серый)
+- **Global Color Scheme**
+    - Switch from dark to light theme
+    - App background: `#fafbfc` (almost white)
+    - Primary text color: `#202124` (dark gray)
+    - Accent color: `#1a73e8` (Google Blue)
+    - Secondary text: `#5f6368` (medium gray)
 
-- **Компоненты (светлая тема)**
-    - `App.vue` — фон `#fafbfc`
-    - `styles.css` — добавлены CSS-переменные для light mode
-    - `Card.vue` — белые карточки с лёгкими тенями
-    - `Button.vue` — плоские цвета вместо градиентов
-    - `Input.vue` — белый фон, тёмный текст
-    - `TitleBar.vue` — белая панель
-    - `HomePage.vue` — обновлены цвета
-    - `CoursePage.vue` — светлые карточки статистики
-    - `CourseCard.vue` — светлые hover-эффекты
-    - `CardItem.vue` — белые флип-карточки
+- **Components (Light Theme)**
+    - `App.vue` — background `#fafbfc`
+    - `styles.css` — added CSS variables for light mode
+    - `Card.vue` — white cards with light shadows
+    - `Button.vue` — flat colors instead of gradients
+    - `Input.vue` — white background, dark text
+    - `TitleBar.vue` — white panel
+    - `HomePage.vue` — updated colors
+    - `CoursePage.vue` — light stats cards
+    - `CourseCard.vue` — light hover effects
+    - `CardItem.vue` — white flip cards
 
-- **QuickAddCard — точное соответствие референсам**
-    - Переключатель режимов с **синей обводкой** (`border: 2px solid #1a73e8`) у активной кнопки
-    - Все кнопки имеют серую обводку (`border: 1px solid #dadce0`)
-    - Прозрачный фон у переключателя (не серый контейнер)
-    - Информационный блок с голубым фоном `#e8f0fe` и текстом `#1967d2`
+- **QuickAddCard — Exact Match to References**
+    - Mode switcher with **blue border** (`border: 2px solid #1a73e8`) on active button
+    - All buttons have gray border (`border: 1px solid #dadce0`)
+    - Transparent background for switcher (not gray container)
+    - Info block with blue background `#e8f0fe` and text `#1967d2`
 
-- **Карточки статистики (CoursePage)**
-    - **Светло-голубой фон** `#e8f0fe` (было серый #f8f9fa)
-    - Голубая обводка `#d2e3fc`
-    - Выделенная карточка "Сегодня": `#d2e3fc` с обводкой `2px`
-    - Hover: более насыщенный голубой `#d2e3fc`
+- **Stats Cards (CoursePage)**
+    - **Light Blue Background** `#e8f0fe` (was gray #f8f9fa)
+    - Blue border `#d2e3fc`
+    - Highlighted "Today" card: `#d2e3fc` with `2px` border
+    - Hover: more saturated blue `#d2e3fc`
 
 ### Technical Details
 
-- Убраны все glassmorphism эффекты (`backdrop-filter: blur()`)
-- Убраны градиенты, применены плоские цвета
-- Мягкие тени: `0 1px 3px rgba(0, 0, 0, 0.08)`
-- State badges (карточки): светлые фоны вместо градиентных
+- Removed all glassmorphism effects (`backdrop-filter: blur()`)
+- Removed gradients, applied flat colors
+- Soft shadows: `0 1px 3px rgba(0, 0, 0, 0.08)`
+- State badges (cards): light backgrounds instead of gradient
     - New: `#e8f0fe` / `#1a73e8`
     - Learning: `#fef7e0` / `#f9ab00`
     - Review: `#e6f4ea` / `#0f9d58`
@@ -435,10 +452,10 @@ getEffectiveSettings: (state) => (courseId) => {
 
 ### Design Philosophy
 
-- Минималистичный, чистый дизайн
-- Следование Material Design principles
-- Улучшенная читаемость
-- Соответствие предоставленным UI референсам
+- Minimalist, clean design
+- Adherence to Material Design principles
+- Improved readability
+- Compliance with provided UI references
 
 ---
 
@@ -446,72 +463,72 @@ getEffectiveSettings: (state) => (courseId) => {
 
 ### Added
 
-#### Frontend: Batch-добавление карточек (Batch Card Import)
+#### Frontend: Batch Card Import
 
 - **QuickAddCard Component Enhancement**
-    - Добавлен переключатель режимов: "Одна карточка" / "Массовое добавление"
-    - Режим массового добавления через textarea
-    - Формат ввода: `вопрос | ответ` (каждая строка — новая карточка)
-    - Парсинг и валидация batch-данных:
-        - Проверка наличия разделителя `|`
-        - Проверка корректности формата (ровно 1 разделитель на строку)
-        - Проверка на пустые значения front/back
-        - Информативные сообщения об ошибках с номером строки
-    - Последовательная отправка карточек через существующий emit механизм
-    - Задержка 50ms между карточками для плавности
-    - Автоочистка textarea после успешного добавления
+    - Added mode switcher: "Single Card" / "Batch Add"
+    - Batch add mode via textarea
+    - Input format: `question | answer` (each line is a new card)
+    - Parsing and validation of batch data:
+        - Check for separator `|` presence
+        - Check format correctness (exactly 1 separator per line)
+        - Check for empty front/back values
+        - Informative error messages with line number
+    - Sequential card submission via existing emit mechanism
+    - 50ms delay between cards for smoothness
+    - Auto-clear textarea after successful addition
 
 - **Premium UI Design**
-    - Премиальный редизайн компонента QuickAddCard
-    - Насыщенный glassmorphism эффект (backdrop-filter: blur(16px))
-    - Многослойные box-shadows для глубины и объёма
-    - Увеличенная типографика: заголовок 20px (было 16px), font-weight 700
-    - Светящиеся иконки с drop-shadow эффектом (#60a5fa)
-    - Премиальные toggle-кнопки с gradient background (135deg, #3b82f6 → #2563eb)
-    - Плавные анимации с cubic-bezier timing function
-    - Transform эффекты на hover (translateY + scale)
-    - Увеличенные отступы: padding 32px (было 20px), border-radius 16px (было 12px)
-    - Элегантная информационная панель с gradient background
-    - Стилизованный code element с monospace шрифтом и border
-    - Responsive design с адаптивными падингами для мобильных
+    - Premium redesign of QuickAddCard component
+    - Rich glassmorphism effect (backdrop-filter: blur(16px))
+    - Multi-layer box-shadows for depth and volume
+    - Increased typography: title 20px (was 16px), font-weight 700
+    - Glowing icons with drop-shadow effect (#60a5fa)
+    - Premium toggle buttons with gradient background (135deg, #3b82f6 → #2563eb)
+    - Smooth animations with cubic-bezier timing function
+    - Transform effects on hover (translateY + scale)
+    - Increased spacing: padding 32px (was 20px), border-radius 16px (was 12px)
+    - Elegant info panel with gradient background
+    - Stylized code element with monospace font and border
+    - Responsive design with adaptive padding for mobile
 
 ### Documentation
 
-- **docs/features/batch-add-cards.md** — полная документация функциональности:
-    - Обзор возможностей batch-импорта
-    - Формат ввода и примеры использования
-    - Технические детали реализации
-    - Описание функций парсинга и валидации
-    - Преимущества и совместимость
+- **docs/features/batch-add-cards.md** — full functionality documentation:
+    - Overview of batch import capabilities
+    - Input format and usage examples
+    - Technical implementation details
+    - Description of parsing and validation functions
+    - Benefits and compatibility
 
-- **docs/features/ui-improvements.md** — детальное описание UI улучшений:
-    - Сравнение "до" и "после" для всех элементов
-    - CSS техники и эффекты
-    - Цветовая палитра и spacing
-    - Производительность и accessibility
+- **docs/features/ui-improvements.md** — detailed UI improvements description:
+    - Before/After comparison for all elements
+    - CSS techniques and effects
+    - Color palette and spacing
+    - Performance and accessibility
 
 ### Technical Details
 
-- **Новые функции в QuickAddCard.vue**:
-    - `parseBatchInput(text)` — парсинг textarea в массив `{front, back}[]`
-    - `validateBatchInput()` — валидация batch-данных с детальными ошибками
-    - `handleBatchAdd()` — последовательная отправка карточек
-    - `switchMode(newMode)` — переключение режимов с очисткой ошибок
+- **New functions in QuickAddCard.vue**:
+    - `parseBatchInput(text)` — parse textarea into `{front, back}[]` array
+    - `validateBatchInput()` — batch data validation with detailed errors
+    - `handleBatchAdd()` — sequential card submission
+    - `switchMode(newMode)` — mode switching with error clearing
 
-- **CSS улучшения**:
+- **CSS Improvements**:
     - Multi-layered box-shadows
     - Advanced gradients (145deg angle)
-    - Filter effects (drop-shadow для glow)
+    - Filter effects (drop-shadow for glow)
     - Transform animations (GPU-accelerated)
-    - Inset shadows для depth
+    - Inset shadows for depth
     - Improved color contrasts (#60a5fa, #cbd5e1, #f1f5f9)
 
 ### Verified
 
-- ✅ ESLint frontend проверка пройдена (Exit code: 0)
-- ✅ Markdownlint проверка документации пройдена
-- ✅ Компонент полностью обратно совместим
-- ✅ Не требуется изменений в backend
+- ✅ ESLint frontend check passed (Exit code: 0)
+- ✅ Markdownlint documentation check passed
+- ✅ Component fully backward compatible
+- ✅ No backend changes required
 
 ---
 
@@ -519,76 +536,76 @@ getEffectiveSettings: (state) => (courseId) => {
 
 ### Added
 
-#### Frontend: Управление карточками (Cards Management)
+#### Frontend: Cards Management
 
 - **Entity Layer**
-    - API сервис для карточек (`shared/api/cards.js`) с полным CRUD функционалом
-    - TypeScript типы (`shared/types/card.ts`): CardState enum, Card interface, DTOs, CourseStats
-    - Pinia store (`entities/card/model/useCardStore.js`) с reactive state management
+    - API service for cards (`shared/api/cards.js`) with full CRUD functionality
+    - TypeScript types (`shared/types/card.ts`): CardState enum, Card interface, DTOs, CourseStats
+    - Pinia store (`entities/card/model/useCardStore.js`) with reactive state management
     - Getters: `getCardsByCourse`, `getCourseStats`
     - Actions: `fetchCardsByCourse`, `fetchCourseStats`, `createCard`, `updateCard`, `deleteCard`
-    - Автоматическое обновление статистики после create/delete операций
+    - Auto-update statistics after create/delete operations
 
 - **Widgets**
-    - `CardItem.vue` — карточка с CSS 3D flip анимацией (вопрос ↔ ответ)
-    - State badges (New, Learning, Review, Relearning) с цветовой индикацией
-    - Due date форматирование ("Сегодня", "Завтра", "Через N дней")
-    - Line clamp для обрезки длинного текста
-    - Hover эффекты для кнопок Edit/Delete
-    - `CardList.vue` — список карточек с loading skeleton и empty state
-    - `CardEditorModal.vue` — модальное окно create/edit с валидацией
-    - Character counters для front/back (max 10000 символов)
-    - `QuickAddCard.vue` — inline форма быстрого добавления
-    - Автоочистка формы после успешного добавления
+    - `CardItem.vue` — card with CSS 3D flip animation (question ↔ answer)
+    - State badges (New, Learning, Review, Relearning) with color indication
+    - Due date formatting ("Today", "Tomorrow", "In N days")
+    - Line clamp for long text truncation
+    - Hover effects for Edit/Delete buttons
+    - `CardList.vue` — card list with loading skeleton and empty state
+    - `CardEditorModal.vue` — create/edit modal with validation
+    - Character counters for front/back (max 10000 chars)
+    - `QuickAddCard.vue` — inline quick add form
+    - Auto-clear form after successful addition
     - Responsive grid layout (desktop: 2 cols, mobile: 1 col)
 
 - **Pages Integration**
-    - Полная интеграция CoursePage с управлением карточками
+    - Full CoursePage integration with card management
     - Stats Grid: Total, New, Review, Due Today
-    - Training button с dynamic text и disabled state
-    - CRUD handlers с confirm dialogs для удаления
+    - Training button with dynamic text and disabled state
+    - CRUD handlers with confirm dialogs for deletion
     - Dual mode support: Quick Add + Modal Editor
 
 ### Fixed
 
 - **Backend Routes Conflict**
-    - Исправлен конфликт роутов в `routes/index.ts`
-    - Добавлен префикс `/courses` для coursesRouter
-    - Теперь `GET /api/courses` корректно обрабатывается без ошибки "Invalid course ID"
-    - Порядок регистрации роутов: courses → cards → training → settings
+    - Fixed route conflict in `routes/index.ts`
+    - Added `/courses` prefix for coursesRouter
+    - `GET /api/courses` is now correctly handled without "Invalid course ID" error
+    - Route registration order: courses → cards → training → settings
 
 ### Changed
 
 - **CoursePage.vue**
-    - Переход с mock данных на реальные API запросы
-    - Интеграция useCourseStore и useCardStore
-    - Computed properties для reactive data
-    - Loading states и error handling
-    - Stats отображение с hover эффектами
+    - Switch from mock data to real API requests
+    - Integration of useCourseStore and useCardStore
+    - Computed properties for reactive data
+    - Loading states and error handling
+    - Stats display with hover effects
 
 ### Documentation
 
-- **Cards_Frontend_Implementation_Plan.md** — детальный план реализации frontend карточек
-- **Cards_Frontend_Walkthrough.md** — comprehensive walkthrough с описанием всех компонентов
-    - Обзор 8 созданных файлов
+- **Cards_Frontend_Implementation_Plan.md** — detailed frontend implementation plan for cards
+- **Cards_Frontend_Walkthrough.md** — comprehensive walkthrough describing all components
+    - Overview of 8 created files
     - API endpoints integration
     - Architecture highlights (Feature-Sliced Design)
     - Manual testing plan
-    - UX Features описание
+    - UX Features description
 
 ### Verified
 
-- ✅ ESLint проверка пройдена (Exit code: 0)
-- ✅ TypeScript компиляция успешна
-- ✅ Frontend dev server запущен (Vite на localhost:5173)
-- ✅ Backend routes исправлены и скомпилированы
+- ✅ ESLint check passed (Exit code: 0)
+- ✅ TypeScript compilation successful
+- ✅ Frontend dev server running (Vite on localhost:5173)
+- ✅ Backend routes fixed and compiled
 
 ### Technical Details
 
-- Созданные файлы: 8 (3 Entity Layer + 4 Widgets + 1 Page integration)
-- API endpoints используются: 5 (getByCourseId, create, update, delete, getCourseStats)
-- Feature-Sliced Design соблюден во всех слоях
-- State management: Pinia stores с auto-update локального состояния
+- Files created: 8 (3 Entity Layer + 4 Widgets + 1 Page integration)
+- API endpoints used: 5 (getByCourseId, create, update, delete, getCourseStats)
+- Feature-Sliced Design adhered to in all layers
+- State management: Pinia stores with local state auto-update
 
 ---
 
@@ -596,162 +613,162 @@ getEffectiveSettings: (state) => (courseId) => {
 
 ### Added
 
-#### Backend: Cards и FSRS система
+#### Backend: Cards and FSRS System
 
-- **Database Schema расширена для FSRS**
-    - `CardsTable` — карточки с полным набором FSRS полей:
+- **Database Schema extended for FSRS**
+    - `CardsTable` — cards with full set of FSRS fields:
         - `due`, `stability`, `difficulty`, `elapsedDays`, `scheduledDays`
         - `reps`, `lapses`, `state`, `lastReview`, `stepIndex`
-    - `SettingsTable` — глобальные настройки приложения
-    - `CourseSettingsTable` — индивидуальные настройки курсов
-    - Индексы для оптимизации: `courseId`, `due`, `state`
+    - `SettingsTable` — global application settings
+    - `CourseSettingsTable` — individual course settings
+    - Indexes for optimization: `courseId`, `due`, `state`
 
-- **Migration System с отслеживанием**
-    - Таблица `_migrations` для учета примененных миграций
-    - 4 отдельные миграции: courses, cards, settings, courseSettings
-    - Функция `runMigrations()` — автоматическое применение недостающих миграций
-    - Идемпотентность: `.ifNotExists()` для всех `createTable()` и `createIndex()`
-    - Логирование процесса применения миграций
+- **Migration System with tracking**
+    - `_migrations` table to track applied migrations
+    - 4 separate migrations: courses, cards, settings, courseSettings
+    - `runMigrations()` function — automatic application of missing migrations
+    - Idempotency: `.ifNotExists()` for all `createTable()` and `createIndex()`
+    - Migration process logging
 
 - **FSRS Service (`services/fsrs/index.ts`)**
-    - Интеграция библиотеки `ts-fsrs` для spaced repetition
-    - Кастомные Learning Steps: 10 минут → 4 часа → REVIEW
+    - Integration of `ts-fsrs` spaced repetition library
+    - Custom Learning Steps: 10 minutes → 4 hours → REVIEW
     - State Machine: NEW → LEARNING → REVIEW → RELEARNING
-    - `calculateNextReview()` — расчет интервалов с учетом Rating
-    - `canShowNewCards()` — проверка временных ограничений (4 часа до конца дня)
-    - `initializeNewCard()` — создание карточки с дефолтными FSRS значениями
+    - `calculateNextReview()` — interval calculation considering Rating
+    - `canShowNewCards()` — time constraint check (4 hours till end of day)
+    - `initializeNewCard()` — create card with default FSRS values
 
 - **Repositories**
     - `CardRepository` — CRUD + getDueCards + getCourseStats
-    - `SettingsRepository` — глобальные + курса + getEffectiveSettings
-    - Singleton instances для удобного использования
+    - `SettingsRepository` — global + course + getEffectiveSettings
+    - Singleton instances for convenient usage
 
 - **Validation Schemas (Zod)**
     - `schemas/card.ts`: CreateCard, UpdateCard, ReviewCard (Rating 1-4)
-    - `schemas/settings.ts`: GlobalSettings, CourseSettings с валидацией JSON
+    - `schemas/settings.ts`: GlobalSettings, CourseSettings with JSON validation
 
 - **REST API Endpoints (13 endpoints)**
     - **Cards API** (`routes/cards.ts`):
-        - `GET /api/courses/:courseId/cards` — список карточек
-        - `POST /api/courses/:courseId/cards` — создание
-        - `GET /api/cards/:id` — получение
-        - `PUT /api/cards/:id` — обновление
-        - `DELETE /api/cards/:id` — удаление
-        - `GET /api/courses/:courseId/stats` — статистика
+        - `GET /api/courses/:courseId/cards` — card list
+        - `POST /api/courses/:courseId/cards` — create
+        - `GET /api/cards/:id` — get
+        - `PUT /api/cards/:id` — update
+        - `DELETE /api/cards/:id` — delete
+        - `GET /api/courses/:courseId/stats` — statistics
     - **Training API** (`routes/training.ts`):
-        - `GET /api/courses/:courseId/due-cards` — карточки для повторения
-        - `POST /api/training/review` — отправка результата review
+        - `GET /api/courses/:courseId/due-cards` — cards due
+        - `POST /api/training/review` — submit review result
     - **Settings API** (`routes/settings.ts`):
-        - `GET /api/settings` — глобальные настройки
-        - `PUT /api/settings` — обновление глобальных
-        - `GET /api/courses/:courseId/settings` — настройки курса
-        - `PUT /api/courses/:courseId/settings` — обновление настроек курса
-        - `DELETE /api/courses/:courseId/settings` — сброс к глобальным
+        - `GET /api/settings` — global settings
+        - `PUT /api/settings` — update global
+        - `GET /api/courses/:courseId/settings` — course settings
+        - `PUT /api/courses/:courseId/settings` — update course settings
+        - `DELETE /api/courses/:courseId/settings` — reset to global
 
 ### Changed
 
 - **backend/src/services/database/index.ts**
-    - Изменена логика инициализации БД: миграции применяются всегда, не только для новой БД
-    - Замена `up(dbInstance)` на `runMigrations(dbInstance)`
+    - Changed DB initialization logic: migrations applied always, not just for new DB
+    - Replaced `up(dbInstance)` with `runMigrations(dbInstance)`
 
 - **backend/src/services/database/migrations.ts**
-    - Полный переход на систему отслеживания миграций
-    - Разбиение на отдельные миграции вместо одной монолитной функции `up()`
-    - Добавлена функция `rollbackAllMigrations()` для тестирования
+    - Full transition to migration tracking system
+    - Split into separate migrations instead of one monolithic `up()` function
+    - Added `rollbackAllMigrations()` function for testing
 
 - **backend/src/routes/index.ts**
-    - Зарегистрированы новые роуты: cards, training, settings
+    - Registered new routes: cards, training, settings
 
 ### Fixed
 
-- **TypeScript ошибки**
-    - FSRS импорты: использование `Rating` enum из ts-fsrs (с type cast `as any` для совместимости)
-    - Zod schema syntax: исправлен `ReviewCardSchema` (убран `errorMap`, использован `message`)
-    - ZodError обработка: замена `.errors` на `.issues` во всех routes
-    - Удалены неиспользуемые импорты (`NewCard` в cardRepository)
+- **TypeScript errors**
+    - FSRS imports: usage of `Rating` enum from ts-fsrs (with `as any` type cast for compatibility)
+    - Zod schema syntax: fixed `ReviewCardSchema` (removed `errorMap`, used `message`)
+    - ZodError handling: replaced `.errors` with `.issues` in all routes
+    - Removed unused imports (`NewCard` in cardRepository)
 
 - **Code Formatting**
-    - Применен prettier ко всем backend файлам
-    - Исправлены line breaks и отступы
+    - Applied prettier to all backend files
+    - Fixed line breaks and indentation
 
 ### Documentation
 
-- **Backend_Cards_FSRS_Walkthrough.md** — comprehensive walkthrough реализации
-    - Обзор всех созданных файлов
-    - 13 API endpoints с примерами
-    - Database schema с FSRS полями
-    - Детальное описание FSRS State Machine
-    - Результаты верификации и компиляции
+- **Backend_Cards_FSRS_Walkthrough.md** — comprehensive walkthrough of implementation
+    - Overview of all created files
+    - 13 API endpoints with examples
+    - Database schema with FSRS fields
+    - Detailed FSRS State Machine description
+    - Verification and compilation results
 
-- **Migration_System_Walkthrough.md** — детальная документация migration system
-    - Архитектура tracking system
-    - Список миграций и их содержимое
-    - Исправленные проблемы (ifNotExists)
-    - Результаты тестирования на существующей БД
-    - Руководство по добавлению новых миграций
+- **Migration_System_Walkthrough.md** — detailed migration system documentation
+    - Tracking system architecture
+    - List of migrations and their content
+    - Fixed issues (ifNotExists)
+    - Testing results on existing DB
+    - Guide for adding new migrations
 
-- **Cards_FSRS_Implementation_Plan.md** — технический план реализации
-- **Cards_FSRS_Architecture.md** — Mermaid диаграммы архитектуры
-- **Cards_FSRS_Tasks.md** — детальный чеклист задач
-- **docs/Task.md** — обновлен прогресс (Фаза 4 Backend завершена)
+- **Cards_FSRS_Implementation_Plan.md** — technical implementation plan
+- **Cards_FSRS_Architecture.md** — Mermaid architecture diagrams
+- **Cards_FSRS_Tasks.md** — detailed checklist
+- **docs/Task.md** — updated progress (Phase 4 Backend completed)
 
 ### Verified
 
-- ✅ TypeScript компиляция без ошибок
-- ✅ Prettier форматирование применен
-- ✅ Migration system работает на существующей БД (4 миграции применились успешно)
-- ✅ Server запускается и слушает на динамическом порту
-- ✅ Таблицы созданы: `_migrations`, `courses`, `cards`, `settings`, `courseSettings`
-- ✅ Индексы созданы для всех необходимых полей
+- ✅ TypeScript compilation without errors
+- ✅ Prettier formatting applied
+- ✅ Migration system works on existing DB (4 migrations applied successfully)
+- ✅ Server starts and listens on dynamic port
+- ✅ Tables created: `_migrations`, `courses`, `cards`, `settings`, `courseSettings`
+- ✅ Indexes created for all necessary fields
 
 ### Dependencies
 
-- Добавлена зависимость: `ts-fsrs` (TypeScript FSRS library)
+- Added dependency: `ts-fsrs` (TypeScript FSRS library)
 
 ## [0.1.0] - 2026-01-05 18:52
 
 ### Fixed
 
-- **Исправлены все ошибки markdown линтинга в документации**:
-    - `Implementation_Plan.md` — разбиты длинные строки, исправлена иерархия заголовков (h5→h4),
-       добавлен язык для code block
-    - `Frontend_Integration_Plan.md` — разбиты длинные строки, исправлены blockquotes
-    - `Testing_API.md` — добавлены пустые строки вокруг code blocks (MD031)
-    - `Walkthrough.md` — убраны trailing punctuation из заголовков, разбиты длинные строки
-    - Автоматически исправлены пустые строки вокруг списков (MD032) во всех файлах
-    - Автоматически удалены trailing spaces (MD009)
+- **Fixed all markdown linting errors in documentation**:
+    - `Implementation_Plan.md` — split long lines, fixed heading hierarchy (h5→h4),
+       added language for code block
+    - `Frontend_Integration_Plan.md` — split long lines, fixed blockquotes
+    - `Testing_API.md` — added blank lines around code blocks (MD031)
+    - `Walkthrough.md` — removed trailing punctuation from headers, split long lines
+    - Automatically fixed blank lines around lists (MD032) in all files
+    - Automatically removed trailing spaces (MD009)
 
 ### Changed
 
-- **`.markdownlint.json`** — отключено правило MD028 (no-blanks-blockquote), т.к. оно конфликтует с
-  GitHub Alert blocks синтаксисом (`[!IMPORTANT]`, `[!WARNING]`, `[!NOTE]`)
+- **`.markdownlint.json`** — disabled MD028 (no-blanks-blockquote) rule as it conflicts with
+  GitHub Alert blocks syntax (`[!IMPORTANT]`, `[!WARNING]`, `[!NOTE]`)
 
 ### Verified
 
-- ✅ Все 8 markdown файлов в `docs/` проходят проверку `markdownlint-cli2` без ошибок
+- ✅ All 8 markdown files in `docs/` pass `markdownlint-cli2` check without errors
 
 ## [0.1.0] - 2026-01-05 18:30
 
 ### Added
 
-- **Расширена документация проекта**:
-    - Добавлены недостающие пункты из раздела "Technical Specifications" в `Task.md`
-    - Добавлены детальные разделы в `Implementation_Plan.md`:
-        - Настройки (глобальные и для курса)
-        - Система уведомлений с проверкой времени дня
-        - Tray integration (сворачивание в трей)
-        - Расширенный функционал (статистика, импорт/экспорт, медиа, поиск, теги)
-    - Добавлен раздел "Следующие этапы реализации" в `Walkthrough.md`
+- **Extended project documentation**:
+    - Added missing points from "Technical Specifications" section to `Task.md`
+    - Added detailed sections to `Implementation_Plan.md`:
+        - Settings (global and course)
+        - Notification system with time of day check
+        - Tray integration (minimize to tray)
+        - Extended features (statistics, import/export, media, search, tags)
+    - Added "Next Implementation Stages" section to `Walkthrough.md`
 
 ### Changed
 
-- **Переименование проекта**: "Anki Tiny" → "Repetitio"
-    - Обновлены все `package.json` (root, frontend, backend)
-    - Обновлены названия в UI: TitleBar, router, console.log
-    - Обновлена вся документация: README, Task.md, Implementation_Plan.md, Walkthrough.md
-    - Переименована БД: `anki.db` → `repetitio.db`
-    - Обновлены комментарии и tooltip в Electron Tray
-    - Исправлена опечатка в `frontend/package.json`: "Fontend" → "Frontend"
+- **Project Renaming**: "Anki Tiny" → "Repetitio"
+    - Updated all `package.json` (root, frontend, backend)
+    - Updated names in UI: TitleBar, router, console.log
+    - Updated all documentation: README, Task.md, Implementation_Plan.md, Walkthrough.md
+    - Renamed DB: `anki.db` → `repetitio.db`
+    - Updated comments and tooltip in Electron Tray
+    - Fixed typo in `frontend/package.json`: "Fontend" → "Frontend"
 
 ---
 
@@ -759,57 +776,57 @@ getEffectiveSettings: (state) => (courseId) => {
 
 ### Added
 
-#### Frontend: Управление курсами (Courses Management)
+#### Frontend: Courses Management
 
 - **Data Layer**
-    - API сервис для курсов (`shared/api/courses.js`) с полным CRUD функционалом
-    - TypeScript типы для курсов (`shared/types/course.ts`)
-    - Pinia store (`entities/course/model/useCourseStore.js`) с reactive state management
+    - API service for courses (`shared/api/courses.js`) with full CRUD functionality
+    - TypeScript types for courses (`shared/types/course.ts`)
+    - Pinia store (`entities/course/model/useCourseStore.js`) with reactive state management
     - Getters: `sortedCourses`, `getCourseById`
     - Actions: `fetchCourses`, `createCourse`, `updateCourse`, `deleteCourse`
 
 - **UI Components**
-    - Расширен `Input.vue` для поддержки textarea режима с атрибутом rows
-    - Создан `Modal.vue` с backdrop blur, ESC/click-outside закрытием, анимациями
-    - Слоты для header и footer в модальном окне
+    - Extended `Input.vue` to support textarea mode with rows attribute
+    - Created `Modal.vue` with backdrop blur, ESC/click-outside closure, animations
+    - Slots for header and footer in modal window
 
 - **Widgets**
-    - `CourseCard.vue` — карточка курса с hover эффектами, кнопками Edit/Delete
-    - `CourseList.vue` — grid layout для отображения списка курсов
-    - `CourseEditorModal.vue` — модальное окно создания/редактирования курса с валидацией
+    - `CourseCard.vue` — course card with hover effects, Edit/Delete buttons
+    - `CourseList.vue` — grid layout for displaying course list
+    - `CourseEditorModal.vue` — course creation/editing modal with validation
 
 - **Pages**
-    - Полная интеграция `HomePage.vue` с Pinia store
-    - CRUD операции для курсов
-    - Empty state для новых пользователей
+    - Full `HomePage.vue` integration with Pinia store
+    - CRUD operations for courses
+    - Empty state for new users
     - Loading states
 
 ### Changed
 
 - **frontend/src/app/main.js**
-    - Интеграция Pinia store manager
-    - Динамическое определение backend URL на основе порта от Electron
-    - Инициализация приложения после получения backend порта через IPC
+    - Pinia store manager integration
+    - Dynamic backend URL determination based on Electron port
+    - Application initialization after receiving backend port via IPC
 
 - **frontend/src/shared/api/client.js**
-    - Обновлен для работы с глобальной переменной `window.__BACKEND_URL__`
+    - Updated to work with global variable `window.__BACKEND_URL__`
 
 ### Fixed
 
-- Backend port transmission — приложение корректно получает динамический порт через IPC
-- Code formatting в Vue компонентах
+- Backend port transmission — application correctly receives dynamic port via IPC
+- Code formatting in Vue components
 
 ### Documentation
 
-- Создан `docs/Frontend_Integration_Plan.md` с детальным планом реализации
-- Создан `docs/Walkthrough_Frontend_Courses.md` с документацией всех компонентов
-- Обновлен `docs/Task.md` с прогрессом выполнения
+- Created `docs/Frontend_Integration_Plan.md` with detailed implementation plan
+- Created `docs/Walkthrough_Frontend_Courses.md` with documentation of all components
+- Updated `docs/Task.md` with progress
 
 ### Verified
 
-- ✅ Загрузка списка курсов из backend API
-- ✅ Создание нового курса через UI
-- ✅ Backend port transmission через Electron IPC
+- ✅ Loading course list from backend API
+- ✅ Creating new course via UI
+- ✅ Backend port transmission via Electron IPC
 
 ## [0.1.0] - 2026-01-05 17:04
 
@@ -817,33 +834,33 @@ getEffectiveSettings: (state) => (courseId) => {
 
 #### Project Structure: NPM Workspaces
 
-- **Рефакторинг структуры монорепозитория**
+- **Monorepo structure refactoring**
 
-    - Создан корневой `package.json` с поддержкой npm workspaces
-    - Frontend и backend объявлены как отдельные workspaces
-    - Централизованное управление зависимостями через корневой package.json
+    - Created root `package.json` with npm workspaces support
+    - Frontend and backend declared as separate workspaces
+    - Centralized dependency management via root package.json
 
-- **Упрощение команд разработки**
+- **Simplification of development commands**
 
-    - Команды `dev` и `bundle` перенесены из `backend/package.json` в корневой
-    - Команда `npm run dev` теперь запускается из корня проекта
-    - Команда `npm run bundle` собирает frontend, backend и создаёт installer
-    - Добавлены общие команды `lint` и `format` для всех workspaces
+    - `dev` and `bundle` commands moved from `backend/package.json` to root
+    - `npm run dev` now runs from project root
+    - `npm run bundle` builds frontend, backend and creates installer
+    - Added common `lint` and `format` commands for all workspaces
 
-- **Обновлена документация**
+- **Updated documentation**
 
-    - README.md обновлён с инструкциями по использованию workspaces
-    - Создан `docs/Workspaces.md` с полным руководством по работе с workspaces
-    - Описаны команды установки, разработки и сборки
+    - README.md updated with instructions on using workspaces
+    - Created `docs/Workspaces.md` with full guide on working with workspaces
+    - Described installation, development and build commands
 
 ### Technical Details
 
-- npm workspaces позволяют:
+- npm workspaces allow:
 
-    - Установить все зависимости одной командой (`npm install` из корня)
-    - Использовать hoisting для общих зависимостей
-    - Запускать команды для конкретных workspaces: `npm run <script> --workspace=<name>`
-    - Упростить CI/CD pipeline
+    - Install all dependencies with one command (`npm install` from root)
+    - Use hoisting for shared dependencies
+    - Run commands for specific workspaces: `npm run <script> --workspace=<name>`
+    - Simplify CI/CD pipeline
 
 ## [0.1.0] - 2026-01-05 16:50
 
@@ -851,30 +868,30 @@ getEffectiveSettings: (state) => (courseId) => {
 
 #### Development Experience
 
-- **Hot-Reload для фронтенда в режиме разработки**
+- **Hot-Reload for frontend in development mode**
 
-    - Electron теперь загружает фронтенд с Vite dev server (`http://localhost:5173`) в dev режиме
-    - Все изменения во фронтенде видны мгновенно без перезапуска приложения
-    - DevTools открываются автоматически в режиме разработки
-    - Установлен пакет `concurrently` для параллельного запуска процессов
-    - Команда `npm run dev` запускают фронтенд и бэкенд одновременно
-    - Цветная консоль для разделения логов (фронтенд - синий, бэкенд - зелёный)
+    - Electron now loads frontend from Vite dev server (`http://localhost:5173`) in dev mode
+    - All frontend changes are visible instantly without app restart
+    - DevTools open automatically in development mode
+    - Installed `concurrently` package for running processes in parallel
+    - `npm run dev` command runs frontend and backend simultaneously
+    - Colored console to separate logs (frontend - blue, backend - green)
 
 ### Changed
 
 - **backend/src/electron/main.ts**
-    - Изменён импорт Electron на namespace import для совместимости
-    - Добавлена логика загрузки с Vite dev server в development режиме
-    - Регистрация кастомного протокола `lmorozanki://` только для production
-    - Разрешена навигация по localhost в dev режиме
+    - Changed Electron import to namespace import for compatibility
+    - Added logic to load from Vite dev server in development mode
+    - Registration of custom `lmorozanki://` protocol only for production
+    - Allowed navigation to localhost in dev mode
 
 - **backend/package.json**
-    - Обновлены команды `dev` и `electron:dev` для параллельного запуска
-    - Добавлена зависимость `concurrently`
+    - Updated `dev` and `electron:dev` commands for parallel execution
+    - Added `concurrently` dependency
 
 ### Fixed
 
-- **backend/src/config/index.ts** — исправлена ESLint ошибка с форматированием тернарного оператора
+- **backend/src/config/index.ts** — fixed ESLint error with ternary operator formatting
 
 ## [0.1.0] - 2026-01-05 16:11
 
@@ -882,57 +899,57 @@ getEffectiveSettings: (state) => (courseId) => {
 
 #### Backend: Database Service (2026-01-05)
 
-- **Database Layer с Kysely + better-sqlite3**
-    - Конфигурация приложения (`config/index.ts`) с путем к БД
-    - TypeScript схема для таблиц (`services/database/schema.ts`)
-    - Автоматические миграции для таблицы `courses`
-    - Singleton Database Service с инициализацией в `userData/repetitio.db`
+- **Database Layer with Kysely + better-sqlite3**
+    - Application configuration (`config/index.ts`) with DB path
+    - TypeScript schema for tables (`services/database/schema.ts`)
+    - Automatic migrations for `courses` table
+    - Singleton Database Service initialized in `userData/repetitio.db`
 
 - **Course Repository**
-    - CRUD операции: `findAll()`, `findById()`, `create()`, `update()`, `delete()`
-    - Автоматическое обновление `updatedAt` при изменении
+    - CRUD operations: `findAll()`, `findById()`, `create()`, `update()`, `delete()`
+    - Automatic `updatedAt` update on change
 
 #### Backend: Courses API (2026-01-05)
 
-- **REST API endpoints для управления курсами**
-    - `GET /api/courses` — список всех курсов
-    - `POST /api/courses` — создание нового курса
-    - `GET /api/courses/:id` — получение курса по ID
-    - `PUT /api/courses/:id` — обновление курса
-    - `DELETE /api/courses/:id` — удаление курса
+- **REST API endpoints for course management**
+    - `GET /api/courses` — list all courses
+    - `POST /api/courses` — create new course
+    - `GET /api/courses/:id` — get course by ID
+    - `PUT /api/courses/:id` — update course
+    - `DELETE /api/courses/:id` — delete course
 
-- **Валидация с Zod v4**
-    - `createCourseSchema` — валидация при создании (name обязателен)
-    - `updateCourseSchema` — валидация при обновлении (все поля optional)
-    - Детальные сообщения об ошибках через `issues`
+- **Validation with Zod v4**
+    - `createCourseSchema` — validation on creation (name required)
+    - `updateCourseSchema` — validation on update (all fields optional)
+    - Detailed error messages via `issues`
 
 #### Infrastructure (2026-01-05)
 
-- **Утилиты**
-    - Pino logger с pretty printing (`utils/logger.ts`)
-    - Performance Timer для отладки (`utils/performance.ts`)
+- **Utilities**
+    - Pino logger with pretty printing (`utils/logger.ts`)
+    - Performance Timer for debugging (`utils/performance.ts`)
 
 - **Electron configuration**
-    - Добавлены скрипты: `rebuild`, `postinstall` для better-sqlite3
-    - Установлен `electron-rebuild` для нативных модулей
+    - Added scripts: `rebuild`, `postinstall` for better-sqlite3
+    - Installed `electron-rebuild` for native modules
 
-- **Документация**
-    - `docs/Testing_API.md` — инструкции для тестирования API через DevTools
-    - Обновлен `docs/Walkthrough.md` с описанием реализованного функционала
-    - Обновлен `docs/Task.md` с прогрессом выполнения
+- **Documentation**
+    - `docs/Testing_API.md` — instructions for testing API via DevTools
+    - Updated `docs/Walkthrough.md` with description of implemented features
+    - Updated `docs/Task.md` with progress
 
 ### Changed
 
-- `backend/src/server.ts` — интеграция Database Service, удалены старые сервисы
-- `backend/src/electron/main.ts` — восстановлена TypeScript версия с корректными импортами
-- `backend/package.json`, `frontend/package.json` — версия обновлена до 0.1.0
+- `backend/src/server.ts` — integration of Database Service, removed old services
+- `backend/src/electron/main.ts` — restored TypeScript version with correct imports
+- `backend/package.json`, `frontend/package.json` — updated version to 0.1.0
 
 ### Technical Details
 
-- База данных: SQLite в `userData/repetitio.db`
-- ORM: Kysely v0.27 с полной типобезопасностью
-- Валидация: Zod v4
-- Установлены типы: `@types/better-sqlite3`
+- Database: SQLite in `userData/repetitio.db`
+- ORM: Kysely v0.27 with full type safety
+- Validation: Zod v4
+- Types installed: `@types/better-sqlite3`
 
 ## [Unreleased] - 2026-01-05 14:25
 
@@ -940,86 +957,86 @@ getEffectiveSettings: (state) => (courseId) => {
 
 #### Frontend Architecture
 
-- **Feature-Sliced Design структура**
-    - Реализована полная архитектура frontend (app, pages, widgets, features, entities, shared слои)
-    - Настроен Vue Router с hash mode для работы с кастомным протоколом `lmorozanki://`
-    - Созданы TypeScript типы для Electron API интеграции
+- **Feature-Sliced Design structure**
+    - Implemented full frontend architecture (app, pages, widgets, features, entities, shared layers)
+    - Configured Vue Router with hash mode to work with custom protocol `lmorozanki://`
+    - Created TypeScript types for Electron API integration
 
-- **Кастомный Title Bar**
-    - Frameless окно с draggable областью для перемещения
-    - Кнопки управления окном: Minimize, Maximize/Restore, Close
-    - Интеграция с Electron IPC handlers
-    - Backdrop blur эффект (Acrylic material на Windows 11)
+- **Custom Title Bar**
+    - Frameless window with draggable area for moving
+    - Window control buttons: Minimize, Maximize/Restore, Close
+    - Integration with Electron IPC handlers
+    - Backdrop blur effect (Acrylic material on Windows 11)
 
-- **UI компоненты (shared/ui)**
-    - `Button.vue` — 4 варианта (primary, secondary, danger, ghost), 3 размера
-    - `Input.vue` — с label, error states, валидацией
-    - `Card.vue` — с backdrop blur и hover эффектами
+- **UI components (shared/ui)**
+    - `Button.vue` — 4 variants (primary, secondary, danger, ghost), 3 sizes
+    - `Input.vue` — with label, error states, validation
+    - `Card.vue` — with backdrop blur and hover effects
 
-- **Страницы приложения**
-    - `HomePage` — список курсов, empty state, кнопка создания нового курса
-    - `CoursePage` — детальный вид курса, статистика, управление карточками
-    - `TrainingPage` — интерфейс повторения с переворачиваемыми карточками
-    - `SettingsPage` — настройки времени тренировок (начало/конец дня)
+- **Application Pages**
+    - `HomePage` — course list, empty state, create new course button
+    - `CoursePage` — detailed course view, statistics, card management
+    - `TrainingPage` — review interface with flip cards
+    - `SettingsPage` — training time settings (start/end of day)
 
-- **API интеграция**
-    - HTTP клиент на базе axios с динамическим определением backend порта
-    - API client готов к интеграции с backend endpoints
+- **API integration**
+    - HTTP client based on axios with dynamic backend port determination
+    - API client ready for integration with backend endpoints
 
 - **Assets**
-    - Шрифты Roboto (Web Font)
-    - CSS стили приложения
-    - Placeholder изображения
+    - Roboto Fonts (Web Font)
+    - Application CSS styles
+    - Placeholder images
 
 #### Documentation
 
-- **README.md расширен**
-    - Добавлено оглавление (Contents)
-    - Описаны структуры данных (Course, Card, Settings)
-    - Детальное описание Technology Stack
-    - Архитектурная диаграмма (Frontend & Backend)
-    - Application Features с статусом реализации
-    - Current Status проекта (Фазы 1-2 завершены)
-    - Prerequisites и Installation инструкции
+- **README.md extended**
+    - Added Contents
+    - Described data structures (Course, Card, Settings)
+    - Detailed Technology Stack description
+    - Architecture diagram (Frontend & Backend)
+    - Application Features with implementation status
+    - Current Status (Phases 1-2 completed)
+    - Prerequisites and Installation instructions
 
-- **Walkthrough документация**
-    - `implementation_plan.md` — архитектурный план реализации
-    - `walkthrough.md` — детальный walkthrough по созданной архитектуре
-    - `task.md` — чеклист задач с прогрессом выполнения
+- **Walkthrough documentation**
+    - `implementation_plan.md` — architectural implementation plan
+    - `walkthrough.md` — detailed walkthrough of created architecture
+    - `task.md` — checklist of tasks with progress
 
 #### Infrastructure
 
 - **Linting**
-    - Добавлен npm скрипт `lint` в frontend/package.json
-    - Все ESLint ошибки исправлены (self-closing tags в Vue компонентах)
-    - Все Markdownlint ошибки исправлены в README.md
+    - Added npm `lint` script in frontend/package.json
+    - All ESLint errors fixed (self-closing tags in Vue components)
+    - All Markdownlint errors fixed in README.md
 
 ### Changed
 
-- `frontend/index.html` — обновлен title на "Repetitio", убраны лишние Tailwind классы
-- `frontend/package.json` — добавлен lint скрипт
+- `frontend/index.html` — updated title to "Repetitio", removed extra Tailwind classes
+- `frontend/package.json` — added lint script
 
 ### Fixed
 
-- Исправлены пути к директориям frontend/backend (2026-01-05, commits 57a6f49, 32dba9d)
-- Исправлен backend/package.json (2026-01-05, commit 631e629)
+- Fixed paths to frontend/backend directories (2026-01-05, commits 57a6f49, 32dba9d)
+- Fixed backend/package.json (2026-01-05, commit 631e629)
 
 ## [0.0.0] - 2026-01-05 03:04
 
 ### Initial Release
 
-- Начальный scaffolding проекта (commit 1ef8e25)
-- `.gitignore` файл (commit 9d80175)
-- Исключение `.agent` директории из git (commit 1746e22)
-- Базовая структура README.md с философией разработки
+- Initial project scaffolding (commit 1ef8e25)
+- `.gitignore` file (commit 9d80175)
+- Exclusion of `.agent` directory from git (commit 1746e22)
+- Basic README.md structure with development philosophy
 
 ---
 
-## Легенда
+## Legend
 
-- **Added** — новый функционал
-- **Changed** — изменения в существующем функционале
-- **Deprecated** — функционал, который скоро будет удален
-- **Removed** — удаленный функционал
-- **Fixed** — исправления багов
-- **Security** — исправления уязвимостей
+- **Added** — new features
+- **Changed** — changes in existing functionality
+- **Deprecated** — functionality to be removed soon
+- **Removed** — removed functionality
+- **Fixed** — bug fixes
+- **Security** — security fixes

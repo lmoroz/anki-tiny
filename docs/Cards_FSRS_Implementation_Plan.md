@@ -1,636 +1,225 @@
-# План реализации: Система карточек и FSRS
+# Implementation Plan: Cards and FSRS (Backend & Frontend)
 
-## Описание задачи
+## Overview
 
-Реализация одной из самых сложных частей приложения Repetitio — системы управления карточками для обучения с использованием алгоритма интервального повторения FSRS (Free Spaced Repetition Scheduler).
+This plan outlines the implementation stages for the flashcard system and FSRS (spcaed repetition) algorithm.
+The implementation covers the entire stack: from the database to the user interface.
 
-### Цели реализации
-
-1. **Backend**: Создать полноценный API для работы с карточками, включая CRUD операции
-2. **FSRS Integration**: Интегрировать библиотеку `ts-fsrs` для расчета оптимальных интервалов повторения
-3. **Learning Steps**: Реализовать кастомную логику обучения (первый шаг — 4 часа)
-4. **Training System**: Создать систему тренировок с отслеживанием прогресса
-5. **Settings**: Реализовать глобальные и индивидуальные настройки курсов
-6. **Frontend**: Создать UI для управления карточками и прохождения тренировок
+**Implementation Status:**
+- Backend: ✅ Completed
+- Frontend: 📅 Planned
 
 ---
 
-## Требования к FSRS
+## Stage 1: Database Schema ✅
 
-> [!IMPORTANT]
-> Библиотека `ts-fsrs` требует хранения специфичных полей для каждой карточки.
-> Эти поля критически важны для корректной работы алгоритма.
+**Goal:** Create tables for storing cards and settings supporting FSRS fields.
 
-### Обязательные поля FSRS
-
-| Поле            | Тип       | Описание                                           |
-|-----------------|-----------|---------------------------------------------------|
-| `due`           | Timestamp | Дата и время следующего показа                     |
-| `stability`     | Double    | Параметр стабильности памяти (ключевой)            |
-| `difficulty`    | Double    | Текущая сложность карты                            |
-| `elapsed_days`  | Integer   | Дней с последнего успешного повторения             |
-| `scheduled_days`| Integer   | На какой интервал карта была отправлена            |
-| `reps`          | Integer   | Общее количество повторений                        |
-| `lapses`        | Integer   | Количество забываний (нажатий "Again")             |
-| `state`         | Integer   | Состояние: 0=New, 1=Learning, 2=Review, 3=Relearning |
-| `last_review`   | Timestamp | Время последнего ответа                            |
+- [x] **1.1. Determine FSRS Data Structure**
+  - Use fields: `stability`, `difficulty`, `elapsed_days`, `scheduled_days`, `reps`, `lapses`, `state`, `last_review`.
+  - Add `due_date` field for quick filtering.
+- [x] **1.2. Create `cards` table**
+  - Fields: `id`, `course_id`, `front`, `back`, `...fsrs_fields`.
+  - Indices: `course_id`, `due_date`, `state`.
+- [x] **1.3. Create `settings` table (Global Settings)**
+  - Fields: `training_start_hour`, `training_end_hour`, `min_time_before_end` (4h).
+  - Fields: `notifications_enabled`, `learning_steps` (JSON), `enable_fuzz`.
+- [x] **1.4. Create `course_settings` table (Course Settings)**
+  - Similar fields to global + `course_id`.
+  - All fields are nullable (inherit from global if null).
 
 ---
 
-## Предлагаемые изменения
+## Stage 2: FSRS Library Integration ✅
 
-### Backend: Database Schema
+**Goal:** Integrate `ts-fsrs` library and set up logic.
 
-#### [MODIFY] [schema.ts](file:///e:/Develop/anki-tiny/backend/src/services/database/schema.ts)
-
-Добавить интерфейсы для новых таблиц:
-
-```typescript
-// Таблица cards
-export interface CardsTable {
-  id: Generated<number>;
-  courseId: number;
-  front: string;
-  back: string;
-  
-  // FSRS поля
-  due: string;  // ISO timestamp
-  stability: number;
-  difficulty: number;
-  elapsedDays: number;
-  scheduledDays: number;
-  reps: number;
-  lapses: number;
-  state: number;  // 0=New, 1=Learning, 2=Review, 3=Relearning
-  lastReview: string | null;  // ISO timestamp
-  
-  // Для Learning Steps
-  stepIndex: number;  // Текущий шаг обучения
-  
-  createdAt: Generated<string>;
-  updatedAt: Generated<string>;
-}
-
-export type Card = Selectable<CardsTable>;
-export type NewCard = Insertable<CardsTable>;
-export type CardUpdate = Updateable<CardsTable>;
-
-// Таблица settings
-export interface SettingsTable {
-  id: Generated<number>;
-  trainingStartHour: number;  // 8 по умолчанию
-  trainingEndHour: number;    // 22 по умолчанию
-  minTimeBeforeEnd: number;   // 4 часа
-  notificationsEnabled: number;  // SQLite boolean (0/1)
-  learningSteps: string;      // JSON массив, например "[10, 240]" (минуты)
-  enableFuzz: number;         // SQLite boolean
-  createdAt: Generated<string>;
-  updatedAt: Generated<string>;
-}
-
-// Таблица course_settings
-export interface CourseSettingsTable {
-  id: Generated<number>;
-  courseId: number;
-  trainingStartHour: number | null;
-  trainingEndHour: number | null;
-  minTimeBeforeEnd: number | null;
-  notificationsEnabled: number | null;
-  learningSteps: string | null;
-  enableFuzz: number | null;
-  createdAt: Generated<string>;
-  updatedAt: Generated<string>;
-}
-
-// Обновить Database interface
-export interface Database {
-  courses: CoursesTable;
-  cards: CardsTable;
-  settings: SettingsTable;
-  courseSettings: CourseSettingsTable;
-}
-```
+- [x] **2.1. Install Library**
+  - `npm install ts-fsrs` (backend).
+- [x] **2.2. Create Database Service**
+  - Initialization of FSRS instance with parameters (generator).
+  - Helper functions for calculating next interval.
+- [x] **2.3. Implement "Time Restrictions" Logic**
+  - Function `canShowNewCards(now, settings)`: returns `false` if `(end_of_day - now) < 4 hours` (since first step is 4h).
+- [x] **2.4. Define "Learning Steps" Logic**
+  - Default: `1m` (Again), `10m` (Hard), `4h` (Good), `1d` (Easy) - *This is an example, need to clarify specific steps*.
+  - Requirement: "first short interval 4 hours".
+  - **Correction:** FSRS handles scheduling, but "steps" for New/Learning cards are often handled manually or via library parameters.
 
 ---
 
-#### [NEW] [migrations/002_create_cards_table.sql](file:///e:/Develop/anki-tiny/backend/src/services/database/migrations/002_create_cards_table.sql)
+## Stage 3: Cards API (Backend) ✅
 
-```sql
-CREATE TABLE IF NOT EXISTS cards (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    courseId INTEGER NOT NULL,
-    front TEXT NOT NULL,
-    back TEXT NOT NULL,
-    
-    -- FSRS поля
-    due TEXT NOT NULL,
-    stability REAL NOT NULL DEFAULT 0.0,
-    difficulty REAL NOT NULL DEFAULT 5.0,
-    elapsedDays INTEGER NOT NULL DEFAULT 0,
-    scheduledDays INTEGER NOT NULL DEFAULT 0,
-    reps INTEGER NOT NULL DEFAULT 0,
-    lapses INTEGER NOT NULL DEFAULT 0,
-    state INTEGER NOT NULL DEFAULT 0,
-    lastReview TEXT,
-    stepIndex INTEGER NOT NULL DEFAULT 0,
-    
-    createdAt TEXT NOT NULL DEFAULT (datetime('now')),
-    updatedAt TEXT NOT NULL DEFAULT (datetime('now')),
-    
-    FOREIGN KEY (courseId) REFERENCES courses(id) ON DELETE CASCADE
-);
+**Goal:** CRUD endpoints for cards.
 
-CREATE INDEX idx_cards_courseId ON cards(courseId);
-CREATE INDEX idx_cards_due ON cards(due);
-CREATE INDEX idx_cards_state ON cards(state);
-```
-
-#### [NEW] [migrations/003_create_settings_table.sql](file:///e:/Develop/anki-tiny/backend/src/services/database/migrations/003_create_settings_table.sql)
-
-```sql
-CREATE TABLE IF NOT EXISTS settings (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    trainingStartHour INTEGER NOT NULL DEFAULT 8,
-    trainingEndHour INTEGER NOT NULL DEFAULT 22,
-    minTimeBeforeEnd INTEGER NOT NULL DEFAULT 4,
-    notificationsEnabled INTEGER NOT NULL DEFAULT 1,
-    learningSteps TEXT NOT NULL DEFAULT '[10, 240]',
-    enableFuzz INTEGER NOT NULL DEFAULT 1,
-    createdAt TEXT NOT NULL DEFAULT (datetime('now')),
-    updatedAt TEXT NOT NULL DEFAULT (datetime('now'))
-);
-
--- Вставить дефолтную запись
-INSERT INTO settings (id) VALUES (1);
-```
-
-#### [NEW] [migrations/004_create_course_settings_table.sql](file:///e:/Develop/anki-tiny/backend/src/services/database/migrations/004_create_course_settings_table.sql)
-
-```sql
-CREATE TABLE IF NOT EXISTS courseSettings (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    courseId INTEGER NOT NULL UNIQUE,
-    trainingStartHour INTEGER,
-    trainingEndHour INTEGER,
-    minTimeBeforeEnd INTEGER,
-    notificationsEnabled INTEGER,
-    learningSteps TEXT,
-    enableFuzz INTEGER,
-    createdAt TEXT NOT NULL DEFAULT (datetime('now')),
-    updatedAt TEXT NOT NULL DEFAULT (datetime('now')),
-    
-    FOREIGN KEY (courseId) REFERENCES courses(id) ON DELETE CASCADE
-);
-
-CREATE INDEX idx_course_settings_courseId ON courseSettings(courseId);
-```
+- [x] **3.1. `POST /api/courses/:id/cards`**
+  - Zod validation: `front`, `back` required.
+  - Create card with initial FSRS state (New).
+- [x] **3.2. `GET /api/courses/:id/cards`**
+  - List of cards (pagination?).
+  - Search/Filter (optional for MVP).
+- [x] **3.3. `PUT /api/cards/:id`**
+  - Update texts (`front`, `back`).
+- [x] **3.4. `DELETE /api/cards/:id`**
+  - Delete card.
 
 ---
 
-### Backend: FSRS Service
+## Stage 4: Training API (Backend) ✅
 
-#### [NEW] [services/fsrs/index.ts](file:///e:/Develop/anki-tiny/backend/src/services/fsrs/index.ts)
+**Goal:** Endpoints for the learning session.
 
-Сервис для работы с алгоритмом FSRS:
-
-**Ключевые функции:**
-
-1. **`initializeFSRS(settings)`** — инициализация FSRS с параметрами из настроек
-2. **`calculateNextReview(card, rating, settings)`** — расчет следующего интервала повторения
-3. **`handleLearningSteps(card, rating, settings)`** — обработка шагов обучения (NEW, LEARNING)
-4. **`transitionToReview(card)`** — переход карты в состояние REVIEW
-5. **`getDueCards(courseId, currentSettings)`** — получение карт для повторения с учетом времени
-
-**Логика Learning Steps:**
-
-```typescript
-// Псевдокод
-if (card.state === CardState.NEW || card.state === CardState.LEARNING) {
-  const steps = parseSteps(settings.learningSteps); // [10, 240] минут
-  
-  if (rating === Rating.GOOD || rating === Rating.EASY) {
-    card.stepIndex++;
-    
-    if (card.stepIndex >= steps.length) {
-      // Завершили все шаги, переводим в REVIEW
-      transitionToReview(card);
-    } else {
-      // Переходим к следующему шагу
-      const nextStepMinutes = steps[card.stepIndex];
-      card.due = new Date(Date.now() + nextStepMinutes * 60 * 1000);
-      card.state = CardState.LEARNING;
-    }
-  } else if (rating === Rating.AGAIN) {
-    // Возврат к первому шагу
-    card.stepIndex = 0;
-    card.due = new Date(Date.now() + steps[0] * 60 * 1000);
-    card.lapses++;
-  }
-} else {
-  // Card в состоянии REVIEW - используем FSRS
-  const fsrs = initializeFSRS(settings);
-  const result = fsrs.calculate(card, rating);
-  updateCardFromFSRS(card, result);
-}
-```
+- [x] **4.1. `GET /api/courses/:id/due-cards`**
+  - Returns list of cards to review.
+  - **Logic:**
+    - Filter by `due_date <= now`.
+    - Join with settings.
+    - If `canShowNewCards` is false -> exclude cards with `state == New` (or equivalent).
+- [x] **4.2. `POST /api/training/review`**
+  - Body: `{ cardId, rating }` (Rating: Again, Hard, Good, Easy).
+  - Calculate new parameters via FSRS.
+  - Update card in DB.
+  - Log repetition (history table? - optional for MVP, but good for stats).
 
 ---
 
-### Backend: Repositories
+## Stage 5: Settings API (Backend) ✅
 
-#### [NEW] [repositories/cardRepository.ts](file:///e:/Develop/anki-tiny/backend/src/repositories/cardRepository.ts)
+**Goal:** Management of settings.
 
-CRUD операции для карточек:
-
-- `getCardsByCourseId(courseId: number): Promise<Card[]>`
-- `getCardById(id: number): Promise<Card | null>`
-- `createCard(data: NewCard): Promise<Card>`
-- `updateCard(id: number, data: CardUpdate): Promise<Card>`
-- `deleteCard(id: number): Promise<void>`
-- `getDueCards(courseId: number, currentTime: Date, settings: Settings): Promise<Card[]>`
-
-#### [NEW] [repositories/settingsRepository.ts](file:///e:/Develop/anki-tiny/backend/src/repositories/settingsRepository.ts)
-
-- `getGlobalSettings(): Promise<Settings>`
-- `updateGlobalSettings(data: Partial<Settings>): Promise<Settings>`
-- `getCourseSettings(courseId: number): Promise<CourseSettings | null>`
-- `updateCourseSettings(courseId: number, data: Partial<CourseSettings>): Promise<CourseSettings>`
-- `deleteCourseSettings(courseId: number): Promise<void>`
-- `getEffectiveSettings(courseId: number): Promise<Settings>` — возвращает настройки курса или глобальные
+- [x] **5.1. `GET /api/settings`** & **`PUT /api/settings`** (Global).
+- [x] **5.2. `GET /api/courses/:id/settings`** & **`PUT /api/courses/:id/settings`** (Course).
+  - GET returns merged settings (Course > Global > Default).
 
 ---
 
-### Backend: Validation Schemas
+## Stage 6: Frontend Entity Layer (Cards) 📅
 
-#### [NEW] [schemas/card.ts](file:///e:/Develop/anki-tiny/backend/src/schemas/card.ts)
+**Goal:** Models and Stores for Frontend.
 
-```typescript
-import { z } from 'zod';
-
-export const CreateCardSchema = z.object({
-  front: z.string().min(1, 'Front is required'),
-  back: z.string().min(1, 'Back is required'),
-});
-
-export const UpdateCardSchema = z.object({
-  front: z.string().min(1).optional(),
-  back: z.string().min(1).optional(),
-});
-
-export const ReviewCardSchema = z.object({
-  cardId: z.number().int().positive(),
-  rating: z.enum(['1', '2', '3', '4']), // Again, Hard, Good, Easy
-});
-```
-
-#### [NEW] [schemas/settings.ts](file:///e:/Develop/anki-tiny/backend/src/schemas/settings.ts)
-
-```typescript
-export const GlobalSettingsSchema = z.object({
-  trainingStartHour: z.number().int().min(0).max(23).optional(),
-  trainingEndHour: z.number().int().min(0).max(23).optional(),
-  minTimeBeforeEnd: z.number().int().min(1).max(12).optional(),
-  notificationsEnabled: z.boolean().optional(),
-  learningSteps: z.string().optional(), // JSON массив
-  enableFuzz: z.boolean().optional(),
-});
-
-export const CourseSettingsSchema = GlobalSettingsSchema;
-```
+- [ ] **6.1. Types**
+  - `Card`, `ReviewLog`, `FSRSParameters`.
+- [ ] **6.2. Card Service (API Client)**
+  - Methods for all endpoints.
+- [ ] **6.3. Card Store (Pinia)**
+  - State: `cards`, `currentCard`, `sessionStats`.
+  - Actions: `loadCards`, `createCard`, `submitReview`.
 
 ---
 
-### Backend: API Routes
+## Stage 7: Frontend Cards UI Components 📅
 
-#### [NEW] [routes/cards.ts](file:///e:/Develop/anki-tiny/backend/src/routes/cards.ts)
+**Goal:** Basic components.
 
-- `GET /api/courses/:courseId/cards` — список карточек курса
-- `POST /api/courses/:courseId/cards` — создание новой карточки
-- `GET /api/cards/:id` — получение карточки по ID
-- `PUT /api/cards/:id` — обновление карточки
-- `DELETE /api/cards/:id` — удаление карточки
-
-#### [NEW] [routes/training.ts](file:///e:/Develop/anki-tiny/backend/src/routes/training.ts)
-
-- `GET /api/courses/:courseId/due-cards` — получение карточек для повторения
-- `POST /api/training/review` — отправка результата повторения (rating)
-
-**Логика `/due-cards`:**
-
-```typescript
-// Псевдокод
-const settings = await getEffectiveSettings(courseId);
-const now = new Date();
-const currentHour = now.getHours();
-
-// Проверка времени тренировок
-if (currentHour < settings.trainingStartHour || currentHour >= settings.trainingEndHour) {
-  return { cards: [], message: 'Outside training hours' };
-}
-
-// Проверка "4 часа до конца дня"
-const endTime = new Date();
-endTime.setHours(settings.trainingEndHour, 0, 0, 0);
-const hoursUntilEnd = (endTime.getTime() - now.getTime()) / (1000 * 60 * 60);
-
-if (hoursUntilEnd < settings.minTimeBeforeEnd) {
-  // Исключаем NEW карточки, возвращаем только DUE
-  const dueCards = await getDueCards(courseId, now, settings, { excludeNew: true });
-  return { cards: dueCards, message: 'Too close to end of day for new cards' };
-}
-
-// Нормальная ситуация - возвращаем все due карты
-const dueCards = await getDueCards(courseId, now, settings);
-return { cards: dueCards };
-```
-
-#### [NEW] [routes/settings.ts](file:///e:/Develop/anki-tiny/backend/src/routes/settings.ts)
-
-- `GET /api/settings` — получение глобальных настроек
-- `PUT /api/settings` — обновление глобальных настроек
-
-#### [NEW] [routes/course-settings.ts](file:///e:/Develop/anki-tiny/backend/src/routes/course-settings.ts)
-
-- `GET /api/courses/:courseId/settings` — получение настроек курса
-- `PUT /api/courses/:courseId/settings` — обновление настроек курса
-- `DELETE /api/courses/:courseId/settings` — сброс к глобальным настройкам
+- [ ] **7.1. `CardList` Widget**
+  - List of cards in course settings.
+  - "Edit" and "Delete" buttons.
+- [ ] **7.2. `CardEditor` (Modal/Inline)**
+  - Fields Front/Back.
+  - Rich Text Editor? (Start with plain text/markdown).
+- [ ] **7.3. `QuickAddCard` Widget**
+  - Form on the course page for quick addition.
+  - "Add & Continue" behavior.
 
 ---
 
-### Frontend: Entity Layer
+## Stage 8: Frontend Course Page Integration 📅
 
-#### [NEW] [entities/card/model/types.ts](file:///e:/Develop/anki-tiny/frontend/src/entities/card/model/types.ts)
+**Goal:** Display cards on Course Page.
 
-```typescript
-export enum CardState {
-  NEW = 0,
-  LEARNING = 1,
-  REVIEW = 2,
-  RELEARNING = 3,
-}
-
-export enum Rating {
-  AGAIN = 1,
-  HARD = 2,
-  GOOD = 3,
-  EASY = 4,
-}
-
-export interface Card {
-  id: number;
-  courseId: number;
-  front: string;
-  back: string;
-  due: string;
-  stability: number;
-  difficulty: number;
-  elapsedDays: number;
-  scheduledDays: number;
-  reps: number;
-  lapses: number;
-  state: CardState;
-  lastReview: string | null;
-  stepIndex: number;
-  createdAt: string;
-  updatedAt: string;
-}
-```
-
-#### [NEW] [entities/card/api/cardApi.ts](file:///e:/Develop/anki-tiny/frontend/src/entities/card/api/cardApi.ts)
-
-HTTP клиент для работы с cards API:
-
-- `fetchCardsByCourseId(courseId)`
-- `createCard(courseId, data)`
-- `updateCard(id, data)`
-- `deleteCard(id)`
-
-#### [NEW] [entities/card/model/cardStore.ts](file:///e:/Develop/anki-tiny/frontend/src/entities/card/model/cardStore.ts)
-
-Pinia store для управления состоянием карточек.
+- [ ] **8.1. Update `CoursePage`**
+  - Add "Start Training" button (if due cards exist).
+  - Add `QuickAddCard` widget.
+  - Add list of cards (or link to separate page "Manage Cards").
 
 ---
 
-### Frontend: Widgets
+## Stage 9: Frontend Training Page 📅
 
-#### [NEW] [widgets/card-list/CardList.vue](file:///e:/Develop/anki-tiny/frontend/src/widgets/card-list/CardList.vue)
+**Goal:** The main interface for learning.
 
-Компонент для отображения списка карточек:
-
-- Группировка по состоянию (New, Learning, Review)
-- Пагинация или виртуальный скроллинг
-- Empty state
-- Loading state
-
-#### [NEW] [widgets/card-list/CardItem.vue](file:///e:/Develop/anki-tiny/frontend/src/widgets/card-list/CardItem.vue)
-
-Отдельная карточка в списке:
-
-- Отображение front/back (сокращенно)
-- Badge со статусом
-- Кнопки Edit/Delete
-
-#### [NEW] [widgets/card-editor/CardEditor.vue](file:///e:/Develop/anki-tiny/frontend/src/widgets/card-editor/CardEditor.vue)
-
-Modal для создания/редактирования карточки:
-
-- Textarea для front
-- Textarea для back
-- Валидация
-- Кнопки Save/Cancel
-
-#### [NEW] [widgets/card-editor/QuickAddCard.vue](file:///e:/Develop/anki-tiny/frontend/src/widgets/card-editor/QuickAddCard.vue)
-
-Компактная форма для быстрого добавления карточек:
-
-- Inline форма
-- Enter для сохранения
-- Автоочистка после добавления
+- [ ] **9.1. Create `TrainingPage` (`/training/:courseId`)**.
+- [ ] **9.2. Implement Card Display**
+  - "Question" state (Back hidden).
+  - "Answer" state (Back visible).
+- [ ] **9.3. Implement Action Buttons**
+  - Again, Hard, Good, Easy.
+  - Display next intervals (if possible to calculate on client or fetch from backend).
+- [ ] **9.4. Implement "Session Complete" screen**.
 
 ---
 
-### Frontend: Pages
+## Stage 10: Frontend Settings Pages 📅
 
-#### [MODIFY] [pages/course/CoursePage.vue](file:///e:/Develop/anki-tiny/frontend/src/pages/course/CoursePage.vue)
+**Goal:** UI for Settings.
 
-Интеграция управления карточками:
-
-- Header с названием курса и статистикой
-- QuickAddCard widget
-- CardList widget с кнопками управления
-- Кнопка "Начать тренировку"
-- Кнопка "Настройки курса"
-
-#### [MODIFY] [pages/training/TrainingPage.vue](file:///e:/Develop/anki-tiny/frontend/src/pages/training/TrainingPage.vue)
-
-Интерфейс тренировки:
-
-- Загрузка due cards при старте
-- Отображение текущей карточки (front → back при клике)
-- Кнопки оценки: Again, Hard, Good, Easy
-- Прогресс-бар (X из Y)
-- Завершение сессии с поздравлением
-- Empty states
-
-#### [MODIFY] [pages/settings/SettingsPage.vue](file:///e:/Develop/anki-tiny/frontend/src/pages/settings/SettingsPage.vue)
-
-Глобальные настройки:
-
-- Time pickers для часов тренировок
-- Input для minTimeBeforeEnd
-- Toggle для уведомлений
-- Input для Learning Steps (JSON массив)
-- Toggle для Enable Fuzz
+- [ ] **10.1. Global Settings Page**
+  - Inputs for time ranges.
+  - FSRS parameters adjustment (advanced).
+- [ ] **10.2. Course Settings Modal/Page**
+  - "Use Global" switch.
+  - Overrides.
 
 ---
 
-## План верификации
+## Stage 11: Backend Unit Tests ✅
 
-### Automated Tests
+**Goal:** Verify FSRS logic.
 
-#### 1. Backend Unit Tests: FSRS Service
-
-**Файл:** `backend/tests/services/fsrs.test.ts`
-
-**Тесты:**
-
-- Расчет интервала для NEW карточки с Learning Steps
-- Переход между шагами обучения (LEARNING → REVIEW)
-- Обработка LAPSES (Again → reset to step 0)
-- Корректность применения enable_fuzz
-- Расчет интервала для REVIEW карточки через ts-fsrs
-
-**Команда запуска:**
-
-```bash
-cd backend
-npm run test -- --testPathPattern=fsrs.test.ts
-```
-
-#### 2. Backend Unit Tests: Card Repository
-
-**Файл:** `backend/tests/repositories/cardRepository.test.ts`
-
-**Тесты:**
-
-- Создание карточки с дефолтными FSRS полями
-- Получение карточек по courseId
-- Обновление FSRS полей после review
-- getDueCards с фильтрацией по времени
-
-**Команда запуска:**
-
-```bash
-cd backend
-npm run test -- --testPathPattern=cardRepository.test.ts
-```
-
-#### 3. E2E Tests: Cards CRUD
-
-**Файл:** `tests/e2e/cards.spec.ts` (Playwright)
-
-**Тесты:**
-
-- Создание карточки через Quick Add
-- Редактирование карточки через CardEditor
-- Удаление карточки с подтверждением
-- Отображение списка карточек с группировкой
-
-**Команда запуска:**
-
-```bash
-npx playwright test cards.spec.ts
-```
-
-#### 4. E2E Tests: Training Flow
-
-**Файл:** `tests/e2e/training.spec.ts`
-
-**Тесты:**
-
-- Загрузка due cards для курса
-- Flip карточки (front → back)
-- Нажатие кнопок оценки (Good)
-- Завершение сессии с поздравлением
-
-**Команда запуска:**
-
-```bash
-npx playwright test training.spec.ts
-```
+- [x] **11.1. Test FSRS calculation**
+  - Verify interval growth.
+- [x] **11.2. Test Time Restrictions**
+  - Mock time and check filtering of new cards.
+- [x] **11.3. Test Settings Inheritance**
+  - Verify course settings override global.
 
 ---
 
-### Manual Verification
+## Stage 12: Integration Testing 📅
 
-#### 1. Проверка FSRS алгоритма
+**Goal:** Verify full flow.
 
-**Шаги:**
-
-1. Создать курс и добавить несколько карточек
-2. Запустить тренировку через UI
-3. Ответить "Good" на первую карточку (NEW)
-4. Проверить в БД: `SELECT due, state, stepIndex FROM cards WHERE id = X`
-   - Ожидаемый результат: `state = 1` (LEARNING), `stepIndex = 1`, `due` через 10 минут
-5. Подождать 10 минут (или вручную изменить due в БД на текущее время)
-6. Снова открыть тренировку, ответить "Good"
-7. Проверить в БД:
-   - Ожидаемый результат: `state = 2` (REVIEW), `stepIndex = 2`, `due` рассчитан через FSRS
-
-#### 2. Проверка временных ограничений
-
-**Шаги:**
-
-1. Открыть Settings, установить `trainingEndHour = 18`
-2. Изменить системное время на 17:00
-3. Создать курс с NEW карточками
-4. Попытаться начать тренировку
-5. Ожидаемый результат: Новые карточки не предлагаются (до конца дня < 4 часов)
-6. Изменить время на 13:00
-7. Снова начать тренировку
-8. Ожидаемый результат: Новые карточки доступны
-
-#### 3. Проверка индивидуальных настроек курса
-
-**Шаги:**
-
-1. Создать курс
-2. Открыть настройки курса, изменить `learningSteps` на `[5, 120]`
-3. Добавить карточку и начать тренировку
-4. Ответить "Good" на NEW карточку
-5. Проверить в БД: `due` должно быть через 5 минут (не 10)
+- [ ] **12.1. Create Course -> Add Card -> Train -> Verify Due Date**.
 
 ---
 
-## Риски и ограничения
+## Stage 13: Verification & Documentation 📅
 
-> [!WARNING]
-> **Сложность FSRS алгоритма**
-> Библиотека `ts-fsrs` требует точного соблюдения контракта данных.
-> Неправильное хранение/обновление полей может привести к некорректным расчетам.
+**Goal:** Final checks.
 
-> [!WARNING]
-> **Временные зоны**
-> Необходимо учитывать временную зону пользователя при расчете `trainingStartHour` и `trainingEndHour`.
-> Все timestamp в БД хранятся в UTC, преобразование в локальное время должно происходить на frontend.
-
-> [!CAUTION]
-> **Миграции БД**
-> Добавление новых таблиц требует запуска миграций. Если пользователь установил старую версию,
-> необходимо обеспечить совместимость схемы БД.
-
-> [!NOTE]
-> **Learning Steps**
-> Значения Learning Steps хранятся как JSON string в БД. Необходима валидация при парсинге.
+- [ ] **13.1. Verify requirement:** "first short interval 4 hours".
+- [ ] **13.2. Verify requirement:** "notifications".
+- [ ] **13.3. Verify requirement:** "minimize to tray".
 
 ---
 
-## Следующие шаги после реализации
+## Risks and Limitations
 
-После успешной реализации Cards и FSRS:
+1. **FSRS Complexity**: Tuning parameters might be difficult for users. Need good defaults.
+   - *Mitigation*: Hide advanced settings behind "Advanced" toggle.
+2. **Time Zones**: "End of day" (22:00) depends on user timezone.
+   - *Mitigation*: Backend should handle dates in UTC, but logic for "hours" likely needs local time offset or assume checking against local time sent from client? Or store timezone in settings.
+   - *Simplify*: For desktop app (Electron), Backend logic runs locally, so system time is user time. ✅
 
-1. **Система уведомлений** — интеграция Electron Notification API
-2. **Tray Integration** — сворачивание в системный трей
-3. **Статистика** — dashboard с прогрессом обучения
-4. **Импорт/Экспорт** — совместимость с Anki (опционально)
-5. **Медиа в карточках** — поддержка изображений и аудио
+---
+
+## FSRS Requirements Detail (from user)
+
+> "User wants to adapt intervals to their needs, for example, make the first short interval 4 hours instead of one day"
+
+This implies **Custom Learning Steps**.
+Standard Anki steps: `1m 10m`.
+User request: `4h ...`.
+
+**Solution:**
+Configure `learning_steps` parameter.
+If `ts-fsrs` supports custom steps before entering main scheduling, use that.
+Otherwise, manually handle "Learning" state logic. Since we implement our own scheduler wrapper, we can control this.
+
+**Logic Plan:**
+1. **New Card** -> Reviewed "Good" -> Enters **Learning**.
+2. **Learning Step 1**: Interval = 4 hours.
+3. Card becomes Due after 4 hours.
+4. User reviews -> "Good" -> **Graduated** (moves to Review state) OR Next Step.
+
+Needs flexible "Steps" configuration field in Settings (e.g., "4h, 1d").

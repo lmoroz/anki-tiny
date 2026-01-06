@@ -2,7 +2,7 @@
 
 ## Overview
 
-Реализована полнофункциональная система управления настройками для приложения Repetitio. Система позволяет управлять глобальными настройками приложения и настройками отдельных курсов с поддержкой наследования (fallback).
+Implemented a fully functional settings management system for the Repetitio application. The system allows managing global application settings and individual course settings with inheritance support (fallback).
 
 ## Implemented Components
 
@@ -10,54 +10,54 @@
 
 #### 1. API Client (`frontend/src/shared/api/settings.js`)
   
-API клиент для взаимодействия с backend endpoints:
+API client for interaction with backend endpoints:
 
-- `getGlobalSettings()` — получение глобальных настроек
-- `updateGlobalSettings(settings)` — обновление глобальных настроек
-- `getCourseSettings(courseId)` — получение настроек курса
-- `updateCourseSettings(courseId, settings)` — обновление настроек курса
-- `resetCourseSettings(courseId)` — сброс настроек курса к глобальным
+- `getGlobalSettings()` — get global settings
+- `updateGlobalSettings(settings)` — update global settings
+- `getCourseSettings(courseId)` — get course settings
+- `updateCourseSettings(courseId, settings)` — update course settings
+- `resetCourseSettings(courseId)` — reset course settings to global
 
 #### 2. TypeScript Types (`frontend/src/shared/types/settings.ts`)
 
-Определены интерфейсы:
+Defined interfaces:
 
-- `GlobalSettings` — структура глобальных настроек
-- `CourseSettings` — структура настроек курса (extends GlobalSettings)
-- `UpdateSettingsDTO` — DTO для обновления (все поля optional)
-- `SettingsValidation` — результат валидации настроек
+- `GlobalSettings` — global settings structure
+- `CourseSettings` — course settings structure (extends GlobalSettings)
+- `UpdateSettingsDTO` — DTO for update (all fields optional)
+- `SettingsValidation` — validation result
 
 #### 3. Pinia Store (`frontend/src/entities/settings/model/useSettingsStore.js`)
 
-State management с логикой наследования настроек:
+State management with settings inheritance logic:
 
 **State:**
 
-- `globalSettings` — глобальные настройки приложения
-- `courseSettings` — Map<courseId, CourseSettings> для индивидуальных настроек
-- `loading` — флаг загрузки
-- `error` — ошибки
+- `globalSettings` — global application settings
+- `courseSettings` — Map<courseId, CourseSettings> for individual settings
+- `loading` — loading flag
+- `error` — errors
 
 **Getters:**
 
-- `getEffectiveSettings(courseId)` — возвращает настройки курса или глобальные (fallback)
-- `hasCustomSettings(courseId)` — проверяет наличие индивидуальных настроек
+- `getEffectiveSettings(courseId)` — returns course settings or global (fallback)
+- `hasCustomSettings(courseId)` — checks for individual settings
 
 **Actions:**
 
 - `fetchGlobalSettings()`, `updateGlobalSettings()`
 - `fetchCourseSettings(courseId)`, `updateCourseSettings()`
-- `resetCourseSettings(courseId)` — удаление индивидуальных настроек
+- `resetCourseSettings(courseId)` — remove individual settings
 
 ### UI Components
 
 #### TimeRangePicker (`frontend/src/shared/ui/TimeRangePicker.vue`)
 
-Компонент выбора временного диапазона:
+Time range selection component:
 
-- Два селектора (начало/конец дня) с часами от 0 до 23
-- Визуальная timeline шкала с активным диапазоном (синий цвет)
-- Метки времени: 0:00, 6:00, 12:00, 18:00, 24:00
+- Two selectors (start/end of day) with hours 0-23
+- Visual timeline scale with active range (blue color)
+- Time marks: 0:00, 6:00, 12:00, 18:00, 24:00
 - Props: `start`, `end`, `disabled`
 - Events: `update:start`, `update:end`
 
@@ -65,109 +65,109 @@ State management с логикой наследования настроек:
 
 #### SettingsForm (`frontend/src/widgets/settings-form/SettingsForm.vue`)
 
-Форма редактирования настроек с real-time validation:
+Settings editing form with real-time validation:
 
 **Features:**
 
-- Интеграция TimeRangePicker для временного диапазона
-- Input для minTimeBeforeEnd (1-12 часов)
-- Checkbox для уведомлений
-- Preview секция с расчетом эффективного расписания
-- Real-time валидация:
+- TimeRangePicker integration
+- Input for minTimeBeforeEnd (1-12 hours)
+- Checkbox for notifications
+- Preview section with effective schedule calculation
+- Real-time validation:
     - `trainingStartHour < trainingEndHour`
-    - `minTimeBeforeEnd` от 1 до 12 часов
-    - Диапазон тренировок >= minTimeBeforeEnd
+    - `minTimeBeforeEnd` from 1 to 12 hours
+    - Training duration >= minTimeBeforeEnd
 
 **Props:**
 
-- `modelValue` — текущие настройки
-- `readonly` — режим только для чтения
+- `modelValue` — current settings
+- `readonly` — read-only mode
 
 **Events:**
 
-- `update:modelValue` — синхронизация изменений
-- `save` — сохранение валидных настроек
+- `update:modelValue` — sync changes
+- `save` — save valid settings
 
 #### CourseSettingsModal (`frontend/src/widgets/course-settings-modal/CourseSettingsModal.vue`)
 
-Модальное окно для настроек курса:
+Modal window for course settings:
 
 **Features:**
 
-- Переключатель: "Глобальные" / "Индивидуальные"
-- Интеграция SettingsForm (readonly в режиме глобальных)
-- Кнопка "Сбросить к глобальным" (если есть индивидуальные)
-- Modal footer с кнопками "Отмена" / "Сохранить"
+- Switch: "Global" / "Individual"
+- SettingsForm integration (readonly in global mode)
+- "Reset to Global" button (if individual settings exist)
+- Modal footer with "Cancel" / "Save" buttons
 
 **Logic:**
 
-- При переключении на глобальные → поля становятся readonly, показывают глобальные значения
-- При переключении на индивидуальные → поля становятся editable
-- Reset удаляет индивидуальные настройки курса
+- Switch to Global → fields become readonly, show global values
+- Switch to Individual → fields become editable
+- Reset removes individual course settings
 
 ### Pages
 
 #### SettingsPage (`frontend/src/pages/settings/SettingsPage.vue`)
 
-Главная страница настроек с двумя секциями:
+Main settings page with two sections:
 
-**Section 1: Глобальные настройки**
+**Section 1: Global Settings**
 
-- Card с SettingsForm
-- Сохранение через `handleSaveGlobal()`
+- Card with SettingsForm
+- Save via `handleSaveGlobal()`
 
-**Section 2: Настройки курсов**
+**Section 2: Course Settings**
 
-- Список всех курсов с badges:
-    - "Индивидуальные" (синий) — если курс имеет custom settings
-    - "Глобальные" (серый) — если использует fallback
-- Кнопка "Настроить" для каждого курса
+- List of all courses with badges:
+    - "Individual" (blue) — if course has custom settings
+    - "Global" (grey) — if using fallback
+- "Configure" button for each course
 
 **Integration:**
 
-- Загрузка данных через `settingsStore.fetchGlobalSettings()` и `courseStore.fetchCourses()`
-- Определение эффективных настроек через `settingsStore.hasCustomSettings()`
+- Data loading via `settingsStore.fetchGlobalSettings()` and `courseStore.fetchCourses()`
+- Effective settings determination via `settingsStore.hasCustomSettings()`
 
 #### CoursePage Integration
 
-Добавлена кнопка "Настройки курса" в header:
+Added "Course Settings" button to header:
 
-- Расположена рядом с кнопкой "Назад"
-- Открывает CourseSettingsModal
-- Передает `courseId` и `courseName`
+- Located next to "Back" button
+- Opens CourseSettingsModal
+- Passes `courseId` and `courseName`
 
 ## Architecture Highlights
 
 ### Settings Inheritance Pattern
 
 ```javascript
-// В useSettingsStore.js
+// In useSettingsStore.js
 getEffectiveSettings: (state) => (courseId) => {
   if (!courseId) return state.globalSettings
   return state.courseSettings.get(courseId) || state.globalSettings
 }
 ```
 
-Паттерн обеспечивает:
+This pattern ensures:
 
-- Курсы по умолчанию используют глобальные настройки
-- Индивидуальные настройки переопределяют глобальные
-- Простой способ проверки: `hasCustomSettings(courseId)`
+- Courses use global settings by default
+- Individual settings override global ones
+- Simple check: `hasCustomSettings(courseId)`
 
 ### Validation Logic
 
-Real-time валидация в SettingsForm:
+Real-time validation in SettingsForm:
 
 ```javascript
 const validation = computed(() => {
   const errors = {}
   
-  if (start >= end) errors.timeRange = 'Начало должно быть раньше конца'
+  if (start >= end) errors.timeRange = 'Start must be before end'
   
   const duration = (end - start + 24) % 24
-  if (duration < minTime) errors.minTime = 'Диапазон слишком короткий'
+  if (duration < minTime) errors.minTime = 'Range too short'
   
-  if (minTime < 1 || minTime > 12) errors.minTimeValue = '1-12 часов'
+  if (minTime < 1 || minTime > 12) errors.minTimeValue = '1-12 hours'
   
   return { isValid: Object.keys(errors).length === 0, errors }
 })
@@ -236,4 +236,4 @@ const validation = computed(() => {
 
 ## Conclusion
 
-Система настроек полностью реализована в соответствии с OpenSpec proposal. Все компоненты следуют Feature-Sliced Design архитектуре, используют Pinia для state management, и обеспечивают четкое разделение ответственности между слоями. Логика наследования настроек проста и интуитивна, валидация работает в real-time, UI компоненты переиспользуемые и гибкие.
+The settings system is fully implemented according to the OpenSpec proposal. All components follow Feature-Sliced Design architecture, use Pinia for state management, and ensure clear separation of concerns between layers. Inheritance logic is simple and intuitive, validation works in real-time, UI components are reusable and flexible.

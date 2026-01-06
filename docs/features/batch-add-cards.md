@@ -1,89 +1,89 @@
-# Массовое добавление карточек
+# Batch Card Addition
 
-## Обзор
+## Overview
 
-Добавлена функциональность batch-добавления карточек через textarea в компоненте `QuickAddCard.vue`.
+Added functionality for batch adding cards via a textarea in the `QuickAddCard.vue` component.
 
-## Что изменено
+## What's Changed
 
-### Компонент: `frontend/src/widgets/quick-add-card/QuickAddCard.vue`
+### Component: `frontend/src/widgets/quick-add-card/QuickAddCard.vue`
 
-**Новые возможности:**
+**New capabilities:**
 
-1. **Переключатель режимов** — пользователь может выбрать между двумя режимами:
-   - **"Одна карточка"** — исходный функционал быстрого добавления одной карточки через два поля (вопрос/ответ)
-   - **"Массовое добавление"** — новый режим для batch-импорта карточек через textarea
+1. **Mode Switcher** — user can choose between two modes:
+   - **"Single Card"** — original functionality for quickly adding one card via two fields (front/back).
+   - **"Batch Add"** — new mode for batch importing cards via textarea.
 
-2. **Формат ввода для batch-добавления:**
+2. **Input format for batch addition:**
 
    ```text
-   вопрос | ответ
+   question | answer
    ```
 
-   - Каждая строка — новая карточка
-   - Текст до `|` — лицевая сторона карточки (front)
-   - Текст после `|` — обратная сторона карточки (back)
+   - Each line — new card
+   - Text before `|` — front side
+   - Text after `|` — back side
 
-3. **Валидация:**
-   - Проверка на наличие разделителя `|` в каждой строке
-   - Проверка, что разделитель `|` встречается ровно один раз
-   - Проверка на пустые значения front/back
-   - Информативные сообщения об ошибках с указанием номера строки
+3. **Validation:**
+   - Checks for existence of separator `|` in each line
+   - Checks that separator `|` occurs exactly once
+   - Checks for empty front/back values
+   - Informative error messages indicating line number
 
-4. **UI улучшения:**
-   - Современный переключатель режимов с активным состоянием
-   - Textarea с автоматической высотой (10 строк)
-   - Информационная подсказка с форматом ввода
-   - Responsive design для мобильных устройств
+4. **UI Improvements:**
+   - Modern mode switcher with active state
+   - Auto-height textarea (10 rows)
+   - Info tooltip with input format
+   - Responsive design for mobile devices
 
-## Технические детали
+## Technical Details
 
-### Новые функции
+### New Functions
 
-- `parseBatchInput(text)` — парсинг textarea в массив объектов `{front, back}[]`
-- `validateBatchInput()` — валидация входных данных batch-формы
-- `handleBatchAdd()` — обработка массового добавления карточек
-- `switchMode(newMode)` — переключение между режимами с очисткой ошибок
+- `parseBatchInput(text)` — parses textarea into array of `{front, back}[]` objects
+- `validateBatchInput()` — validates batch form input data
+- `handleBatchAdd()` — handles batch card addition
+- `switchMode(newMode)` — switches between modes clearing errors
 
-### Логика обработки
+### Processing Logic
 
-1. Пользователь вводит карточки в формате `вопрос | ответ` (каждая строка — новая карточка)
-2. При нажатии "Добавить все карточки" запускается валидация
-3. Если валидация успешна, каждая карточка отправляется через существующий emit `@added`
-4. Между отправками карточек добавлена задержка 50ms для плавности
-5. После успешного добавления textarea очищается
+1. User enters cards in `question | answer` format (each line is a new card).
+2. Clicking "Add All Cards" triggers validation.
+3. If validation succeeds, each card is sent via existing `@added` emit.
+4. 50ms delay added between card submissions for smoothness.
+5. Textarea is cleared after successful addition.
 
-### Пример использования
+### Usage Example
 
-**Ввод:**
+**Input:**
 
 ```text
-банты | бАнты
-бороду | бОроду (вин. п., только в этой форме ед.ч. ударение на 1-ом слоге)
-бухгалтеров | бухгАлтеров
-вероисповедание | вероисповЕдание, от веру исповЕдать
-гражданство | граждАнство
-дефис | дефИс
+bows | bOws
+beard | bEard
+accountants | accOuntants
+denomination | denomiNation
+citizenship | citiZenship
+hyphen | hyPhen
 ```
 
-**Результат:**
+**Result:**
 
-- Создаётся 6 карточек
-- Каждая карточка сохраняется в БД
-- UI обновляется автоматически через store
+- 6 cards created
+- Each card saved to DB
+- UI updates automatically via store
 
-## Совместимость
+## Compatibility
 
-- Полностью обратно совместимо с существующим API
-- Использует существующий emit-механизм `@added`
-- Не требует изменений в backend
-- Не требует изменений в `CoursePage.vue`
+- Fully backward compatible with existing API
+- Uses existing `@added` emit mechanism
+- Requires no backend changes
+- Requires no `CoursePage.vue` changes
 
-## Преимущества
+## Benefits
 
-✅ Ускоряет процесс создания карточек при массовом вводе  
-✅ Удобно для импорта учебных материалов  
-✅ Интуитивный формат `вопрос | ответ`  
-✅ Детальная валидация с понятными сообщениями об ошибках  
-✅ Адаптивный дизайн  
-✅ Сохраняет существующую функциональность
+✅ Accelerates card creation process for mass input  
+✅ Convenient for importing learning materials  
+✅ Intuitive `question | answer` format  
+✅ Detailed validation with clear error messages  
+✅ Adaptive design  
+✅ Preserves existing functionality

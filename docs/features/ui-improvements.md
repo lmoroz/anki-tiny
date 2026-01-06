@@ -1,30 +1,29 @@
 # UI Design Improvements - QuickAddCard Component
 
-## Обзор изменений
+## Overview of Changes
 
-Компонент `QuickAddCard.vue` получил полный визуальный редизайн для создания премиального,
-современного пользовательского опыта.
+The `QuickAddCard.vue` component received a complete visual redesign to create a premium, modern user experience.
 
-## Ключевые улучшения
+## Key Improvements
 
-### 1. Карточка (Container)
+### 1. Card Container
 
-**Было:**
+**Before:**
 
-- Простой gradient с низкой opacity
-- Минимальный blur (10px)
-- Базовый border
-- Маленький padding (20px)
-- Маленький border-radius (12px)
+- Simple gradient with low opacity
+- Minimal blur (10px)
+- Basic border
+- Small padding (20px)
+- Small border-radius (12px)
 
-**Стало:**
+**After:**
 
-- Насыщенный gradient с высокой opacity (145deg угол)
-- Усиленный blur effect (16px) для glassmorphism
-- Многослойные box-shadows для глубины
-- Увеличенный padding (32px) для воздушности
-- Увеличенный border-radius (16px) для мягкости
-- Inset shadow для объёмного эффекта
+- Rich gradient with high opacity (145deg angle)
+- Enhanced blur effect (16px) for glassmorphism
+- Multi-layer box-shadows for depth
+- Increased padding (32px) for airiness
+- Increased border-radius (16px) for softness
+- Inset shadow for volumetric effect
 
 ```css
 background: linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(51, 65, 85, 0.85));
@@ -34,21 +33,21 @@ box-shadow:
   inset 0 1px 0 0 rgba(148, 163, 184, 0.1);
 ```
 
-### 2. Заголовок (Section Title)
+### 2. Section Title
 
-**Было:**
+**Before:**
 
 - 16px font-size
 - 600 font-weight
-- Базовая иконка 20px
+- Basic 20px icon
 
-**Стало:**
+**After:**
 
-- 20px font-size (увеличение на 25%)
+- 20px font-size (25% increase)
 - 700 font-weight (bold)
-- Letter-spacing -0.02em для лучшей читаемости
-- Иконка 24px с drop-shadow эффектом
-- Яркий оттенок синего (#60a5fa)
+- Letter-spacing -0.02em for better readability
+- 24px icon with drop-shadow effect
+- Bright blue shade (#60a5fa)
 
 ```css
 .section-title i {
@@ -57,20 +56,20 @@ box-shadow:
 }
 ```
 
-### 3. Переключатель режимов (Mode Switcher)
+### 3. Mode Switcher
 
-**Было:**
+**Before:**
 
-- Плоская кнопка с простым background
-- Минимальный hover эффект
+- Flat button with simple background
+- Minimal hover effect
 
-**Стало:**
+**After:**
 
-- Dark inset контейнер с внутренней тенью
-- Активная кнопка с gradient (135deg, #3b82f6 → #2563eb)
-- Множественные shadows для активной кнопки
+- Dark inset container with inner shadow
+- Active button with gradient (135deg, #3b82f6 → #2563eb)
+- Multiple shadows for active button
 - Transform hover effect (translateY + scale)
-- Улучшенный timing function (cubic-bezier)
+- Improved timing function (cubic-bezier)
 
 ```css
 .mode-btn.active {
@@ -82,22 +81,22 @@ box-shadow:
 }
 ```
 
-### 4. Информационный блок (Batch Help)
+### 4. Info Block (Batch Help)
 
-**Было:**
+**Before:**
 
-- Простой flat background
-- Базовая иконка
-- Обычный code element
+- Simple flat background
+- Basic icon
+- Regular code element
 
-**Стало:**
+**After:**
 
 - Gradient background (135deg angle)
-- Glowing иконка с drop-shadow
-- Улучшенный code element с border
-- Monospace шрифт (Consolas, Monaco)
-- Font-weight 600 для code
-- Увеличенный padding и line-height
+- Glowing icon with drop-shadow
+- Improved code element with border
+- Monospace font (Consolas, Monaco)
+- Font-weight 600 for code
+- Increased padding and line-height
 
 ```css
 .batch-help {
@@ -112,60 +111,60 @@ box-shadow:
 
 ### 5. Spacing & Layout
 
-**Улучшения:**
+**Improvements:**
 
-- Увеличены gaps между элементами (16px → 20px)
-- Больше margin-bottom для header (20px → 28px)
-- Margin-top для form-actions (4px)
-- Responsive padding для мобильных (32px → 24px)
+- Increased gaps between elements (16px → 20px)
+- More margin-bottom for header (20px → 28px)
+- Margin-top for form-actions (4px)
+- Responsive padding for mobile (32px → 24px)
 
-### 6. Цветовая палитра
+### 6. Color Palette
 
-**Обновлённые цвета:**
+**Updated Colors:**
 
-- Иконки: `#3b82f6` → `#60a5fa` (более яркий)
-- Текст помощи: `#94a3b8` → `#cbd5e1` (лучшая контрастность)
-- Code text: `#e2e8f0` → `#f1f5f9` (более светлый)
+- Icons: `#3b82f6` → `#60a5fa` (brighter)
+- Help text: `#94a3b8` → `#cbd5e1` (better contrast)
+- Code text: `#e2e8f0` → `#f1f5f9` (lighter)
 
-### 7. Анимации и эффекты
+### 7. Animations and Effects
 
-**Новые эффекты:**
+**New Effects:**
 
-- Transform на hover: `translateY(-1px)` + `scale(1.1)` для иконок
-- Drop-shadow для светящихся элементов
-- Cubic-bezier timing function для плавности
-- Transition 250ms вместо 200ms
+- Transform on hover: `translateY(-1px)` + `scale(1.1)` for icons
+- Drop-shadow for glowing elements
+- Cubic-bezier timing function for smoothness
+- Transition 250ms instead of 200ms
 
-## Технические детали
+## Technical Details
 
-### CSS улучшения
+### CSS Improvements
 
 - ✅ Multi-layered box-shadows
 - ✅ Advanced gradients (145deg angle)
 - ✅ Filter effects (drop-shadow)
 - ✅ Transform animations
-- ✅ Inset shadows для depth
+- ✅ Inset shadows for depth
 - ✅ Improved color contrasts
 
-### Производительность
+### Performance
 
 - ✅ CSS transforms (GPU-accelerated)
-- ✅ Backdrop-filter с fallback
-- ✅ Оптимизированные transitions
+- ✅ Backdrop-filter with fallback
+- ✅ Optimized transitions
 
 ### Accessibility
 
-- ✅ Увеличенные размеры кнопок
-- ✅ Лучшая контрастность текста
-- ✅ Чёткие визуальные состояния
+- ✅ Increased button sizes
+- ✅ Better text contrast
+- ✅ Clear visual states
 
-## Итоговый результат
+## Final Result
 
-Компонент теперь выглядит как **премиальный продукт уровня enterprise**, с:
+The component now looks like a **premium enterprise-level product**, with:
 
-- Профессиональной глубиной и иерархией
-- Плавными, приятными анимациями
-- Современными визуальными эффектами
-- Отличной читаемостью и usability
+- Professional depth and hierarchy
+- Smooth, pleasing animations
+- Modern visual effects
+- Excellent readability and usability
 
-Пользователи получают **wow-эффект** при первом взгляде! 🎨✨
+Users get a **wow-effect** at first glance! 🎨✨

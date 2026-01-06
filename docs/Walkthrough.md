@@ -1,40 +1,40 @@
-# Walkthrough: Database Service и Courses API
+# Walkthrough: Database Service and Courses API
 
-## Что реализовано
+## Implemented Features
 
 ### 1. Database Layer
 
-#### ✅ Конфигурация
+#### ✅ Configuration
 
-Создан [`config/index.ts`](file:///e:/Develop/anki-tiny/backend/src/config/index.ts):
+Created [`config/index.ts`](file:///e:/Develop/anki-tiny/backend/src/config/index.ts):
 
-- PORT для Express сервера (auto-assign с 0)
-- DEBUG_PERF для отладки производительности
-- DATABASE_PATH - путь к SQLite БД в `userData/repetitio.db`
+- PORT for Express server (auto-assign from 0)
+- DEBUG_PERF for performance debugging
+- DATABASE_PATH - path to SQLite DB in `userData/repetitio.db`
 
 #### ✅ Database Schema
 
-Создан [`services/database/schema.ts`](file:///e:/Develop/anki-tiny/backend/src/services/database/schema.ts):
+Created [`services/database/schema.ts`](file:///e:/Develop/anki-tiny/backend/src/services/database/schema.ts):
 
-- TypeScript типы для таблиц через Kysely
-- `CoursesTable` с полями: id, name, description, createdAt, updatedAt
-- Типы для CRUD операций: `Course`, `NewCourse`, `CourseUpdate`
+- TypeScript types for tables via Kysely
+- `CoursesTable` with fields: id, name, description, createdAt, updatedAt
+- Types for CRUD operations: `Course`, `NewCourse`, `CourseUpdate`
 
-#### ✅ Миграции
+#### ✅ Migrations
 
-Создан [`services/database/migrations.ts`](file:///e:/Develop/anki-tiny/backend/src/services/database/migrations.ts):
+Created [`services/database/migrations.ts`](file:///e:/Develop/anki-tiny/backend/src/services/database/migrations.ts):
 
-- Функция `up()` для создания таблицы `courses`
-- Индекс на поле `name` для быстрого поиска
-- CURRENT_TIMESTAMP для автоматических timestamp полей
+- `up()` function to create `courses` table
+- Index on `name` field for fast lookup
+- CURRENT_TIMESTAMP for automatic timestamp fields
 
 #### ✅ Database Service
 
-Создан [`services/database/index.ts`](file:///e:/Develop/anki-tiny/backend/src/services/database/index.ts):
+Created [`services/database/index.ts`](file:///e:/Develop/anki-tiny/backend/src/services/database/index.ts):
 
-- Singleton pattern для Kysely инстанса
-- `initializeDatabase()` - инициализация БД с автоматическим применением миграций
-- `getDatabase()` - получение инстанса БД
+- Singleton pattern for Kysely instance
+- `initializeDatabase()` - DB initialization with auto-migrations
+- `getDatabase()` - get DB instance
 - `closeDatabase()` - graceful shutdown
 
 ---
@@ -43,13 +43,13 @@
 
 #### ✅ Course Repository
 
-Создан [`services/repositories/courseRepository.ts`](file:///e:/Develop/anki-tiny/backend/src/services/repositories/courseRepository.ts):
+Created [`services/repositories/courseRepository.ts`](file:///e:/Develop/anki-tiny/backend/src/services/repositories/courseRepository.ts):
 
-- `findAll()` - получение всех курсов с сортировкой по createdAt
-- `findById(id)` - получение курса по ID
-- `create(data)` - создание курса
-- `update(id, data)` - обновление курса с автоматическим updatedAt
-- `delete(id)` - удаление курса
+- `findAll()` - get all courses sorted by createdAt
+- `findById(id)` - get course by ID
+- `create(data)` - create course
+- `update(id, data)` - update course with automatic updatedAt
+- `delete(id)` - delete course
 
 ---
 
@@ -57,67 +57,67 @@
 
 #### ✅ Validation
 
-Создан [`schemas/course.ts`](file:///e:/Develop/anki-tiny/backend/src/schemas/course.ts):
+Created [`schemas/course.ts`](file:///e:/Develop/anki-tiny/backend/src/schemas/course.ts):
 
-- `createCourseSchema` - валидация при создании (name обязателен, max 255 символов)
-- `updateCourseSchema` - валидация при обновлении (все поля optional)
-- Использование Zod v4 с `issues` полем
+- `createCourseSchema` - creation validation (name required, max 255 chars)
+- `updateCourseSchema` - update validation (all fields optional)
+- Using Zod v4 with `issues` field
 
 #### ✅ Routes
 
-Создан [`routes/courses.ts`](file:///e:/Develop/anki-tiny/backend/src/routes/courses.ts):
+Created [`routes/courses.ts`](file:///e:/Develop/anki-tiny/backend/src/routes/courses.ts):
 
-- `GET /api/courses` - список всех курсов
-- `POST /api/courses` - создание курса
-- `GET /api/courses/:id` - получение курса по ID
-- `PUT /api/courses/:id` - обновление курса
-- `DELETE /api/courses/:id` - удаление курса
+- `GET /api/courses` - list all courses
+- `POST /api/courses` - create course
+- `GET /api/courses/:id` - get course by ID
+- `PUT /api/courses/:id` - update course
+- `DELETE /api/courses/:id` - delete course
 
-Все endpoints включают:
+All endpoints include:
 
-- Валидацию через Zod
-- Обработку ошибок (400, 404, 500)
-- Корректные HTTP статусы
+- Zod validation
+- Error handling (400, 404, 500)
+- Correct HTTP statuses
 
 #### ✅ Router
 
-Создан [`routes/index.ts`](file:///e:/Develop/anki-tiny/backend/src/routes/index.ts):
+Created [`routes/index.ts`](file:///e:/Develop/anki-tiny/backend/src/routes/index.ts):
 
-- Подключение courses routes через `/api/courses`
+- Connecting courses routes via `/api/courses`
 
 ---
 
 ### 4. Server Integration
 
-#### ✅ Обновлен [`server.ts`](file:///e:/Develop/anki-tiny/backend/src/server.ts)
+#### ✅ Updated [`server.ts`](file:///e:/Develop/anki-tiny/backend/src/server.ts)
 
-- Удалены старые сервисы (`metadataCache`, `indexerService`)
-- Добавлена инициализация БД в `startServer()`
-- Обновлен `shutdown()` для закрытия БД
-- Импорт routes из `./routes`
+- Removed old services (`metadataCache`, `indexerService`)
+- Added DB initialization in `startServer()`
+- Updated `shutdown()` to close DB
+- Importing routes from `./routes`
 
-#### ✅ Утилиты
+#### ✅ Utilities
 
-Созданы:
+Created:
 
-- [`utils/logger.ts`](file:///e:/Develop/anki-tiny/backend/src/utils/logger.ts) - Pino logger с pretty printing
-- [`utils/performance.ts`](file:///e:/Develop/anki-tiny/backend/src/utils/performance.ts) - Performance Timer для отладки
+- [`utils/logger.ts`](file:///e:/Develop/anki-tiny/backend/src/utils/logger.ts) - Pino logger with pretty printing
+- [`utils/performance.ts`](file:///e:/Develop/anki-tiny/backend/src/utils/performance.ts) - Performance Timer for debugging
 
 ---
 
 ### 5. Dependencies
 
-#### ✅ Установлены типы
+#### ✅ Types installed
 
-- `@types/better-sqlite3` - типы для SQLite
+- `@types/better-sqlite3` - SQLite types
 
 ---
 
-## Текущий статус
+## Current Status
 
 ### ✅ TypeScript Compilation
 
-TypeScript успешно компилируется без ошибок:
+TypeScript compiles successfully without errors:
 
 ```bash
 npm run build
@@ -126,26 +126,26 @@ npm run build
 
 ### ✅ Electron Configuration
 
-- Корректная конфигурация `main.ts` (восстановлена пользователем)
-- IPC handlers в `app.on('ready')`
-- Добавлены скрипты в `package.json`:
-    - `rebuild` - пересборка нативных модулей (better-sqlite3)
-    - `postinstall` - автоматическая установка app deps
+- Correct `main.ts` configuration (restored by user)
+- IPC handlers in `app.on('ready')`
+- Scripts added to `package.json`:
+    - `rebuild` - rebuild native modules (better-sqlite3)
+    - `postinstall` - auto install app deps
 
-### ✅ Конфигурация проекта (ручные изменения)
+### ✅ Project Configuration (manual changes)
 
-Пользователь внес следующие изменения:
+User made following changes:
 
-- **`.gitignore`** - обновлен для исключения временных файлов
-- **`backend/package.json`** - добавлены скрипты `rebuild` и `postinstall`, добавлен `electron-rebuild` в devDependencies
-- **`backend/src/electron/main.ts`** - восстановлена TypeScript версия с корректными импортами
-- **`frontend/package.json`** - обновлены зависимости
+- **`.gitignore`** - updated to exclude temporary files
+- **`backend/package.json`** - added `rebuild` and `postinstall` scripts, added `electron-rebuild` to devDependencies
+- **`backend/src/electron/main.ts`** - restored TypeScript version with correct imports
+- **`frontend/package.json`** - dependencies updated
 
-### ✅ Готовность к тестированию
+### ✅ Ready for Testing
 
-**Приложение готово к запуску и тестированию!**
+**Application is ready for launch and testing!**
 
-📋 **Инструкции для тестирования**: [test_instructions.md](file:///C:/Users/I%20am/.gemini/antigravity/brain/bc595a4d-ea69-4936-a587-52eab5b66415/test_instructions.md)
+📋 **Testing Instructions**: [Testing_API.md](Testing_API.md)
 
 ---
 
@@ -153,131 +153,131 @@ npm run build
 
 ### ✅ NPM Workspaces
 
-Проект переведён на npm workspaces для упрощения управления монорепозиторием:
+Project migrated to npm workspaces for monorepo management:
 
-- **Корневой `package.json`**
-    - Определены workspaces: `frontend` и `backend`
-    - Общие команды: `dev`, `bundle`, `lint`, `format`
+- **Root `package.json`**
+    - Defined workspaces: `frontend` and `backend`
+    - Shared commands: `dev`, `bundle`, `lint`, `format`
 
 - **Backend `package.json`**
-    - Удалены команды `dev` и `bundle` (перенесены в корень)
-    - Сохранён `postinstall` скрипт для `electron-rebuild`
+    - Removed `dev` and `bundle` commands (moved to root)
+    - Kept `postinstall` script for `electron-rebuild`
 
-- **Документация**
-    - Создан `docs/Workspaces.md` с полным руководством
-    - Обновлён `README.md` с новыми инструкциями по установке
-    - Добавлены примечания о `postinstall` скрипте
+- **Documentation**
+    - Created `docs/Workspaces.md` with full guide
+    - Updated `README.md` with new installation instructions
+    - Added notes about `postinstall` script
 
-### ✅ Преимущества workspaces
+### ✅ Workspaces Benefits
 
-- Централизованная установка зависимостей: `npm install` из корня
-- Упрощённые команды разработки из корня проекта
-- Hoisting общих зависимостей
-- Автоматический запуск `postinstall` для сборки нативных модулей
+- Centralized dependency installation: `npm install` from root
+- Simplified dev commands from project root
+- Hoisting of shared dependencies
+- Automatic `postinstall` execution for native modules build
 
 ---
 
-## Как запустить
+## How to Run
 
-### Установка зависимостей
+### Install Dependencies
 
 ```bash
-# Из корня проекта (один раз)
+# From project root (once)
 npm install
-# Автоматически выполнится postinstall: electron-rebuild для better-sqlite3
+# postinstall will run automatically: electron-rebuild for better-sqlite3
 ```
 
-### Режим разработки
+### Development Mode
 
 ```bash
-# Из корня проекта
+# From project root
 npm run dev
 ```
 
-После запуска откройте DevTools (**F12**) и используйте команды из `test_instructions.md` для тестирования API.
+After launch, open DevTools (**F12**) and use commands from `Testing_API.md`.
 
 ---
 
-## Что протестировать
+## What to Test
 
 1. **Database Layer**:
-    - Создание БД в `userData/repetitio.db`
-    - Работу CRUD API через DevTools Console
-    - Персистентность данных после перезапуска
+    - DB creation in `userData/repetitio.db`
+    - CRUD API operations via DevTools Console
+    - Data persistence after restart
 
-2. **Frontend Integration** (завершено):
-    - API client в `frontend/src/shared/api/client.js`
+2. **Frontend Integration** (completed):
+    - API client in `frontend/src/shared/api/client.js`
     - CourseList widget
-    - HomePage с управлением курсами
+    - HomePage with course management
 
 ---
 
-## Следующие этапы реализации
+## Next Implementation Stages
 
-### 1. Работа с карточками (Cards API)
+### 1. Card Management (Cards API)
 
-- Backend: миграция для таблицы `cards`, Card Repository, API routes
-- Frontend: Pinia store для карточек, CardList widget, CoursePage
-- **Фича**: Быстрое добавление карточек (QuickAddCard компонент)
+- Backend: migration for `cards` table, Card Repository, API routes
+- Frontend: Pinia store for cards, CardList widget, CoursePage
+- **Feature**: Quick add cards (QuickAddCard component)
 
-### 2. Настройки приложения
+### 2. Application Settings
 
-#### Глобальные настройки
+#### Global Settings
 
-- Backend: таблица `settings` с полями:
-    - `trainingStartHour` (начало дня для тренировок, по умолчанию 8)
-    - `trainingEndHour` (конец дня для тренировок, по умолчанию 22)
-    - `minTimeBeforeEnd` (минимальное время до конца дня, 4 часа)
-    - `notificationsEnabled` (включены ли уведомления)
-- Frontend: SettingsPage с time picker компонентами
+- Backend: `settings` table with fields:
+    - `trainingStartHour` (default 8)
+    - `trainingEndHour` (default 22)
+    - `minTimeBeforeEnd` (4 hours)
+    - `notificationsEnabled`
+- Frontend: SettingsPage with time picker components
 
-#### Настройки курса (индивидуальные)
+#### Course Settings (Individual)
 
-- Backend: таблица `course_settings` с наследованием из глобальных
-- Frontend: Course Settings UI с переключателем "Use global settings"
+- Backend: `course_settings` table with inheritance from global
+- Frontend: Course Settings UI with "Use global settings" toggle
 
-### 3. Система интервального повторения (Spaced Repetition)
+### 3. Spaced Repetition System
 
-- Backend: реализация FSRS алгоритма в `services/spaced-repetition.ts`
-- API endpoints для тренировок и отправки результатов повторения
-- Frontend: TrainingPage с flip-анимацией и кнопками оценки (Again, Hard, Good, Easy)
+- Backend: FSRS algorithm implementation in `services/spaced-repetition.ts`
+- API endpoints for training and review submission
+- Frontend: TrainingPage with flip-animation and rating buttons (Again, Hard, Good, Easy)
 
-### 4. Система уведомлений
+### 4. Notification System
 
 > [!IMPORTANT]
-> Приложение должно учитывать время дня для тренировок:
+> App must consider training time settings:
 >
-> - Проверять настройки `trainingStartHour` и `trainingEndHour`
-> - **НЕ предлагать новые карточки, если до конца дня осталось меньше 4 часов**
-    > (первый шаг интервального повторения = 4 часа)
+> - Check `trainingStartHour` and `trainingEndHour`
+> - **DO NOT offer new cards if < 4 hours left until end of day**
+    > (first spaced repetition step = 4 hours)
 
-- Backend: `services/notifications.ts` с периодической проверкой (каждый час)
-- Electron: IPC handlers для системных уведомлений
-- Frontend: настройки уведомлений, тест уведомлений
+- Backend: `services/notifications.ts` with periodic check (every hour)
+- Electron: IPC handlers for system notifications
+- Frontend: notification settings, test notification
 
 ### 5. Tray Integration
 
 > [!IMPORTANT]
-> При клике на кнопку "Close" в title bar приложение должно **сворачиваться в трей**, а не закрываться.
+> When clicking "Close" in title bar, app should **minimize to tray**, not quit.
 
-- Electron: создание Tray icon, контекстное меню, обработка кликов
-- Изменение поведения `window-close`: `hide()` вместо `quit()`
-- Показ окна из трея по клику на иконку
+- Electron: create Tray icon, context menu, click handling
+- Change `window-close` behavior: `hide()` instead of `quit()`
+- Show window from tray on icon click
 
-### 6. Расширенный функционал (опционально)
+### 6. Extended Features (Optional)
 
-- **Статистика прогресса обучения**: Dashboard с графиками, история по дням
-- **Импорт/Экспорт курсов**: JSON формат, совместимость с Anki (опционально)
-- **Медиа в карточках**: загрузка изображений и аудио
-- **Поиск по карточкам**: full-text search API
-- **Теги и категории**: управление тегами, фильтрация
+- **Learning Progress Statistics**: Dashboard with charts
+- **Course Import/Export**: JSON format, Anki compatibility
+- **Media in Cards**: Image/Audio upload
+- **Card Search**: Full-text search API
+- **Tags and Categories**: Tag management, filtering
 
 ---
 
-## Обновления документации
+## Documentation Updates
 
-Все недостающие пункты из раздела "Technical Specifications" в README добавлены в:
+All missing items from "Technical Specifications" in README added to:
 
-- [`Implementation_Plan.md`](file:///e:/Develop/anki-tiny/docs/Implementation_Plan.md)
-- [`Task.md`](file:///e:/Develop/anki-tiny/docs/Task.md)
-- [`Walkthrough.md`](file:///e:/Develop/anki-tiny/docs/Walkthrough.md)
+- [`Implementation_Plan.md`](Implementation_Plan.md)
+- [`Task.md`](Task.md)
+- [`Walkthrough.md`](Walkthrough.md)

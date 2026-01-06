@@ -1,83 +1,79 @@
-# План реализации Repetitio
+# Repetitio Implementation Plan
 
-Electron-приложение для обучения с помощью карточек и интервального повторения на базе Vue 3, TypeScript,
-Tailwind CSS и Express backend.
-
-> [!IMPORTANT]
-> Приложение использует кастомный протокол `lmorozanki://` для загрузки frontend-ресурсов,
-> что требует особой настройки роутинга и CSP политик.
+Electron application for learning with flashcards and spaced repetition based on Vue 3, TypeScript, Tailwind CSS, and Express backend.
 
 > [!IMPORTANT]
-> Окно приложения использует `frame: false` (без стандартной рамки), поэтому необходима реализация
-> собственного title bar с window controls (minimize, maximize, close).
+> The application uses a custom protocol `lmorozanki://` to load frontend resources, which requires specific routing and CSP policy configuration.
+
+> [!IMPORTANT]
+> The application window uses `frame: false` (frameless), so a custom title bar with window controls (minimize, maximize, close) implementation is required.
 
 ---
 
-## Предлагаемые изменения
+## Proposed Changes
 
-### Архитектура Frontend
+### Frontend Architecture
 
 #### Feature-Sliced Design
 
-Организация кода по слоям:
+Code organization by layers:
 
 ```text
 frontend/src/
-├── app/              # Инициализация приложения
-│   ├── main.js      # Точка входа
-│   ├── App.vue      # Корневой компонент
-│   └── router/      # Конфигурация роутера
-├── pages/           # Страницы приложения
+├── app/              # Application initialization
+│   ├── main.js      # Entry point
+│   ├── App.vue      # Root component
+│   └── router/      # Router configuration
+├── pages/           # Application pages
 │   ├── home/
 │   ├── course/
 │   ├── training/
 │   └── settings/
-├── widgets/         # Составные блоки UI
-│   ├── title-bar/   # Кастомный заголовок окна
+├── widgets/         # Composite UI blocks
+│   ├── title-bar/   # Custom window title
 │   ├── course-list/
 │   └── card-editor/
-├── features/        # Бизнес-фичи
+├── features/        # Business features
 │   ├── create-course/
 │   ├── add-card/
 │   └── spaced-repetition/
-├── entities/        # Бизнес-сущности
+├── entities/        # Business entities
 │   ├── course/
 │   ├── card/
 │   └── settings/
-└── shared/          # Переиспользуемый код
-    ├── ui/          # UI-примитивы
-    ├── lib/         # Утилиты
-    ├── api/         # HTTP клиент
-    └── types/       # TypeScript типы
+└── shared/          # Reusable code
+    ├── ui/          # UI primitives
+    ├── lib/         # Utilities
+    ├── api/         # HTTP client
+    └── types/       # TypeScript types
 ```
 
 ---
 
-### Компоненты и модули
+### Components and Modules
 
 #### App Layer
 
 ##### [NEW] [main.js](file:///e:/Develop/anki-tiny/frontend/src/app/main.js)
 
-- Инициализация Vue приложения
-- Подключение router, глобальных стилей
-- Регистрация Electron API handlers
+- Vue application initialization
+- Router and global styles connection
+- Electron API handlers registration
 
 ##### [NEW] [App.vue](file:///e:/Develop/anki-tiny/frontend/src/app/App.vue)
 
-- Корневой компонент с `TitleBar` widget
-- Область для `<router-view>`
-- Глобальные overlay (notifications, modals)
+- Root component with `TitleBar` widget
+- Area for `<router-view>`
+- Global overlays (notifications, modals)
 
 ##### [NEW] [router/index.js](file:///e:/Develop/anki-tiny/frontend/src/app/router/index.js)
 
-- Конфигурация Vue Router с **hash mode** (`createWebHashHistory`)
-- Маршруты: `/`, `/course/:id`, `/training/:id`, `/settings`
-- Navigation guards для проверки состояния
+- Vue Router configuration with **hash mode** (`createWebHashHistory`)
+- Routes: `/`, `/course/:id`, `/training/:id`, `/settings`
+- Navigation guards for state checking
 
 > [!WARNING]
-> Использование `createWebHashHistory` обязательно из-за кастомного протокола `lmorozanki://`.
-> WebHistory не будет работать корректно.
+> Using `createWebHashHistory` is mandatory due to the custom `lmorozanki://` protocol. WebHistory will not work correctly.
 
 ---
 
@@ -85,25 +81,25 @@ frontend/src/
 
 ##### [NEW] [title-bar/TitleBar.vue](file:///e:/Develop/anki-tiny/frontend/src/widgets/title-bar/TitleBar.vue)
 
-Реализация кастомного заголовка окна:
+Custom window title implementation:
 
-**Функциональность:**
+**Functionality:**
 
-- Отображение title приложения
-- Область с `-webkit-app-region: drag` для перетаскивания окна
-- Кнопки управления окном:
+- Display application title
+- Area with `-webkit-app-region: drag` for window dragging
+- Window control buttons:
     - **Minimize**: `window.electronAPI.minimize()`
     - **Maximize/Restore**: `window.electronAPI.toggleMaximize()`
     - **Close**: `window.electronAPI.close()`
 
-**Стилизация:**
+**Styling:**
 
-- Фиксированная высота: 32-40px
-- Backdrop blur эффект (acrylic material)
-- Иконки из `bootstrap-icons`
-- Hover states для кнопок
+- Fixed height: 32-40px
+- Backdrop blur effect (acrylic material)
+- Icons from `bootstrap-icons`
+- Hover states for buttons
 
-**Технические детали:**
+**Technical Details:**
 
 ```css
 .title-bar {
@@ -117,14 +113,14 @@ frontend/src/
 
 ##### [NEW] [course-list/CourseList.vue](file:///e:/Develop/anki-tiny/frontend/src/widgets/course-list/CourseList.vue)
 
-- Список курсов с превью (название, количество карточек, прогресс)
-- Кнопки действий (Edit, Delete, Start Training)
+- List of courses with preview (name, card count, progress)
+- Action buttons (Edit, Delete, Start Training)
 
 ##### [NEW] [card-editor/CardEditor.vue](file:///e:/Develop/anki-tiny/frontend/src/widgets/card-editor/CardEditor.vue)
 
-- Форма для создания/редактирования карточки
-- Поля: Front, Back
-- Rich text поддержка (опционально)
+- Form for creating/editing a card
+- Fields: Front, Back
+- Rich text support (optional)
 
 ---
 
@@ -132,29 +128,29 @@ frontend/src/
 
 ##### [NEW] [home/HomePage.vue](file:///e:/Develop/anki-tiny/frontend/src/pages/home/HomePage.vue)
 
-- Главная страница с обзором курсов
-- Использует `CourseList` widget
-- Кнопка "Создать курс"
+- Main page with course overview
+- Uses `CourseList` widget
+- "Create Course" button
 
 ##### [NEW] [course/CoursePage.vue](file:///e:/Develop/anki-tiny/frontend/src/pages/course/CoursePage.vue)
 
-- Детальный вид курса
-- Список карточек
-- Быстрое добавление карточек
-- Настройки курса
+- Detailed course view
+- Card list
+- Quick add cards
+- Course settings
 
 ##### [NEW] [training/TrainingPage.vue](file:///e:/Develop/anki-tiny/frontend/src/pages/training/TrainingPage.vue)
 
-- Интерфейс тренировки
-- Отображение карточки (Front → Back при клике)
-- Кнопки оценки сложности (Again, Hard, Good, Easy)
-- Прогресс-бар текущей сессии
+- Training interface
+- Card display (Front → Back on click)
+- Difficulty rating buttons (Again, Hard, Good, Easy)
+- Current session progress bar
 
 ##### [NEW] [settings/SettingsPage.vue](file:///e:/Develop/anki-tiny/frontend/src/pages/settings/SettingsPage.vue)
 
-- Глобальные настройки
-- Временные рамки тренировок (с/по)
-- Параметры интервального повторения
+- Global settings
+- Training time frames (from/to)
+- Spaced repetition parameters
 
 ---
 
@@ -162,19 +158,19 @@ frontend/src/
 
 ##### [NEW] [shared/ui/Button.vue](file:///e:/Develop/anki-tiny/frontend/src/shared/ui/Button.vue)
 
-Базовый компонент кнопки с вариантами: primary, secondary, danger
+Base button component with variants: primary, secondary, danger
 
 ##### [NEW] [shared/ui/Input.vue](file:///e:/Develop/anki-tiny/frontend/src/shared/ui/Input.vue)
 
-Базовый компонент поля ввода
+Base input field component
 
 ##### [NEW] [shared/ui/Card.vue](file:///e:/Develop/anki-tiny/frontend/src/shared/ui/Card.vue)
 
-Базовый компонент карточки для контента
+Base card component for content
 
 ##### [NEW] [shared/api/client.js](file:///e:/Develop/anki-tiny/frontend/src/shared/api/client.js)
 
-HTTP клиент на базе axios для работы с backend API:
+Axios-based HTTP client for backend API:
 
 ```javascript
 import axios from 'axios';
@@ -186,15 +182,15 @@ window.electronAPI?.onBackendPort((port) => {
 });
 
 const api = axios.create({
-                             baseURL: `http://localhost:${ backendPort }/api`,
-                         });
+    baseURL: `http://localhost:${backendPort}/api`,
+});
 
 export default api;
 ```
 
 ##### [NEW] [shared/types/electron.d.ts](file:///e:/Develop/anki-tiny/frontend/src/shared/types/electron.d.ts)
 
-TypeScript типы для Electron API:
+TypeScript types for Electron API:
 
 ```typescript
 interface ElectronAPI {
@@ -222,38 +218,38 @@ export {};
 
 ##### [NEW] [routes/courses.ts](file:///e:/Develop/anki-tiny/backend/src/routes/courses.ts)
 
-- `GET /api/courses` - список курсов
-- `POST /api/courses` - создание курса
-- `GET /api/courses/:id` - получение курса
-- `PUT /api/courses/:id` - обновление курса
-- `DELETE /api/courses/:id` - удаление курса
+- `GET /api/courses` - list courses
+- `POST /api/courses` - create course
+- `GET /api/courses/:id` - get course
+- `PUT /api/courses/:id` - update course
+- `DELETE /api/courses/:id` - delete course
 
 ##### [NEW] [routes/cards.ts](file:///e:/Develop/anki-tiny/backend/src/routes/cards.ts)
 
-- `GET /api/courses/:courseId/cards` - список карточек курса
-- `POST /api/courses/:courseId/cards` - добавление карточки
-- `PUT /api/cards/:id` - обновление карточки
-- `DELETE /api/cards/:id` - удаление карточки
+- `GET /api/courses/:courseId/cards` - list course cards
+- `POST /api/courses/:courseId/cards` - add card
+- `PUT /api/cards/:id` - update card
+- `DELETE /api/cards/:id` - delete card
 
 ##### [NEW] [routes/training.ts](file:///e:/Develop/anki-tiny/backend/src/routes/training.ts)
 
-- `GET /api/courses/:courseId/due-cards` - карточки для повторения
-- `POST /api/training/review` - отправка результата повторения
+- `GET /api/courses/:courseId/due-cards` - cards due for review
+- `POST /api/training/review` - submit review result
 
 ##### [NEW] [routes/settings.ts](file:///e:/Develop/anki-tiny/backend/src/routes/settings.ts)
 
-- `GET /api/settings` - получение глобальных настроек
-- `PUT /api/settings` - обновление настроек
-    - `trainingStartHour`: начало дня для тренировок (по умолчанию 8)
-    - `trainingEndHour`: конец дня для тренировок (по умолчанию 22)
-    - `minTimeBeforeEnd`: минимальное время до конца дня (4 часа)
-    - `notificationsEnabled`: включены ли уведомления
+- `GET /api/settings` - get global settings
+- `PUT /api/settings` - update settings
+    - `trainingStartHour`: training start hour (default 8)
+    - `trainingEndHour`: training end hour (default 22)
+    - `minTimeBeforeEnd`: minimum time before day end (4 hours)
+    - `notificationsEnabled`: whether notifications are enabled
 
 ##### [NEW] [routes/course-settings.ts](file:///e:/Develop/anki-tiny/backend/src/routes/course-settings.ts)
 
-- `GET /api/courses/:courseId/settings` - получение настроек курса
-- `PUT /api/courses/:courseId/settings` - обновление настроек курса
-- `DELETE /api/courses/:courseId/settings` - сброс к глобальным настройкам
+- `GET /api/courses/:courseId/settings` - get course settings
+- `PUT /api/courses/:courseId/settings` - update course settings
+- `DELETE /api/courses/:courseId/settings` - reset to global settings
 
 ---
 
@@ -261,37 +257,37 @@ export {};
 
 ##### [NEW] [services/database.ts](file:///e:/Develop/anki-tiny/backend/src/services/database.ts)
 
-Сервис для работы с персистентным хранилищем (JSON или SQLite):
+Service for persistent storage (JSON or SQLite):
 
-- Инициализация БД в `app.getPath('userData')`
-- CRUD операции
+- DB initialization in `app.getPath('userData')`
+- CRUD operations
 
 ##### [NEW] [services/spaced-repetition.ts](file:///e:/Develop/anki-tiny/backend/src/services/spaced-repetition.ts)
 
-Реализация алгоритма интервального повторения (FSRS):
+Spaced repetition algorithm implementation (FSRS):
 
-- Расчет следующего интервала повторения
-- Обновление easiness factor
-- Определение due date
+- Calculate next review interval
+- Update easiness factor
+- Determine due date
 
 ##### [NEW] [services/notifications.ts](file:///e:/Develop/anki-tiny/backend/src/services/notifications.ts)
 
-Сервис для системных уведомлений:
+Service for system notifications:
 
-- Проверка наличия карточек для повторения
-- Фильтрация по времени тренировок (`trainingStartHour` / `trainingEndHour`)
-- **Важно**: Не предлагать новые карточки, если до конца дня осталось меньше 4 часов
-  (первый шаг интервального повторения = 4 часа)
-- Отправка Electron Notification
-- Периодическая проверка (каждый час)
+- Check for due cards
+- Filter by training time (`trainingStartHour` / `trainingEndHour`)
+- **Important**: Do not offer new cards if less than 4 hours remain until day end
+  (first spaced repetition step = 4 hours)
+- Send Electron Notification
+- Partiodic check (every hour)
 
 ##### [NEW] [services/statistics.ts](file:///e:/Develop/anki-tiny/backend/src/services/statistics.ts)
 
-Сервис для статистики прогресса:
+Service for progress statistics:
 
-- Расчет статистики по курсу (всего карточек, изучено, осталось)
-- История обучения по дням
-- Точность ответов (Again/Hard/Good/Easy)
+- Calculate course statistics (total cards, learned, remaining)
+- Study history by day
+- Answer accuracy (Again/Hard/Good/Easy)
 
 ---
 
@@ -299,10 +295,10 @@ export {};
 
 ##### [MODIFY] [electron/main.ts](file:///e:/Develop/anki-tiny/backend/src/electron/main.ts)
 
-**Добавить поддержку Tray:**
+**Add Tray support:**
 
 ```typescript
-import {Tray, Menu} from 'electron';
+import { Tray, Menu } from 'electron';
 
 let tray: Tray | null = null;
 
@@ -310,8 +306,8 @@ function createTray() {
   tray = new Tray(path.join(__dirname, '../../icon.png'));
 
   const contextMenu = Menu.buildFromTemplate([
-    {label: 'Открыть', click: () => mainWindow?.show()},
-    {label: 'Выход', click: () => app.quit()}
+    { label: 'Open', click: () => mainWindow?.show() },
+    { label: 'Exit', click: () => app.quit() }
   ]);
 
   tray.setToolTip('Repetitio');
@@ -322,36 +318,36 @@ function createTray() {
   });
 }
 
-// Изменить поведение window-close
+// Change window-close behavior
 ipcMain.on('window-close', (event) => {
   const win = BrowserWindow.fromWebContents(event.sender);
-  win?.hide(); // Скрыть вместо закрытия (свернуть в трей)
-  event.preventDefault(); // Предотвратить закрытие
+  win?.hide(); // Hide instead of close (minimize to tray)
+  event.preventDefault(); // Prevent closing
 });
 
-// Обработка quit из трея
+// Handle quit from tray
 app.on('before-quit', () => {
   // Cleanup
 });
 ```
 
-**Настроить уведомления:**
+**Configure notifications:**
 
 ```typescript
-import {Notification} from 'electron';
+import { Notification } from 'electron';
 
 ipcMain.handle('show-notification', (_, title, body) => {
-  new Notification({title, body}).show();
+  new Notification({ title, body }).show();
 });
 ```
 
 ##### [MODIFY] [electron/preload.ts](file:///e:/Develop/anki-tiny/backend/src/electron/preload.ts)
 
-Добавить метод для уведомлений:
+Add method for notifications:
 
 ```typescript
 contextBridge.exposeInMainWorld('electronAPI', {
-  // ... существующие методы
+  // ... existing methods
   showNotification: (title: string, body: string) =>
     ipcRenderer.invoke('show-notification', title, body),
 });
@@ -359,261 +355,255 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
 ---
 
-### Конфигурация
+### Configuration
 
 #### [MODIFY] [vite.config.js](file:///e:/Develop/anki-tiny/frontend/vite.config.js)
 
-CSP политика уже настроена корректно для протокола `lmorozanki://`.
+CSP policy is already correctly configured for `lmorozanki://` protocol.
 
-**Проверить:**
+**Check:**
 
-- `base: './'` - относительные пути
-- CSP включает `lmorozanki:` для всех source директив
+- `base: './'` - relative paths
+- CSP includes `lmorozanki:` for all source directives
 
 ##### [MODIFY] [index.html](file:///e:/Develop/anki-tiny/frontend/index.html)
 
-Обновить title:
+Update title:
 
 ```html
 <title>Repetitio</title>
 ```
 
-Обновить путь к main.js:
+Update path to main.js:
 
 ```html
-
 <script type="module" src="/src/app/main.js"></script>
 ```
 
 ---
 
-### Работа с карточками
+### Card Operations
 
-Чтобы внедрить FSRS (Free Spaced Repetition Scheduler),  
-нужно отойти от простых множителей и сохранять историю «состояния» памяти для каждой карточки.  
-Используем библиотеку <https://github.com/open-spaced-repetition/ts-fsrs>
+To implement FSRS (Free Spaced Repetition Scheduler),
+we need to move away from simple multipliers and store memory "state" history for each card.
+We use the library <https://github.com/open-spaced-repetition/ts-fsrs>
 
-#### 1. Поля в базе данных для каждой карточки
+#### 1. Database Fields for Each Card
 
-В классическом SM-2 (старый Anki) мы хранили «фактор легкости».  
-В FSRS нам нужно хранить переменные, которые описывают текущую «прочность» знания.
+In classic SM-2 (old Anki) we stored "easiness factor".
+In FSRS we need to store variables describing current memory "strength".
 
-##### 1. Обязательные поля для FSRS
+##### 1. Mandatory Fields for FSRS
 
-Библиотека ts-fsrs ожидает, что ты передашь ей объект карты. Чтобы восстановить этот объект из БД, тебе нужны эти поля:
+The `ts-fsrs` library expects you to pass it a card object. To restore this object from DB, you need these fields:
 
-`due` **(Datetime)**: Дата и время следующего показа.
-Именно по этому полю ты будешь делать запрос `SELECT * FROM cards WHERE due <= NOW()`.
+`due` **(Datetime)**: Date and time of next review.
+You will query `SELECT * FROM cards WHERE due <= NOW()` using this field.
 
-`stability` **(Float)**: Один из ключевых параметров FSRS.
+`stability` **(Float)**: One of the key FSRS parameters.
 
-`difficulty` **(Float)**: Текущая сложность карты.
+`difficulty` **(Float)**: Current card difficulty.
 
-`elapsed_days` **(Int)**: Сколько дней прошло с последнего успешного повторения.
+`elapsed_days` **(Int)**: Days passed since last successful review.
 
-`scheduled_days` **(Int)**: На какой интервал карта была отправлена в прошлый раз.
+`scheduled_days` **(Int)**: For what interval the card was scheduled last time.
 
-`reps` **(Int)**: Общее количество повторений.
+`reps` **(Int)**: Total repetition count.
 
-`lapses` **(Int)**: Сколько раз пользователь забыл карту (нажал "Again").
+`lapses` **(Int)**: How many times user forgot the card (pressed "Again").
 
-`state` **(Int/Enum)**: Состояние карты (0 - New, 1 - Learning, 2 - Review, 3 - Relearning).
+`state` **(Int/Enum)**: Card state (0 - New, 1 - Learning, 2 - Review, 3 - Relearning).
 
-##### 2. Дополнительные поля для твоей логики
+##### 2. Additional Fields for Your Logic
 
-Чтобы реализовать «шаги обучения» (например, те самые 4 часа) и `enable_fuzz`, добавь:
+To implement "learning steps" (e.g., the 4 hours) and `enable_fuzz`, add:
 
-`last_review` **(Datetime)**: Время последнего ответа. Нужно для расчетов и статистики.
+`last_review` **(Datetime)**: Time of last answer. Needed for calculations and statistics.
 
-`step_index` **(Int)**: Если у тебя в настройках колоды указаны шаги (например, `["10m", "4h"]`), это поле хранит, на
-каком шаге сейчас находится новая карта.
+`step_index` **(Int)**: If your deck settings specify steps (e.g., `["10m", "4h"]`), this field stores which step the new card is currently on.
 
-##### Пример структуры (JSON/SQL)
+##### Example Structure (JSON/SQL)
 
-| Поле           | Тип        | Описание                                                  |
-|----------------|------------|-----------------------------------------------------------|
-| id             | UUID / Int | Первичный ключ                                            |
-| deck_id        | Int        | Ссылка на колоду/курс (где лежат настройки `enable_fuzz`) |
-| question       | Text       | Текст вопроса                                             |
-| answer         | Text       | Текст ответа                                              |
-| due            | Timestamp  | Когда показать в следующий раз                            |
-| stability      | Double     | Параметр стабильности FSRS                                |
-| difficulty     | Double     | Параметр сложности FSRS                                   |
-| elapsed_days   | Int        | Дней с прошлого раза                                      |
-| scheduled_days | Int        | На сколько дней планировалась                             |
-| reps           | Int        | Всего повторов                                            |
-| lapses         | Int        | Всего забываний                                           |
-| state          | Int        | "0=New, 1=Learn, 2=Review, 3=Relearn"                     |
-| last_review    | Timestamp  | Дата последнего ответа                                    |
+| Field          | Type       | Description                                              |
+|----------------|------------|----------------------------------------------------------|
+| id             | UUID / Int | Primary Key                                              |
+| deck_id        | Int        | Link to deck/course (where `enable_fuzz` settings live)  |
+| question       | Text       | Question text                                            |
+| answer         | Text       | Answer text                                              |
+| due            | Timestamp  | Next show time                                           |
+| stability      | Double     | FSRS stability parameter                                 |
+| difficulty     | Double     | FSRS difficulty parameter                                |
+| elapsed_days   | Int        | Days since last time                                     |
+| scheduled_days | Int        | Scheduled days count                                     |
+| reps           | Int        | Total reps                                               |
+| lapses         | Int        | Total lapses                                             |
+| state          | Int        | "0=New, 1=Learn, 2=Review, 3=Relearn"                    |
+| last_review    | Timestamp  | Last review date                                         |
 
-#### 2. Как адаптировать интервалы под пользователя (про 4 часа)
+#### 2. Adapting Intervals for User (About 4 Hours)
 
-Библиотека `ts-fsrs` позволяет передать объект `FSRSParameters`. Чтобы реализовать кастомные короткие интервалы, тебе
-нужно использовать механизм **Learning Steps**.
+The `ts-fsrs` library allows passing an `FSRSParameters` object. To implement custom short intervals, you need to use the **Learning Steps** mechanism.
 
-1. **Настройка колоды**: Храни в БД для каждой колоды массив `learning_steps`. Например: `[0.16, 4]` (в часах) или
-   просто в минутах `[10, 240]`.
-2. **Логика**:
-    - Когда карта в состоянии **New** или **Learning**, ты не используешь основную формулу FSRS для расчета `due`.
-    - Вместо этого ты берешь значение из своего массива `learning_steps[card.step_index]`.
-    - При нажатии "Good" ты увеличиваешь `step_index` и ставишь `due = now + steps[index]`.
-    - Как только шаги кончились, переводишь `state` в **Review** — и вот тут уже в дело вступает полноценный `ts-fsrs`.
+1.  **Deck Settings**: Store `learning_steps` array in DB for each deck. E.g.: `[0.16, 4]` (in hours) or just in minutes `[10, 240]`.
+2.  **Logic**:
+    - When card is in **New** or **Learning** state, you don't use the main FSRS formula for `due` calculation.
+    - Instead, you take value from your `learning_steps[card.step_index]`.
+    - On "Good" press, you increment `step_index` and set `due = now + steps[index]`.
+    - Once steps are exhausted, switch `state` to **Review** — and here full `ts-fsrs` takes over.
 
-##### Про `enable_fuzz`
+##### About `enable_fuzz`
 
-**Fuzz** — это небольшое случайное отклонение интервала, чтобы карточки, выученные в один день, не приходили «толпой»
-через месяц в один и тот же день.
+**Fuzz** is a small random deviation of the interval so that cards learned on the same day don't arrive in a "clump" a month later on the same day.
 
-В `ts-fsrs` это делается при инициализации:
+In `ts-fsrs` this is done at initialization:
 
 ```typescript
 const params = createEmptyParams();
-params.enable_fuzz = true; // берешь из настроек колоды в БД
+params.enable_fuzz = true; // take from deck settings in DB
 const f = fsrs(params);
 ```
 
-Если `enable_fuzz` включен, библиотека сама будет чуть-чуть менять `scheduled_days`
-(например, вместо 10 дней поставит 9 или 11), что автоматически изменит дату `due`.
+If `enable_fuzz` is enabled, the library will slightly change `scheduled_days` itself (e.g., set 9 or 11 instead of 10), which automatically changes the `due` date.
 
-## План верификации
+## Verification Plan
 
 ### Automated Tests
 
-#### Unit тесты для Spaced Repetition сервиса
+#### Unit Tests for Spaced Repetition Service
 
-**Команда:**
+**Command:**
 
 ```bash
 cd backend
 npm run test
 ```
 
-**Описание:**
-Добавить тесты в `backend/tests/services/spaced-repetition.test.ts` для проверки корректности расчета интервалов.
+**Description:**
+Add tests to `backend/tests/services/spaced-repetition.test.ts` to verify correctness of interval calculations.
 
-#### E2E тесты основных сценариев
+#### E2E Tests for Main Scenarios
 
-Использовать Playwright для автоматизации:
+Use Playwright for automation:
 
-1. Создание курса
-2. Добавление карточек
-3. Прохождение тренировки
+1. Create course
+2. Add cards
+3. Complete training
 
 ---
 
 ### Manual Verification
 
-#### 1. Проверка кастомного Title Bar
+#### 1. Custom Title Bar Verification
 
-**Шаги:**
+**Steps:**
 
-1. Запустить приложение: `cd backend && npm run electron:dev`
-2. Убедиться, что заголовок окна отображается корректно
-3. Проверить работу кнопок:
-    - **Minimize** - окно сворачивается
-    - **Maximize** - окно разворачивается на весь экран
-    - **Close** - окно сворачивается в трей (не закрывается)
-4. Попробовать перетащить окно за title bar
+1. Run app: `cd backend && npm run electron:dev`
+2. Ensure window title is displayed correctly
+3. Check buttons:
+    - **Minimize** - window minimizes
+    - **Maximize** - window maximizes to full screen
+    - **Close** - window minimizes to tray (does not close)
+4. Try dragging window by title bar
 
-**Ожидаемый результат:** Все кнопки работают, окно можно перетаскивать.
-
----
-
-#### 2. Проверка роутинга с кастомным протоколом
-
-**Шаги:**
-
-1. Запустить приложение
-2. Перейти на разные страницы через UI
-3. Проверить, что URL в DevTools имеет формат `lmorozanki://app/index.html#/route`
-4. Открыть DevTools (F12) и проверить консоль на наличие ошибок загрузки ресурсов
-
-**Ожидаемый результат:** Все ресурсы загружаются без ошибок 404, роутинг работает.
+**Expected Result:** All buttons work, window can be dragged.
 
 ---
 
-#### 3. Проверка работы с Tray
+#### 2. Routing with Custom Protocol Verification
 
-**Шаги:**
+**Steps:**
 
-1. Запустить приложение
-2. Нажать кнопку "Close" в title bar
-3. Убедиться, что окно скрылось, но приложение не закрылось
-4. Найти иконку в системном трее
-5. Кликнуть по иконке трея
+1. Run app
+2. Navigate to different pages via UI
+3. Check that URL in DevTools has format `lmorozanki://app/index.html#/route`
+4. Open DevTools (F12) and check console for resource loading errors
 
-**Ожидаемый результат:** Окно снова появляется.
-
----
-
-#### 4. Проверка системных уведомлений
-
-**Шаги:**
-
-1. Создать курс и добавить несколько карточек
-2. Пройти тренировку
-3. Дождаться времени следующего повторения (можно вручную изменить due date в БД)
-4. Проверить, что появилось системное уведомление
-
-**Ожидаемый результат:** Уведомление отображается в системном трее Windows/macOS/Linux.
+**Expected Result:** All resources load without 404 errors, routing works.
 
 ---
 
-#### 5. Проверка production build
+#### 3. Tray Operation Verification
 
-**Команда:**
+**Steps:**
+
+1. Run app
+2. Click "Close" button in title bar
+3. Ensure window hid but app didn't quit
+4. Find icon in system tray
+5. Click tray icon
+
+**Expected Result:** Window reappears.
+
+---
+
+#### 4. System Notifications Verification
+
+**Steps:**
+
+1. Create course and add a few cards
+2. Complete training
+3. Wait for next review time (can manually change due date in DB)
+4. Check that system notification appeared
+
+**Expected Result:** Notification displays in Windows/macOS/Linux system tray.
+
+---
+
+#### 5. Production Build Verification
+
+**Command:**
 
 ```bash
 cd backend
 npm run bundle
 ```
 
-**Шаги:**
+**Steps:**
 
-1. Запустить команду сборки
-2. Найти установщик в `dist/`
-3. Установить приложение на чистую систему
-4. Запустить и проверить базовый функционал
+1. Run build command
+2. Find installer in `dist/`
+3. Install app on clean system
+4. Run and check basic functionality
 
-**Ожидаемый результат:** Приложение запускается и работает корректно.
+**Expected Result:** App launches and works correctly.
 
 ---
 
-## Расширенный функционал (опционально)
+## Extended Features (Optional)
 
-### Статистика прогресса обучения
+### Learning Progress Statistics
 
 #### [NEW] [routes/statistics.ts](file:///e:/Develop/anki-tiny/backend/src/routes/statistics.ts)
 
-- `GET /api/courses/:courseId/statistics` - статистика по курсу
-- `GET /api/statistics/daily` - статистика по дням
+- `GET /api/courses/:courseId/statistics` - course statistics
+- `GET /api/statistics/daily` - daily statistics
 
 #### [NEW] [pages/statistics/StatisticsPage.vue](file:///e:/Develop/anki-tiny/frontend/src/pages/statistics/StatisticsPage.vue)
 
-- Dashboard с графиками прогресса
-- Отображение количества изученных карточек по дням/неделям
-- Точность ответов
+- Dashboard with progress charts
+- Display of learned cards count by days/weeks
+- Answer accuracy
 
 ---
 
-### Импорт/Экспорт курсов
+### Course Import/Export
 
 #### [NEW] [routes/export.ts](file:///e:/Develop/anki-tiny/backend/src/routes/export.ts)
 
-- `GET /api/courses/:courseId/export` - экспорт курса в JSON
-- `POST /api/courses/import` - импорт курса из JSON
+- `GET /api/courses/:courseId/export` - export course to JSON
+- `POST /api/courses/import` - import course from JSON
 
 #### [NEW] [features/import-export/](file:///e:/Develop/anki-tiny/frontend/src/features/import-export/)
 
-- Кнопки Export/Import в UI
-- File picker для импорта
-- Формат: совместимость с Anki (опционально)
+- Export/Import buttons in UI
+- File picker for import
+- Format: Anki compatibility (optional)
 
 ---
 
-### Медиа в карточках
+### Media in Cards
 
-#### [NEW] Database Schema для media_files
+#### [NEW] Database Schema for media_files
 
 ```typescript
 interface MediaFilesTable {
@@ -628,33 +618,33 @@ interface MediaFilesTable {
 
 #### [NEW] [routes/media.ts](file:///e:/Develop/anki-tiny/backend/src/routes/media.ts)
 
-- `POST /api/cards/:cardId/media` - upload медиа файла
-- `GET /api/media/:id` - получение медиа файла
-- `DELETE /api/media/:id` - удаление медиа
+- `POST /api/cards/:cardId/media` - upload media file
+- `GET /api/media/:id` - get media file
+- `DELETE /api/media/:id` - delete media
 
 #### [MODIFY] [CardEditor.vue](file:///e:/Develop/anki-tiny/frontend/src/widgets/card-editor/CardEditor.vue)
 
-- Добавить поддержку загрузки изображений/аудио
-- Превью медиа в редакторе
+- Add support for image/audio upload
+- Media preview in editor
 
 ---
 
-### Поиск по карточкам
+### Card Search
 
 #### [NEW] [routes/search.ts](file:///e:/Develop/anki-tiny/backend/src/routes/search.ts)
 
-- `GET /api/search?q=query` - full-text search по карточкам
+- `GET /api/search?q=query` - full-text search across cards
 
 #### [NEW] [widgets/search-bar/SearchBar.vue](file:///e:/Develop/anki-tiny/frontend/src/widgets/search-bar/SearchBar.vue)
 
-- Строка поиска с автодополнением
-- Фильтрация результатов
+- Search bar with autocomplete
+- Result filtering
 
 ---
 
-### Теги и категории
+### Tags and Categories
 
-#### [NEW] Database Schema для tags
+#### [NEW] Database Schema for tags
 
 ```typescript
 interface TagsTable {
@@ -672,30 +662,27 @@ interface CardTagsTable {
 
 #### [NEW] [routes/tags.ts](file:///e:/Develop/anki-tiny/backend/src/routes/tags.ts)
 
-- `GET /api/tags` - список тегов
-- `POST /api/tags` - создание тега
-- `POST /api/cards/:cardId/tags` - добавление тега к карточке
+- `GET /api/tags` - list tags
+- `POST /api/tags` - create tag
+- `POST /api/cards/:cardId/tags` - add tag to card
 
 #### [NEW] [features/tags/](file:///e:/Develop/anki-tiny/frontend/src/features/tags/)
 
 - Tag management UI
-- Фильтрация карточек по тегам
+- Filter cards by tags
 
 ---
 
-## Риски и ограничения
+## Risks and Constraints
 
 > [!CAUTION]
-> **Acrylic Material для Title Bar** - `backgroundMaterial: 'acrylic'` поддерживается только на
-> Windows 11. На других ОС нужно fallback решение.
+> **Acrylic Material for Title Bar** - `backgroundMaterial: 'acrylic'` is supported only on Windows 11. Fallback solution needed for other OS.
 >
 > [!WARNING]
-> **Безопасность IPC** - все IPC handlers должны валидировать входящие данные, чтобы избежать XSS
-> и других атак.
+> **IPC Security** - all IPC handlers must validate incoming data to avoid XSS and other attacks.
 >
 > [!WARNING]
-> **Система уведомлений** - необходимо корректно обрабатывать временные зоны и настройки пользователя.
-> Не предлагать новые карточки, если до конца дня осталось меньше 4 часов.
+> **Notification System** - must correctly handle time zones and user settings. Do not offer new cards if less than 4 hours remain until day end.
 
 > [!NOTE]
-> **База данных** - используется SQLite через `better-sqlite3` и Kysely для типобезопасности.
+> **Database** - uses SQLite via `better-sqlite3` and Kysely for type safety.

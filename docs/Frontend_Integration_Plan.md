@@ -1,15 +1,14 @@
-# Frontend Integration - Управление курсами
+# Frontend Integration - Course Management
 
-Интеграция frontend с реализованным backend API для управления курсами, включая создание
-Pinia stores, API сервисов, UI компонентов и страниц.
+Frontend integration with implemented backend API for course management, including creation of Pinia stores, API services, UI components, and pages.
 
-## Предлагаемые изменения
+## Proposed Changes
 
 ### Data Layer
 
 #### [NEW] [shared/api/courses.js](file:///e:/Develop/anki-tiny/frontend/src/shared/api/courses.js)
 
-API сервис для работы с курсами, использующий axios client:
+API service for working with courses, using axios client:
 
 ```javascript
 import api from './client';
@@ -44,7 +43,7 @@ export const coursesApi = {
 
 #### [NEW] [shared/types/course.ts](file:///e:/Develop/anki-tiny/frontend/src/shared/types/course.ts)
 
-TypeScript типы для курсов (соответствуют backend схеме):
+TypeScript types for courses (matching backend schema):
 
 ```typescript
 export interface Course {
@@ -72,25 +71,25 @@ export interface UpdateCourseDto {
 
 #### [NEW] [entities/course/model/useCourseStore.js](file:///e:/Develop/anki-tiny/frontend/src/entities/course/model/useCourseStore.js)
 
-Pinia store для управления состоянием курсов:
+Pinia store for course state management:
 
 **State:**
 
-- `courses: Course[]` - список всех курсов
-- `loading: boolean` - индикатор загрузки
-- `error: string | null` - ошибка загрузки/операций
+- `courses: Course[]` - list of all courses
+- `loading: boolean` - loading indicator
+- `error: string | null` - loading/operation error
 
 **Actions:**
 
-- `fetchCourses()` - загрузка всех курсов
-- `createCourse(data)` - создание нового курса
-- `updateCourse(id, data)` - обновление курса
-- `deleteCourse(id)` - удаление курса
-- `getCourseById(id)` - получение курса по ID (из состояния)
+- `fetchCourses()` - load all courses
+- `createCourse(data)` - create new course
+- `updateCourse(id, data)` - update course
+- `deleteCourse(id)` - delete course
+- `getCourseById(id)` - get course by ID (from state)
 
 **Getters:**
 
-- `sortedCourses` - курсы, отсортированные по дате обновления (новые первые)
+- `sortedCourses` - courses sorted by update date (newest first)
 
 ---
 
@@ -98,21 +97,21 @@ Pinia store для управления состоянием курсов:
 
 #### [NEW] [shared/ui/Input.vue](file:///e:/Develop/anki-tiny/frontend/src/shared/ui/Input.vue)
 
-Базовый компонент текстового поля с поддержкой:
+Base text input component supporting:
 
 - `v-model` binding
-- Варианты: `text`, `textarea`
-- Состояния: `error`, `disabled`
-- Label и placeholder
+- Variants: `text`, `textarea`
+- States: `error`, `disabled`
+- Label and placeholder
 
 #### [NEW] [shared/ui/Modal.vue](file:///e:/Develop/anki-tiny/frontend/src/shared/ui/Modal.vue)
 
-Модальное окно с:
+Modal window with:
 
-- Backdrop с blur эффектом
-- Анимация появления/скрытия
-- Закрытие по ESC и клику вне области
-- Слоты: `header`, `body`, `footer`
+- Backdrop with blur effect
+- Appearance/disappearance animation
+- Close on ESC and click outside
+- Slots: `header`, `body`, `footer`
 
 ---
 
@@ -120,51 +119,51 @@ Pinia store для управления состоянием курсов:
 
 #### [NEW] [widgets/course-list/CourseList.vue](file:///e:/Develop/anki-tiny/frontend/src/widgets/course-list/CourseList.vue)
 
-Widget для отображения списка курсов:
+Widget for displaying course list:
 
-**Функциональность:**
+**Functionality:**
 
-- Отображение курсов в grid layout
-- Использует `CourseCard` для каждого курса
-- Передает события (edit, delete, select) наверх
-- Empty state при отсутствии курсов
+- Display courses in grid layout
+- Uses `CourseCard` for each course
+- Emits events (edit, delete, select) upwards
+- Empty state when no courses
 
 #### [NEW] [widgets/course-list/CourseCard.vue](file:///e:/Develop/anki-tiny/frontend/src/widgets/course-list/CourseCard.vue)
 
-Карточка одного курса:
+Single course card:
 
-**Отображаемая информация:**
+**Displayed Information:**
 
-- Название курса
-- Описание (если есть)
-- Дата последнего обновления
-- Количество карточек (TODO: после реализации cards API)
+- Course name
+- Description (if any)
+- Last updated date
+- Card count (TODO: after cards API implementation)
 
-**Действия:**
+**Actions:**
 
-- Клик по карточке → переход к курсу
-- Кнопка "Edit" → эмит события `@edit`
-- Кнопка "Delete" → эмит события `@delete`
+- Click on card → navigate to course
+- "Edit" button → emits `@edit` event
+- "Delete" button → emits `@delete` event
 
-**Стилизация:**
+**Styling:**
 
-- Градиентный фон с hover эффектом
-- Иконки из `bootstrap-icons`
-- Hover анимация (scale, shadow)
+- Gradient background with hover effect
+- Icons from `bootstrap-icons`
+- Hover animation (scale, shadow)
 
 #### [NEW] [widgets/course-editor/CourseEditorModal.vue](file:///e:/Develop/anki-tiny/frontend/src/widgets/course-editor/CourseEditorModal.vue)
 
-Модальное окно для создания/редактирования курса:
+Modal for creating/editing a course:
 
-**Функциональность:**
+**Functionality:**
 
-- Режимы: create / edit
-- Форма с полями:
-    - Name (обязательное)
-    - Description (опциональное)
-- Валидация на клиенте (min length для name)
-- Обработка ошибок от API
-- Кнопки: Save, Cancel
+- Modes: create / edit
+- Form with fields:
+    - Name (required)
+    - Description (optional)
+- Client-side validation (min length for name)
+- API error handling
+- Buttons: Save, Cancel
 
 ---
 
@@ -172,16 +171,16 @@ Widget для отображения списка курсов:
 
 #### [MODIFY] [pages/home/HomePage.vue](file:///e:/Develop/anki-tiny/frontend/src/pages/home/HomePage.vue)
 
-Интеграция с реальными данными:
+Integration with real data:
 
-**Изменения:**
+**Changes:**
 
-- Подключить `useCourseStore` вместо заглушки
-- Загрузка курсов при монтировании компонента
-- Отображение `CourseList` widget при наличии курсов
-- Открытие `CourseEditorModal` при создании курса
-- Обработка удаления курса с подтверждением
-- Обработка редактирования курса
+- Connect `useCourseStore` instead of mock
+- Load courses on component mount
+- Display `CourseList` widget if courses exist
+- Open `CourseEditorModal` when creating course
+- Handle course deletion with confirmation
+- Handle course editing
 
 ---
 
@@ -189,7 +188,7 @@ Widget для отображения списка курсов:
 
 #### [MODIFY] [app/main.js](file:///e:/Develop/anki-tiny/frontend/src/app/main.js)
 
-Подключение Pinia:
+Pinia connection:
 
 ```javascript
 import { createPinia } from 'pinia';
@@ -200,159 +199,155 @@ app.use(pinia);
 
 ---
 
-## План верификации
+## Verification Plan
 
-### Проверка существующих тестов
+### Checking Existing Tests
 
-Backend уже имеет API endpoints для courses, которые были протестированы в предыдущей сессии
-(задокументировано в `Testing_API.md`). Frontend тесты в проекте отсутствуют.
+Backend already has API endpoints for courses, which were tested in previous session (documented in `Testing_API.md`). Frontend tests are missing in the project.
 
 ### Automated Tests
 
-На данном этапе автоматизированное тестирование frontend не настроено. Рекомендуется добавление
-Vitest в будущих итерациях.
+Automated frontend testing is not configured at this stage. Adding Vitest in future iterations is recommended.
 
 ### Manual Verification
 
-#### 1. Проверка Backend API
+#### 1. Backend API Check
 
-**Команда:**
+**Command:**
 
 ```bash
 cd backend
 npm run dev
 ```
 
-**Проверка:** Backend должен запуститься на порту 3000 (или динамическом порту). API endpoints
-`/api/courses` должны быть доступны.
+**Check:** Backend should start on port 3000 (or dynamic port). API endpoints `/api/courses` must be available.
 
 ---
 
-#### 2. Проверка загрузки курсов
+#### 2. Course Loading Check
 
-**Команда:**
+**Command:**
 
 ```bash
 cd backend
 npm run electron:dev
 ```
 
-**Шаги:**
+**Steps:**
 
-1. Приложение запускается в Electron
-2. HomePage отображается корректно
-3. Если курсов нет → отображается Empty State с кнопкой "Создать первый курс"
-4. Открыть DevTools (F12) и проверить:
-    - Console: нет ошибок загрузки API
-    - Network: запрос `GET http://localhost:3000/api/courses` выполняется успешно
+1. Application launches in Electron
+2. HomePage displays correctly
+3. If no courses → Empty State with "Create first course" button displays
+4. Open DevTools (F12) and check:
+    - Console: no API load errors
+    - Network: request `GET http://localhost:3000/api/courses` executes successfully
 
-**Ожидаемый результат:** Empty state отображается, API запрос выполняется без ошибок.
-
----
-
-#### 3. Проверка создания курса
-
-**Шаги:**
-
-1. Нажать кнопку "Создать курс"
-2. Модальное окно открывается
-3. Заполнить форму:
-    - Name: "Английский язык"
-    - Description: "Базовая лексика"
-4. Нажать "Сохранить"
-5. Проверить в DevTools:
-    - Network: `POST http://localhost:3000/api/courses` возвращает 201
-    - Console: нет ошибок
-6. Модальное окно закрывается
-7. Новый курс появляется в списке
-
-**Ожидаемый результат:** Курс создается, отображается в списке.
+**Expected Result:** Empty state displays, API request executes without errors.
 
 ---
 
-#### 4. Проверка редактирования курса
+#### 3. Course Creation Check
 
-**Шаги:**
+**Steps:**
 
-1. Навести на карточку курса
-2. Нажать кнопку "Edit" (иконка карандаша)
-3. Модальное окно открывается с заполненными данными
-4. Изменить название на "English Language"
-5. Нажать "Сохранить"
-6. Проверить в DevTools:
-    - Network: `PUT http://localhost:3000/api/courses/1` возвращает 200
-7. Карточка курса обновляется с новым названием
+1. Click "Create Course" button
+2. Modal window opens
+3. Fill form:
+    - Name: "English Language"
+    - Description: "Basic vocabulary"
+4. Click "Save"
+5. Check in DevTools:
+    - Network: `POST http://localhost:3000/api/courses` returns 201
+    - Console: no errors
+6. Modal closes
+7. New course appears in list
 
-**Ожидаемый результат:** Курс обновляется, изменения отображаются.
-
----
-
-#### 5. Проверка удаления курса
-
-**Шаги:**
-
-1. Навести на карточку курса
-2. Нажать кнопку "Delete" (иконка корзины)
-3. Появляется confirm dialog с предупреждением
-4. Подтвердить удаление
-5. Проверить в DevTools:
-    - Network: `DELETE http://localhost:3000/api/courses/1` возвращает 200
-6. Курс исчезает из списка
-7. Если это был последний курс → отображается Empty State
-
-**Ожидаемый результат:** Курс удаляется, список обновляется.
+**Expected Result:** Course is created, appears in list.
 
 ---
 
-#### 6. Проверка обработки ошибок
+#### 4. Course Editing Check
 
-**Шаги:**
+**Steps:**
 
-1. Остановить backend сервер
-2. Попытаться создать новый курс
-3. Проверить, что:
-    - Отображается сообщение об ошибке
-    - Модальное окно не закрывается
-    - Пользователь может повторить попытку
+1. Hover over course card
+2. Click "Edit" button (pencil icon)
+3. Modal opens with filled data
+4. Change name to "English Language (Updated)"
+5. Click "Save"
+6. Check in DevTools:
+    - Network: `PUT http://localhost:3000/api/courses/1` returns 200
+7. Course card updates with new name
 
-**Ожидаемый результат:** Ошибки обрабатываются корректно, пользователю показывается понятное сообщение.
-
----
-
-#### 7. Проверка валидации формы
-
-**Шаги:**
-
-1. Открыть модальное окно создания курса
-2. Попытаться сохранить с пустым полем Name
-3. Проверить, что:
-    - Отображается ошибка валидации
-    - Запрос на backend не отправляется
-    - Кнопка "Сохранить" disabled или показывает ошибку
-
-**Ожидаемый результат:** Форма валидируется на клиенте.
+**Expected Result:** Course updates, changes are reflected.
 
 ---
 
-#### 8. Проверка UI/UX
+#### 5. Course Deletion Check
 
-**Проверка:**
+**Steps:**
 
-- Все анимации (fade transitions, hover effects) работают плавно
-- Модальное окно закрывается по ESC и клику по backdrop
-- Loading states отображаются при операциях
-- Стили соответствуют дизайну (градиенты, spacing, typography)
+1. Hover over course card
+2. Click "Delete" button (trash bin icon)
+3. Confirm dialog appears with warning
+4. Confirm deletion
+5. Check in DevTools:
+    - Network: `DELETE http://localhost:3000/api/courses/1` returns 200
+6. Course disappears from list
+7. If it was the last course → Empty State displays
 
-**Ожидаемый результат:** UI соответствует современным стандартам, анимации плавные.
+**Expected Result:** Course deleted, list updated.
 
 ---
 
-## Дополнительные замечания
+#### 6. Error Handling Check
+
+**Steps:**
+
+1. Stop backend server
+2. Try to create new course
+3. Check that:
+    - Error message is displayed
+    - Modal does not close
+    - User can retry
+
+**Expected Result:** Errors handled correctly, clear message shown to user.
+
+---
+
+#### 7. Form Validation Check
+
+**Steps:**
+
+1. Open create course modal
+2. Try to save with empty Name field
+3. Check that:
+    - Validation error displays
+    - Request not sent to backend
+    - "Save" button disabled or shows error
+
+**Expected Result:** Form validates on client side.
+
+---
+
+#### 8. UI/UX Check
+
+**Check:**
+
+- All animations (fade transitions, hover effects) work smoothly
+- Modal closes on ESC and backdrop click
+- Loading states display during operations
+- Styles match design (gradients, spacing, typography)
+
+**Expected Result:** UI meets modern standards, animations are smooth.
+
+---
+
+## Additional Notes
 
 > [!NOTE]
-> После реализации этого этапа будет готов базовый функционал управления курсами.
-> Следующий шаг - реализация работы с карточками (cards CRUD API + frontend).
+> Basic course management functionality will be ready after this stage implementation.
+> Next step - Cards management implementation (cards CRUD API + frontend).
 >
 > [!TIP]
-> Рекомендуется использовать `@vueuse/core` composables (например, `useConfirmDialog`) для
-> confirm dialogs вместо нативного `window.confirm`.
+> Recommended to use `@vueuse/core` composables (e.g. `useConfirmDialog`) for confirm dialogs instead of native `window.confirm`.

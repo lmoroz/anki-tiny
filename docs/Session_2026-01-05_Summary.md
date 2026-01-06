@@ -1,86 +1,86 @@
-# Итоги Сессии: Backend Cards и FSRS — 05.01.2026
+# Session Summary: Backend Cards and FSRS — 05.01.2026
 
-## Общая информация
+## General Information
 
-**Дата:** 05.01.2026 13:15 - 21:35 (GMT+8)  
-**Длительность:** ~8 часов  
-**Версия:** 0.1.0 → 0.2.0  
+**Date:** 05.01.2026 13:15 - 21:35 (GMT+8)  
+**Duration:** ~8 hours  
+**Version:** 0.1.0 → 0.2.0  
 **Git commit:** `a523bcd` - feat(backend): implement Cards API, FSRS algorithm and migration system
 
 ---
 
-## Выполненные задачи
+## Completed Tasks
 
-### ✅ Backend: Cards и FSRS Система
+### ✅ Backend: Cards and FSRS System
 
-1. **Database Schema расширена для FSRS**
-   - Создана `CardsTable` с 13 FSRS полями (due, stability, difficulty, reps, lapses, state, etc.)
-   - Создана `SettingsTable` для глобальных настроек
-   - Создана `CourseSettingsTable` для индивидуальных настроек курсов
-   - Добавлены 5 индексов для оптимизации (courseId, due, state)
+1. **Database Schema extended for FSRS**
+   - Created `CardsTable` with 13 FSRS fields (due, stability, difficulty, reps, lapses, state, etc.)
+   - Created `SettingsTable` for global settings
+   - Created `CourseSettingsTable` for individual course settings
+   - Added 5 indexes for optimization (courseId, due, state)
 
-2. **Migration System с отслеживанием**
-   - Реализована таблица `_migrations` для tracking примененных миграций
-   - 4 отдельные миграции: courses, cards, settings, courseSettings
-   - Функция `runMigrations()` с автоматическим применением
-   - Идемпотентность через `.ifNotExists()` для tables и indexes
-   - Успешно протестирована на существующей БД
+2. **Migration System with tracking**
+   - Implemented `_migrations` table for tracking applied migrations
+   - 4 separate migrations: courses, cards, settings, courseSettings
+   - `runMigrations()` function with automatic application
+   - Idempotency via `.ifNotExists()` for tables and indexes
+   - Successfully tested on existing DB
 
 3. **FSRS Service** (`services/fsrs/index.ts`)
-   - Интеграция `ts-fsrs` library
-   - Кастомные Learning Steps: 10 мин → 4 часа → REVIEW
+   - `ts-fsrs` library integration
+   - Custom Learning Steps: 10 min → 4 hours → REVIEW
    - State Machine: NEW → LEARNING → REVIEW → RELEARNING
-   - Функции: `calculateNextReview()`, `canShowNewCards()`, `initializeNewCard()`
-   - Проверка временных ограничений (4 часа до конца дня)
+   - Functions: `calculateNextReview()`, `canShowNewCards()`, `initializeNewCard()`
+   - Time limit check (4 hours before day end)
 
 4. **Repositories**
    - `CardRepository`: CRUD + `getDueCards()` + `getCourseStats()`
    - `SettingsRepository`: global + course + `getEffectiveSettings()`
-   - Singleton instances через `db` proxy
+   - Singleton instances via `db` proxy
 
 5. **Validation Schemas (Zod)**
    - `schemas/card.ts`: CreateCard, UpdateCard, ReviewCard
    - `schemas/settings.ts`: GlobalSettings, CourseSettings
-   - JSON validation для `learningSteps`
+   - JSON validation for `learningSteps`
 
 6. **REST API Endpoints (13 endpoints)**
    - **Cards API** (6): GET/POST/PUT/DELETE cards + stats
    - **Training API** (2): GET due-cards + POST review
    - **Settings API** (5): GET/PUT global + GET/PUT/DELETE course settings
 
-### ✅ Исправление ошибок
+### ✅ Bug Fixes
 
-1. **TypeScript ошибки**
-   - FSRS типы: использование `Rating` enum с type cast
-   - Zod schema syntax: исправлен `errorMap` → `message`
-   - ZodError: замена `.errors` на `.issues`
-   - Удалены неиспользуемые импорты
+1. **TypeScript errors**
+   - FSRS types: usage of `Rating` enum with type cast
+   - Zod schema syntax: fixed `errorMap` → `message`
+   - ZodError: replaced `.errors` with `.issues`
+   - Removed unused imports
 
 2. **Code Quality**
-   - Prettier форматирование применен ко всем файлам
-   - ESLint: 0 errors, 7 warnings (any types - допустимо)
-   - TypeScript компиляция: успешно
+   - Prettier formatting applied to all files
+   - ESLint: 0 errors, 7 warnings (any types - acceptable)
+   - TypeScript compilation: successful
 
-### ✅ Документация
+### ✅ Documentation
 
-Создано 6 новых документов:
+Created 6 new documents:
 
 1. **Backend_Cards_FSRS_Walkthrough.md** — comprehensive walkthrough
 2. **Migration_System_Walkthrough.md** — migration system guide
-3. **Cards_FSRS_Implementation_Plan.md** — технический план
-4. **Cards_FSRS_Architecture.md** — Mermaid диаграммы
-5. **Cards_FSRS_Tasks.md** — детальный чеклист
-6. **Backend_Cards_FSRS_Progress.md** — прогресс отчет
+3. **Cards_FSRS_Implementation_Plan.md** — technical plan
+4. **Cards_FSRS_Architecture.md** — Mermaid diagrams
+5. **Cards_FSRS_Tasks.md** — detailed checklist
+6. **Backend_Cards_FSRS_Progress.md** — progress report
 
-Обновлено:
+Updated:
 
-- `docs/Task.md` — Фаза 4 Backend завершена
-- `docs/Changelog.md` — добавлена запись v0.2.0
-- `.agent/rules/workflow.md` — уточнен workflow завершения сессии
+- `docs/Task.md` — Phase 4 Backend completed
+- `docs/Changelog.md` — added v0.2.0 record
+- `.agent/rules/workflow.md` — clarified session completion workflow
 
 ---
 
-## Git Статистика
+## Git Statistics
 
 ### Commit Details
 
@@ -89,13 +89,13 @@ commit a523bcd
 feat(backend): implement Cards API, FSRS algorithm and migration system
 ```
 
-### Изменения
+### Changes
 
-- **26 файлов изменено**
-- **+3772 строк добавлено**
-- **-116 строк удалено**
+- **26 files changed**
+- **+3772 lines added**
+- **-116 lines deleted**
 
-### Новые файлы (15)
+### New Files (15)
 
 **Backend:**
 
@@ -118,11 +118,11 @@ feat(backend): implement Cards API, FSRS algorithm and migration system
 - `docs/Cards_FSRS_Tasks.md`
 - `docs/Migration_System_Walkthrough.md`
 
-### Измененные файлы (11)
+### Modified Files (11)
 
 - `.agent/rules/workflow.md`
 - `backend/icon.png`
-- `backend/package.json` (зависимость ts-fsrs)
+- `backend/package.json` (ts-fsrs dependency)
 - `backend/src/routes/index.ts`
 - `backend/src/services/database/index.ts`
 - `backend/src/services/database/migrations.ts`
@@ -134,7 +134,7 @@ feat(backend): implement Cards API, FSRS algorithm and migration system
 
 ---
 
-## Код Quality Checks
+## Code Quality Checks
 
 ### ✅ TypeScript Compilation
 
@@ -142,7 +142,7 @@ feat(backend): implement Cards API, FSRS algorithm and migration system
 npm run build --workspace=backend
 ```
 
-**Результат:** SUCCESS, 0 errors
+**Result:** SUCCESS, 0 errors
 
 ### ✅ ESLint
 
@@ -150,7 +150,7 @@ npm run build --workspace=backend
 npm run lint --workspace=backend
 ```
 
-**Результат:** 0 errors, 7 warnings (any types - допустимо для совместимости)
+**Result:** 0 errors, 7 warnings (any types - acceptable for compatibility)
 
 ### ✅ Prettier
 
@@ -158,12 +158,12 @@ npm run lint --workspace=backend
 npm run format --workspace=backend
 ```
 
-**Результат:** 42 файла обработано, 8 изменено
+**Result:** 42 files processed, 8 changed
 
 ### ⚠️ Markdownlint
 
-**Результат:** Автоматически исправлено большинство ошибок  
-**Оставшиеся:** Несколько ошибок в новых walkthrough документах (не критично)
+**Result:** Most errors automatically fixed
+**Remaining:** Few errors in new walkthrough documents (not critical)
 
 ---
 
@@ -171,7 +171,7 @@ npm run format --workspace=backend
 
 ### ✅ Migration System
 
-Протестирована на существующей БД:
+Tested on existing DB:
 
 ```
 📦 Database at: E:\Develop\anki-tiny\backend\repetitio.db
@@ -185,19 +185,19 @@ npm run format --workspace=backend
 🚀 Server running on port 1095
 ```
 
-**Идемпотентность подтверждена:** Повторный запуск показал "All migrations are up to date"
+**Idempotency confirmed:** Rerun showed "All migrations are up to date"
 
 ### ✅ Database Structure
 
-**5 таблиц созданы:**
+**5 tables created:**
 
-1. `_migrations` (4 записи)
-2. `courses` (уже существовала)
-3. `cards` (новая, с FSRS полями)
-4. `settings` (новая)
-5. `courseSettings` (новая)
+1. `_migrations` (4 records)
+2. `courses` (already existed)
+3. `cards` (new, with FSRS fields)
+4. `settings` (new)
+5. `courseSettings` (new)
 
-**5 индексов созданы:**
+**5 indexes created:**
 
 - courses_name_idx
 - cards_courseId_idx, cards_due_idx, cards_state_idx
@@ -205,29 +205,29 @@ npm run format --workspace=backend
 
 ---
 
-## Архитектурные решения
+## Architectural Decisions
 
 ### Migration System
 
-**Преимущества:**
+**Benefits:**
 
-- ✅ Отслеживание через таблицу `_migrations`
-- ✅ Идемпотентность (безопасно запускать многократно)
-- ✅ Автоматическое применение на старте
-- ✅ Production-ready подход
+- ✅ Tracking via `_migrations` table
+- ✅ Idempotency (safe to run multiple times)
+- ✅ Automatic application on start
+- ✅ Production-ready approach
 
 ### FSRS Integration
 
-**Особенности реализации:**
+**Implementation Details:**
 
-- Кастомные Learning Steps перед полным FSRS
-- Временные ограничения для NEW карточек
-- Type cast `as any` для совместимости с ts-fsrs
-- Singleton pattern для repositories
+- Custom Learning Steps before full FSRS
+- Time limits for NEW cards
+- Type cast `as any` for ts-fsrs compatibility
+- Singleton pattern for repositories
 
 ### API Design
 
-**REST endpoints организованы по доменам:**
+**REST endpoints organized by domains:**
 
 - `/api/courses/:courseId/cards` — Cards CRUD
 - `/api/training/*` — Training flow
@@ -235,141 +235,141 @@ npm run format --workspace=backend
 
 ---
 
-## Зависимости
+## Dependencies
 
-### Новые
+### New
 
-- `ts-fsrs` — TypeScript FSRS library для spaced repetition
+- `ts-fsrs` — TypeScript FSRS library for spaced repetition
 
-### Обновленные
+### Updated
 
-Никаких breaking changes в существующих зависимостях
+No breaking changes in existing dependencies
 
 ---
 
-## Следующие шаги
+## Next Steps
 
-### Immediate (Следующая сессия)
+### Immediate (Next Session)
 
 1. **Frontend Integration - Entity Layer**
-   - Card types и API service
-   - Pinia store для карточек
-   - TypeScript типы (CardState, Rating enum)
+   - Card types and API service
+   - Pinia store for cards
+   - TypeScript types (CardState, Rating enum)
 
 2. **Frontend Integration - Widgets**
    - CardList widget
-   - CardItem компонент
+   - CardItem component
    - CardEditor Modal
-   - QuickAddCard компонент
+   - QuickAddCard component
 
 3. **Frontend Integration - Pages**
-   - CoursePage — интеграция cards
-   - TrainingPage — FSRS тренировки
-   - SettingsPage — управление настройками
+   - CoursePage — cards integration
+   - TrainingPage — FSRS training
+   - SettingsPage — settings management
 
 ### Short-term
 
 1. **Backend API Testing**
-   - Postman collection для всех endpoints
-   - Unit tests для FSRS service
-   - Integration tests для repositories
+   - Postman collection for all endpoints
+   - Unit tests for FSRS service
+   - Integration tests for repositories
 
 2. **E2E Testing**
-   - Создание карточки
-   - Прохождение тренировки
-   - Проверка FSRS расчетов
+   - Create card
+   - Complete training
+   - Verify FSRS calculations
 
 ### Medium-term
 
-1. **Расширенный функционал**
-   - Статистика прогресса
-   - Импорт/Экспорт курсов
-   - Медиа в карточках
-   - Поиск и теги
+1. **Extended Features**
+   - Progress statistics
+   - Course Import/Export
+   - Media in cards
+   - Search and tags
 
-2. **Система уведомлений**
-   - Backend: проверка due cards
-   - Electron: системные уведомления
+2. **Notification System**
+   - Backend: check due cards
+   - Electron: system notifications
    - Tray integration
 
 ---
 
-## Ключевые достижения
+## Key Achievements
 
-### 🎯 Цели сессии
+### 🎯 Session Goals
 
-| Цель | Статус | Примечание |
+| Goal | Status | Note |
 |------|--------|------------|
-| Database schema для FSRS | ✅ | 3 новые таблицы |
-| Migration system | ✅ | С отслеживанием |
-| FSRS Service | ✅ | ts-fsrs интеграция |
+| Database schema for FSRS | ✅ | 3 new tables |
+| Migration system | ✅ | With tracking |
+| FSRS Service | ✅ | ts-fsrs integration |
 | 13 API endpoints | ✅ | Cards, Training, Settings |
 | Repositories | ✅ | Card + Settings |
 | Validation | ✅ | Zod schemas |
-| Исправление ошибок | ✅ | TypeScript + Prettier |
-| Документация | ✅ | 6 новых документов |
+| Bug fixes | ✅ | TypeScript + Prettier |
+| Documentation | ✅ | 6 new documents |
 
-### 📊 Метрики
+### 📊 Metrics
 
-- **Строк кода:** ~1,500+ (backend)
-- **Файлов создано:** 15
+- **Lines of code:** ~1,500+ (backend)
+- **Files created:** 15
 - **API endpoints:** 13
-- **Таблиц БД:** 3 новые + 1 служебная
-- **Время разработки:** ~8 часов
+- **DB Tables:** 3 new + 1 system
+- **Development time:** ~8 hours
 - **TypeScript errors:** 0
 - **ESLint errors:** 0
 
 ---
 
-## Риски и ограничения
+## Risks and Constraints
 
-### Известные ограничения
+### Known Limitations
 
 1. **ts-fsrs type compatibility**
-   - Использован `as any` type cast для Rating
-   - Не критично, но требует внимания при обновлении библиотеки
+   - Used `as any` type cast for Rating
+   - Not critical, but requires attention when updating library
 
 2. **SQLite boolean handling**
-   - Boolean хранятся как INTEGER (0/1)
-   - Требуется конверсия в API responses
+   - Booleans stored as INTEGER (0/1)
+   - Conversion required in API responses
 
 3. **Migration rollback**
-   - Реализован только `rollbackAllMigrations()` (для тестирования)
-   - Нет индивидуального отката миграций
+   - Only `rollbackAllMigrations()` implemented (for testing)
+   - No individual migration rollback
 
-### Потенциальные улучшения
+### Potential Improvements
 
-- Добавить down() функции для миграций
-- Реализовать migration history log
-- Добавить transaction support в миграции
-- Улучшить error handling в FSRS service
+- Add down() functions for migrations
+- Implement migration history log
+- Add transaction support to migrations
+- Improve error handling in FSRS service
 
 ---
 
-## Заключение
+## Conclusion
 
-### Итоги
+### Summary
 
-**Backend для Cards и FSRS полностью реализован и готов к frontend интеграции.**
+**Backend for Cards and FSRS is fully implemented and ready for frontend integration.**
 
-Создана профессиональная архитектура с:
+Professional architecture created with:
 
-- ✅ Полноценной FSRS поддержкой
+- ✅ Full FSRS support
 - ✅ Migration tracking system
 - ✅ REST API endpoints
-- ✅ Validation и error handling
+- ✅ Validation and error handling
 - ✅ Comprehensive documentation
 
-### Готовность к следующему этапу
+### Readiness for Next Stage
 
-**Frontend integration** может начинаться немедленно:
+**Frontend integration** can start immediately:
 
-- API endpoints протестированы и работают
-- Database schema стабильна
+- API endpoints tested and working
+- Database schema stable
 - Migration system production-ready
-- Документация актуальна
+- Documentation up to date
 
-### Качество кода
+### Code Quality
 
 - ✅ TypeScript strict mode
 - ✅ ESLint compliance

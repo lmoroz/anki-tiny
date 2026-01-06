@@ -1,73 +1,73 @@
-# 📚 OpenSpec Workflow — Руководство по работе
+# 📚 OpenSpec Workflow — Working Guide
 
-## Что такое OpenSpec?
+## What is OpenSpec?
 
-**OpenSpec** — это методология **spec-driven development** (разработки на основе спецификаций), где:
+**OpenSpec** is a **spec-driven development** methodology where:
 
-- **Specs** (`openspec/specs/`) — это **источник истины** о том, что УЖЕ построено
-- **Changes** (`openspec/changes/`) — это **предложения** о том, что ДОЛЖНО измениться
-- Процесс разработки идёт через три чётких стадии: **Proposal → Implementation → Archive**
+- **Specs** (`openspec/specs/`) — are the **source of truth** about what is ALREADY built
+- **Changes** (`openspec/changes/`) — are **proposals** about what SHOULD change
+- Development process goes through three clear stages: **Proposal → Implementation → Archive**
 
-Это обеспечивает:
+This ensures:
 
-- ✅ Прозрачность изменений
-- ✅ Контроль качества через review
-- ✅ Синхронизацию документации и кода
-- ✅ История всех архитектурных решений
+- ✅ Changes transparency
+- ✅ Quality control through review
+- ✅ Documentation and code synchronization
+- ✅ History of all architectural decisions
 
 ---
 
-## 🔄 Три стадии разработки
+## 🔄 Three Development Stages
 
-### **Stage 1: Creating Changes** (Создание предложений)
+### **Stage 1: Creating Changes** (Creating proposals)
 
-#### Когда нужно создавать Proposal?
+#### When should I create a Proposal?
 
-✅ **Создаём предложение**, если:
+✅ **Create a proposal** if:
 
-- Добавляем новые фичи или функциональность
-- Делаем breaking changes (API, схема БД)
-- Меняем архитектуру или паттерны
-- Оптимизируем производительность (меняется поведение)
-- Обновляем security patterns
+- Adding new features or functionality
+- Making breaking changes (API, DB schema)
+- Changing architecture or patterns
+- Optimizing performance (behavior changes)
+- Updating security patterns
 
-❌ **НЕ создаём предложение**, если:
+❌ **DON'T create a proposal** if:
 
-- Фиксим баги (восстанавливаем задуманное поведение)
-- Исправляем опечатки, форматирование, комментарии
-- Обновляем зависимости (non-breaking)
-- Меняем конфигурацию
-- Добавляем тесты для существующего поведения
+- Fixing bugs (restoring intended behavior)
+- Fixing typos, formatting, comments
+- Updating dependencies (non-breaking)
+- Changing configuration
+- Adding tests for existing behavior
 
-#### Процесс создания предложения
+#### Proposal creation process
 
-**Шаг 1:** Изучаю контекст
+**Step 1:** Study context
 
 ```bash
-openspec list              # Что уже в работе?
-openspec list --specs      # Какие capabilities существуют?
+openspec list              # What's already in progress?
+openspec list --specs      # What capabilities exist?
 ```
 
-**Шаг 2:** Выбираю уникальный `change-id` (kebab-case, глагол в начале)
+**Step 2:** Choose unique `change-id` (kebab-case, verb at the start)
 
-- Примеры: `add-two-factor-auth`, `update-card-schema`, `remove-old-api`
-- Используем префиксы: `add-`, `update-`, `remove-`, `refactor-`
+- Examples: `add-two-factor-auth`, `update-card-schema`, `remove-old-api`
+- Use prefixes: `add-`, `update-`, `remove-`, `refactor-`
 
-**Шаг 3:** Создаю структуру в `openspec/changes/[change-id]/`:
+**Step 3:** Create structure in `openspec/changes/[change-id]/`:
 
 ```text
 openspec/changes/add-card-batch-import/
-├── proposal.md          # Зачем и что меняем
-├── tasks.md             # Чеклист реализации
-├── design.md            # (опционально) Технические решения
-└── specs/               # Дельта-изменения спецификаций
+├── proposal.md          # Why and what we're changing
+├── tasks.md             # Implementation checklist
+├── design.md            # (optional) Technical solutions
+└── specs/               # Specification delta changes
     └── cards/
         └── spec.md      # ADDED/MODIFIED/REMOVED Requirements
 ```
 
-**Шаг 4:** Пишу **spec deltas** (изменения спецификаций)
+**Step 4:** Write **spec deltas** (specification changes)
 
-Формат delta-файла:
+Delta file format:
 
 ```markdown
 ## ADDED Requirements
@@ -85,7 +85,7 @@ The system SHALL allow importing multiple cards from CSV.
 
 ### Requirement: Card Creation API
 
-[Полное обновлённое содержание requirement с всеми scenarios]
+[Complete updated requirement content with all scenarios]
 
 ## REMOVED Requirements
 
@@ -95,37 +95,37 @@ The system SHALL allow importing multiple cards from CSV.
 **Migration**: Use new batch endpoint
 ```
 
-**Критически важно:**
+**Critically important:**
 
-- Каждый requirement ДОЛЖЕН иметь хотя бы один `#### Scenario:`
-- Scenarios используют **4 решётки** (`####`)
-- В `MODIFIED` пишем ПОЛНОЕ содержание requirement, не только изменения
+- Each requirement MUST have at least one `#### Scenario:`
+- Scenarios use **4 hashtags** (`####`)
+- In `MODIFIED` write COMPLETE requirement content, not just changes
 
-**Шаг 5:** Валидирую
+**Step 5:** Validate
 
 ```bash
 openspec validate [change-id] --strict
 ```
 
-**Шаг 6:** Запрашиваю одобрение
+**Step 6:** Request approval
 
-🚨 **AI-агент НЕ начинает реализацию, пока разработчик не одобрит proposal!**
+🚨 **AI agent does NOT start implementation until developer approves the proposal!**
 
 ---
 
-### **Stage 2: Implementing Changes** (Реализация)
+### **Stage 2: Implementing Changes** (Implementation)
 
-После одобрения proposal:
+After proposal approval:
 
-1. ✅ Читаю `proposal.md` — что строим
-2. ✅ Читаю `design.md` (если есть) — технические решения
-3. ✅ Читаю `tasks.md` — чеклист задач
-4. ✅ Реализую задачи **последовательно** (по порядку)
-5. ✅ Подтверждаю завершение — проверяю, что всё готово
-6. ✅ Обновляю чеклист — отмечаю `- [x]` только после **полного** завершения
-7. ✅ После реализации валидирую весь код (линтинг, тесты)
+1. ✅ Read `proposal.md` — what we're building
+2. ✅ Read `design.md` (if exists) — technical solutions
+3. ✅ Read `tasks.md` — task checklist
+4. ✅ Implement tasks **sequentially** (in order)
+5. ✅ Confirm completion — verify everything is ready
+6. ✅ Update checklist — mark `- [x]` only after **complete** finish
+7. ✅ After implementation, validate all code (linting, tests)
 
-**Workflow команда для AI-агента:**
+**Workflow command for AI agent:**
 
 ```text
 /openspec-apply [change-id]
@@ -133,19 +133,19 @@ openspec validate [change-id] --strict
 
 ---
 
-### **Stage 3: Archiving Changes** (Архивация)
+### **Stage 3: Archiving Changes** (Archiving)
 
-После деплоя (когда изменения работают в продакшне):
+After deployment (when changes work in production):
 
-1. Переношу `changes/[name]/` → `changes/archive/YYYY-MM-DD-[name]/`
-2. Обновляю `specs/` — применяю дельты к основным спецификациям
-3. Валидирую архив:
+1. Move `changes/[name]/` → `changes/archive/YYYY-MM-DD-[name]/`
+2. Update `specs/` — apply deltas to main specifications
+3. Validate archive:
 
 ```bash
 openspec validate --strict
 ```
 
-**Workflow команда:**
+**Workflow command:**
 
 ```text
 /openspec-archive [change-id]
@@ -153,113 +153,113 @@ openspec validate --strict
 
 ---
 
-## 🎯 Роли в процессе
+## 🎯 Roles in the Process
 
-### Разработчик (человек)
+### Developer (human)
 
-1. **Запрашивает фичу** — "Добавь импорт карточек из CSV"
-2. **Утверждает proposal** — проверяет, что требования поняты правильно
-3. **Проверяет результат** — тестирует реализацию
-4. **Запускает архивацию** — когда фича задеплоена
+1. **Requests feature** — "Add card import from CSV"
+2. **Approves proposal** — checks that requirements are understood correctly
+3. **Checks result** — tests implementation
+4. **Triggers archiving** — when feature is deployed
 
-### AI-агент
+### AI Agent
 
-1. **Создаёт proposal** с детальным описанием изменений
-2. **Ждёт одобрения** — не кодирует без "ОК"
-3. **Реализует по tasks.md** — последовательно, с обновлением чеклистов
-4. **Синхронизирует документацию** — обновляет `docs/Changelog.md`, `docs/Walkthrough.md`
-5. **Архивирует изменения** — после команды разработчика
+1. **Creates proposal** with detailed description of changes
+2. **Waits for approval** — doesn't code without "OK"
+3. **Implements according to tasks.md** — sequentially, updating checklists
+4. **Synchronizes documentation** — updates `docs/Changelog.md`, `docs/Walkthrough.md`
+5. **Archives changes** — after developer's command
 
 ---
 
-## 🛠 Полезные команды
+## 🛠 Useful Commands
 
-### Для разработчика (человека)
+### For developer (human)
 
 ```bash
-# Что сейчас в работе?
+# What's currently in progress?
 openspec list
 
-# Какие capabilities уже есть?
+# What capabilities already exist?
 openspec list --specs
 
-# Посмотреть детали предложения
+# View proposal details
 openspec show [change-id]
 
-# Посмотреть конкретную спецификацию
+# View specific specification
 openspec show [spec-id] --type spec
 
-# Валидировать предложение
+# Validate proposal
 openspec validate [change-id] --strict
 
-# Валидировать все изменения
+# Validate all changes
 openspec validate --strict
 ```
 
-### Workflow команды (для AI-агента)
+### Workflow commands (for AI agent)
 
 ```text
-# Создать новое предложение
+# Create new proposal
 /openspec-proposal
 
-# Реализовать одобренное предложение
+# Implement approved proposal
 /openspec-apply [change-id]
 
-# Архивировать после деплоя
+# Archive after deployment
 /openspec-archive [change-id]
 ```
 
 ---
 
-## 📋 Структура директорий
+## 📋 Directory Structure
 
 ```text
 openspec/
-├── project.md              # Конвенции проекта
-├── AGENTS.md               # Детальные инструкции для AI
-├── specs/                  # Источник истины — что ПОСТРОЕНО
+├── project.md              # Project conventions
+├── AGENTS.md               # Detailed instructions for AI
+├── specs/                  # Source of truth — what is BUILT
 │   └── [capability]/
-│       ├── spec.md         # Requirements и Scenarios
-│       └── design.md       # Технические паттерны
-└── changes/                # Предложения — что ДОЛЖНО измениться
+│       ├── spec.md         # Requirements and Scenarios
+│       └── design.md       # Technical patterns
+└── changes/                # Proposals — what SHOULD change
     ├── [change-name]/
-    │   ├── proposal.md     # Зачем и что
-    │   ├── tasks.md        # Чеклист
-    │   ├── design.md       # Технические решения (опционально)
+    │   ├── proposal.md     # Why and what
+    │   ├── tasks.md        # Checklist
+    │   ├── design.md       # Technical solutions (optional)
     │   └── specs/
-    │       └── [capability]/spec.md  # Дельты
-    └── archive/            # Завершённые изменения
+    │       └── [capability]/spec.md  # Deltas
+    └── archive/            # Completed changes
         └── YYYY-MM-DD-[change-name]/
 ```
 
 ---
 
-## 💡 Пример полного цикла
+## 💡 Full Cycle Example
 
-### 1️⃣ Разработчик говорит
+### 1️⃣ Developer says
 
-> "Нужно добавить импорт карточек из CSV файла"
+> "Need to add card import from CSV file"
 
-### 2️⃣ AI-агент отвечает
+### 2️⃣ AI agent responds
 
-> "Создам proposal для `add-card-csv-import`. Подождите, изучу существующие specs..."
+> "Will create proposal for `add-card-csv-import`. Wait, studying existing specs..."
 
-Затем создаёт:
+Then creates:
 
 - `openspec/changes/add-card-csv-import/proposal.md`
 - `openspec/changes/add-card-csv-import/tasks.md`
 - `openspec/changes/add-card-csv-import/specs/cards/spec.md`
 
-И говорит:
+And says:
 
-> "✅ Proposal готов! Проверьте `proposal.md` и `tasks.md`. Если всё ОК — скажите 'approve', и я начну
-> реализацию."
+> "✅ Proposal ready! Check `proposal.md` and `tasks.md`. If everything is OK — say 'approve', and I'll
+> start implementation."
 
-### 3️⃣ Разработчик отвечает
+### 3️⃣ Developer responds
 
-> "approve" (или "одобряю")
+> "approve" (or "approve")
 
-### 4️⃣ AI-агент реализует
+### 4️⃣ AI agent implements
 
 ```text
 ✅ 1.1 Create CSV parser service
@@ -268,23 +268,23 @@ openspec/
 ✅ 1.4 Write tests
 ```
 
-И обновляет `docs/Changelog.md`, `docs/Walkthrough.md`
+And updates `docs/Changelog.md`, `docs/Walkthrough.md`
 
-### 5️⃣ Разработчик тестирует и говорит
+### 5️⃣ Developer tests and says
 
 > "/openspec-archive add-card-csv-import"
 
-### 6️⃣ AI-агент архивирует
+### 6️⃣ AI agent archives
 
-- Переносит в `changes/archive/2026-01-06-add-card-csv-import/`
-- Обновляет `specs/cards/spec.md` с новыми requirements
-- Валидирует всё через `--strict`
+- Moves to `changes/archive/2026-01-06-add-card-csv-import/`
+- Updates `specs/cards/spec.md` with new requirements
+- Validates everything via `--strict`
 
 ---
 
-## 📝 Формат спецификаций
+## 📝 Specification Format
 
-### Правильный формат Scenario
+### Correct Scenario format
 
 ```markdown
 #### Scenario: User imports valid CSV
@@ -294,7 +294,7 @@ openspec/
 - **AND** success notification is shown
 ```
 
-### Неправильные форматы
+### Incorrect formats
 
 ```markdown
 - **Scenario: Import CSV** ❌ (bullet)
@@ -302,11 +302,11 @@ openspec/
   ### Scenario: Import CSV ❌ (3 hashtags)
 ```
 
-### Операции с Requirements
+### Operations with Requirements
 
 #### ADDED
 
-Используем для новых capabilities, которые могут существовать независимо.
+Use for new capabilities that can exist independently.
 
 ```markdown
 ## ADDED Requirements
@@ -323,22 +323,22 @@ The system SHALL support importing multiple cards from CSV files.
 
 #### MODIFIED
 
-Используем для изменения существующего поведения.
+Use for changing existing behavior.
 
-**ВАЖНО**: копируем ПОЛНОЕ содержание requirement из `openspec/specs/[capability]/spec.md`,
-затем редактируем.
+**IMPORTANT**: copy COMPLETE requirement content from `openspec/specs/[capability]/spec.md`,
+then edit.
 
 ```markdown
 ## MODIFIED Requirements
 
 ### Requirement: Card Creation
 
-[Полное содержание requirement + все его scenarios]
+[Complete requirement content + all its scenarios]
 ```
 
 #### REMOVED
 
-Используем для удаления устаревших features.
+Use for removing obsolete features.
 
 ```markdown
 ## REMOVED Requirements
@@ -351,7 +351,7 @@ The system SHALL support importing multiple cards from CSV files.
 
 #### RENAMED
 
-Используем только для переименования без изменения логики.
+Use only for renaming without logic changes.
 
 ```markdown
 ## RENAMED Requirements
@@ -362,13 +362,13 @@ The system SHALL support importing multiple cards from CSV files.
 
 ---
 
-## ⚠️ Критически важно
+## ⚠️ Critically Important
 
-1. **Specs = Source of Truth** — всегда синхронизируем спецификации с кодом
-2. **No implementation without approval** — AI не кодирует без одобрения proposal
-3. **Strict validation** — всегда проверяем через `--strict` перед коммитом
-4. **Sequential tasks** — задачи выполняются по порядку, отмечаются по факту завершения
-5. **At least one scenario** — каждый requirement должен иметь минимум один scenario
+1. **Specs = Source of Truth** — always sync specifications with code
+2. **No implementation without approval** — AI doesn't code without proposal approval
+3. **Strict validation** — always check via `--strict` before commit
+4. **Sequential tasks** — tasks are executed in order, marked after completion
+5. **At least one scenario** — each requirement must have at least one scenario
 
 ---
 
@@ -376,80 +376,80 @@ The system SHALL support importing multiple cards from CSV files.
 
 ### Simplicity First
 
-- По умолчанию < 100 строк нового кода
-- Реализация в одном файле, пока не доказана необходимость разделения
-- Избегаем фреймворков без чёткого обоснования
-- Выбираем проверенные, скучные паттерны
+- By default <100 lines of new code
+- Implementation in one file until proven need for separation
+- Avoid frameworks without clear justification
+- Choose proven, boring patterns
 
 ### Complexity Triggers
 
-Добавляем сложность только при:
+Add complexity only when:
 
-- Данных о производительности, показывающих, что текущее решение слишком медленное
-- Конкретных требованиях к масштабу (> 1000 пользователей, > 100MB данных)
-- Множестве проверенных use cases, требующих абстракции
+- Performance data showing current solution is too slow
+- Specific scale requirements (> 1000 users, > 100MB data)
+- Multiple proven use cases requiring abstraction
 
 ### Clear References
 
-- Используем формат `file.ts:42` для ссылок на код
-- Ссылаемся на спецификации как `specs/auth/spec.md`
-- Связываем related changes и PRs
+- Use `file.ts:42` format for code references
+- Reference specifications as `specs/auth/spec.md`
+- Link related changes and PRs
 
 ### Capability Naming
 
-- Используем verb-noun: `user-auth`, `payment-capture`
-- Одна цель на capability
-- Правило 10-минутной понятности
-- Разделяем, если описание требует "AND"
+- Use verb-noun: `user-auth`, `payment-capture`
+- One goal per capability
+- 10-minute clarity rule
+- Split if description requires "AND"
 
 ### Change ID Naming
 
-- Используем kebab-case, короткие и описательные: `add-two-factor-auth`
-- Предпочитаем префиксы с глаголами: `add-`, `update-`, `remove-`, `refactor-`
-- Обеспечиваем уникальность; если занято, добавляем `-2`, `-3` и т.д.
+- Use kebab-case, short and descriptive: `add-two-factor-auth`
+- Prefer verb prefixes: `add-`, `update-`, `remove-`, `refactor-`
+- Ensure uniqueness; if taken, add `-2`, `-3`, etc.
 
 ---
 
 ## 🔧 Troubleshooting
 
-### Частые ошибки
+### Common Errors
 
 #### "Change must have at least one delta"
 
-- Проверьте, что `changes/[name]/specs/` существует с .md файлами
-- Убедитесь, что файлы имеют операции (## ADDED Requirements)
+- Check that `changes/[name]/specs/` exists with .md files
+- Ensure files have operations (## ADDED Requirements)
 
 #### "Requirement must have at least one scenario"
 
-- Проверьте, что scenarios используют формат `#### Scenario:` (4 решётки)
-- Не используйте bullet points или bold для заголовков scenarios
+- Check that scenarios use `#### Scenario:` format (4 hashtags)
+- Don't use bullet points or bold for scenario headers
 
 #### Silent scenario parsing failures
 
-- Требуется точный формат: `#### Scenario: Name`
-- Для отладки: `openspec show [change] --json --deltas-only`
+- Exact format required: `#### Scenario: Name`
+- For debugging: `openspec show [change] --json --deltas-only`
 
-### Советы по валидации
+### Validation tips
 
 ```bash
-# Всегда используем strict mode для комплексных проверок
+# Always use strict mode for comprehensive checks
 openspec validate [change] --strict
 
-# Отладка парсинга дельт
+# Debug delta parsing
 openspec show [change] --json | jq '.deltas'
 
-# Проверка конкретного requirement
+# Check specific requirement
 openspec show [spec] --json -r 1
 ```
 
 ---
 
-## 📚 Дополнительные ресурсы
+## 📚 Additional Resources
 
-- **Детальные инструкции**: см. `openspec/AGENTS.md`
-- **Конвенции проекта**: см. `openspec/project.md`
-- **Workflow команды**: см. `.agent/workflows/openspec-*.md`
+- **Detailed instructions**: see `openspec/AGENTS.md`
+- **Project conventions**: see `openspec/project.md`
+- **Workflow commands**: see `.agent/workflows/openspec-*.md`
 
 ---
 
-**Помните:** Specs — это истина. Changes — это предложения. Держите их синхронизированными! 🚀
+**Remember:** Specs are truth. Changes are proposals. Keep them synchronized! 🚀

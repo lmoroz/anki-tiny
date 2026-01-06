@@ -1,4 +1,4 @@
-# Визуализация архитектуры: Cards и FSRS
+# Architecture Visualization: Cards and FSRS
 
 ## Database Schema
 
@@ -408,10 +408,10 @@ flowchart LR
 
 ## Notes
 
-> **Database Schema**: Все FSRS-специфичные поля необходимы для корректной работы алгоритма.
+> **Database Schema**: All FSRS-specific fields are required for the algorithm to work correctly.
 
-> **State Machine**: Переходы между состояниями карточек строго определены алгоритмом FSRS.
+> **State Machine**: Transitions between card states are strictly defined by the FSRS algorithm.
 
-> **Time Restrictions**: Критически важны для пользовательского опыта — нельзя предлагать NEW карточки, если до конца дня < 4 часов.
+> **Time Restrictions**: Critical for user experience — must not offer NEW cards if < 4 hours until end of day.
 
-> **Learning Steps**: Кастомная логика, которая работает ДО того, как карточка попадет в полноценный FSRS цикл.
+> **Learning Steps**: Custom logic that works BEFORE the card enters the full FSRS cycle.

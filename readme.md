@@ -50,23 +50,25 @@ AI assistant on this project.
 
 ## 📋 Technical Specifications
 
-Приложение для обучения с помощью карточек и интервального повторения (вдохновлено Anki).
-Необходимые фичи:
+Application for learning using flashcards and spaced repetition (inspired by Anki).
+Required features:
 
-1. Создание топика/курса
-2. Быстрое добавление новых карточек в курс
-3. Общие настройки, которые должны быть в такой системе
-4. Настройки индивидуальные для каждого курса, по-умолчанию, берутся из общих, но можно
-   отредактировать для каждого курса отдельно
-5. Должна быть возможность установить время дня, с какого по какой час возможны тренировки и,
-   приложение не дложно предлагать к изучению новые карточки, если до окончания условного текущего дня осталось меньше
-   4 часов, так как первый шаг повторения — 4 часа
-6. Приложение должно вызывать системные уведомления windows/linux/macos, когда нужно приступить к повторению очередных карточек
-7. приложение должно сворачиваться в системный трей по клику на кнопке «свернуть»
-   и разворачиваться из него по клику на иконку
-8. система, используемая для запоминания — user customized FSRS (используем библиотеку
-   <https://github.com/open-spaced-repetition/ts-fsrs>): пользователь хочет адаптировать интервалы под
-   себя, допустим, сделать самый первый, короткий интервал — не сутки, а 4 часа
+1. Creating topics/courses
+2. Quick addition of new cards to a course
+3. General settings typical for such systems
+4. Individual settings for each course; by default, taken from general settings,
+   but can be edited for each course separately
+5. Ability to set time of day (from which hour to which hour) for training sessions;
+   application should not offer new cards for learning if less than 4 hours remain
+   until the end of the current day, since the first repetition step is 4 hours
+6. Application should trigger system notifications (Windows/Linux/macOS) when it's
+   time to review cards
+7. Application should minimize to system tray on "minimize" button click
+   and restore from tray on icon click
+8. Memory system used: user-customized FSRS (using library
+   <https://github.com/open-spaced-repetition/ts-fsrs>): user wants to adapt
+   intervals to their needs, for example, make the first short interval 4 hours
+   instead of one day
 
 ---
 
@@ -83,50 +85,51 @@ AI assistant on this project.
 
 ## 💾 Data Structure
 
-### Course (Курс)
+### Course
 
 ```typescript
 interface Course {
-  id: string;
+  id: number;
   name: string;
   description: string;
-  cardsCount: number;
-  dueCardsCount: number;
-  settings?: CourseSettings;  // Индивидуальные настройки или наследуются из глобальных
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }
 ```
 
-### Card (Карточка)
+### Card
 
 ```typescript
 interface Card {
-  id: string;
-  courseId: string;
-  front: string;        // Вопрос
-  back: string;         // Ответ
-  easinessFactor: number;  // Фактор легкости (2.5 по умолчанию)
-  interval: number;     // Интервал повторения в днях
-  repetitions: number;  // Количество успешных повторений
-  dueDate: Date;        // Дата следующего повторения
-  createdAt: Date;
-  lastReviewedAt?: Date;
+  id: number;
+  courseId: number;
+  front: string;
+  back: string;
+  state: CardState;     // New, Learning, Review, Relearning
+  due: string;          // ISO Date
+  stability: number;    // FSRS
+  difficulty: number;   // FSRS
+  elapsedDays: number;
+  scheduledDays: number;
+  reps: number;
+  lapses: number;
+  lastReview?: string;
+  stepIndex?: number;   // For learning steps
 }
 ```
 
-### Settings (Настройки)
+### Settings
 
 ```typescript
 interface Settings {
-  trainingStartHour: number;   // Начало дня тренировок (8 по умолчанию)
-  trainingEndHour: number;     // Конец дня тренировок (22 по умолчанию)
-  minTimeBeforeEnd: number;    // Минимальное время до конца дня (4 часа)
+  trainingStartHour: number;   // Training day start (default 8)
+  trainingEndHour: number;     // Training day end (default 22)
+  minTimeBeforeEnd: number;    // Minimum time before end of day (4 hours)
   notificationsEnabled: boolean;
 }
 
 interface CourseSettings extends Settings {
-  courseId: string;
+  courseId: number;
 }
 ```
 
@@ -137,27 +140,29 @@ interface CourseSettings extends Settings {
 ### Frontend
 
 - **Vue 3** (v3.5+) — Composition API, `<script setup>`
-- **Vue Router** (v4.6+) — Hash mode для работы с `lmorozanki://` протоколом
-- **Vite** (v7.2+) — Build tool и dev server
-- **Tailwind CSS** (v4.1+) — Utility-first CSS framework
-- **Axios** (v1.13+) — HTTP клиент для API запросов
-- **Bootstrap Icons** — Набор иконок
-- **@vueuse/core** — Composition утилиты
+- **Vue Router** (v4.6+) — Hash mode for `lmorozanki://` protocol
+- **Vite** (v6.0+) — Build tool and dev server
+- **Tailwind CSS** (v4.0+) — Utility-first CSS framework
+- **Pinia** — State management
+- **Axios** (v1.7+) — HTTP client for API requests
+- **Bootstrap Icons** — Icon set
+- **@vueuse/core** — Composition utilities
 
 ### Backend
 
-- **Node.js** + **TypeScript** (v5.9+)
-- **Express** (v4.18+) — Web framework
-- **Electron** (v39.2+) — Desktop приложение
-- **Zod** (v4.1+) — Валидация схем
-- **Pino** — Логирование
-- **Chokidar** — File watching
+- **Node.js** + **TypeScript** (v5.7+)
+- **Express** (v4.21+) — Web framework
+- **Electron** (v33.2+) — Desktop application
+- **Zod** (v3.24+) — Schema validation
+- **Better-SQLite3** + **Kysely** — Database & ORM
+- **ts-fsrs** — Spaced repetition algorithm
+- **Pino** — Logging
 
 ### Architecture
 
-- **Feature-Sliced Design** — Архитектурная методология для frontend
-- **Custom Protocol** — `lmorozanki://` для загрузки ресурсов
-- **IPC Communication** — Electron preload API для безопасного взаимодействия
+- **Feature-Sliced Design** — Architectural methodology for frontend
+- **Custom Protocol** — `lmorozanki://` for resource loading
+- **IPC Communication** — Electron preload API for secure interaction
 
 ---
 
@@ -167,32 +172,33 @@ interface CourseSettings extends Settings {
 
 ```text
 frontend/src/
-├── app/              # Инициализация приложения
+├── app/              # Application initialization
 │   ├── main.js
 │   ├── App.vue
 │   └── router/
-├── pages/           # Страницы
+├── pages/           # Pages
 │   ├── home/
 │   ├── course/
 │   ├── training/
 │   └── settings/
-├── widgets/         # Составные UI блоки
-│   ├── title-bar/   # Кастомный заголовок окна
+├── widgets/         # Composite UI blocks
+│   ├── title-bar/   # Custom window title bar
 │   ├── course-list/
-│   └── card-editor/
-├── features/        # Бизнес-фичи
+│   ├── card-list/
+│   └── settings-form/
+├── features/        # Business features
 │   ├── create-course/
 │   ├── add-card/
 │   └── spaced-repetition/
-├── entities/        # Бизнес-сущности
+├── entities/        # Business entities
 │   ├── course/
 │   ├── card/
 │   └── settings/
-└── shared/          # Переиспользуемый код
-    ├── ui/          # UI компоненты (Button, Input, Card)
-    ├── api/         # HTTP клиент
-    ├── lib/         # Утилиты
-    └── types/       # TypeScript типы
+└── shared/          # Reusable code
+    ├── ui/          # UI components (Button, Input, Card, Modal)
+    ├── api/         # HTTP client & Services
+    ├── lib/         # Utilities
+    └── types/       # TypeScript types
 ```
 
 ### Backend Structure
@@ -200,12 +206,16 @@ frontend/src/
 ```text
 backend/src/
 ├── electron/        # Electron main process
-│   ├── main.ts      # Entry point, Tray, протокол lmorozanki://
+│   ├── main.ts      # Entry point, lmorozanki:// protocol
 │   └── preload.ts   # IPC bridge
-├── routes/          # API endpoints
-├── controllers/     # Request handlers
-├── services/        # Бизнес-логика
-├── schemas/         # Zod validation
+├── routes/          # API endpoints (courses, cards, settings, etc.)
+├── services/        # Business logic
+│   ├── database/    # Kysely schema & migrations
+│   ├── fsrs/        # Spaced repetition algorithm
+│   └── repositories/# Data access layer
+├── schemas/         # Zod validation schemas
+├── config/          # Configuration
+├── utils/           # Utilities (logger, etc.)
 └── server.ts        # Express server
 ```
 
@@ -215,157 +225,163 @@ backend/src/
 
 ### Implemented
 
-#### 🎨 Custom Title Bar
+#### 🗂️ Course & Card Management
 
-- Frameless окно с кастомным заголовком
-- Draggable область для перемещения окна
-- Кнопки управления: Minimize, Maximize/Restore, Close
-- Backdrop blur эффект (Acrylic material на Windows 11)
-- Интеграция с Electron IPC
+- **Course Management**: Create, Read, Update, Delete courses.
+- **Card Management**: Full CRUD for flashcards.
+- **Batch Import**: Add multiple cards at once via "Batch Add" mode (text based `question | answer`).
+- **Quick Add**: Inline mode for rapid card creation.
 
-#### 📱 Responsive Pages
+#### ⚙️ Settings System
 
-- **Home Page** — список курсов, создание нового курса
-- **Course Page** — детальный вид курса, управление карточками
-- **Training Page** — интерфейс повторения с переворачиваемыми карточками
-- **Settings Page** — глобальные настройки времени тренировок
+- **Global Settings**: Configure training hours (start/end) and notification preferences.
+- **Course Settings**: Override global settings per course (Inheritance pattern).
+- **Time Range Picker**: Visual UI for selecting active hours.
 
-#### 🎯 UI Components
+#### 🧠 Backend Core
 
-- Button (primary, secondary, danger, ghost варианты)
-- Input (с label, error states, валидацией)
-- Card (с backdrop blur, hover эффектами)
-- Loading states
-- Empty states
+- **FSRS v5 Algorithm**: Integration of `ts-fsrs` for advanced spaced repetition.
+- **Database**: SQLite with robust migration system.
+- **REST API**: Full API coverage for frontend integration.
+- **Validation**: Strict Zod schemas for all inputs.
+
+#### 🎨 UI & UX
+
+- **Custom Title Bar**: Frameless acrylic design with window controls.
+- **UI Theme**: Clean, premium aesthetic with systemized CSS variables.
+- **Animations**: Smooth transitions, flip effects, and hover states.
 
 ### In Progress
 
-- 🔄 Backend API endpoints (courses, cards, training)
-- 🔄 Алгоритм интервального повторения (FSRS)
-- 🔄 Персистентное хранилище данных (SQLite)
-- 🔄 Системные уведомления
-- 🔄 Tray integration (сворачивание в трей)
+- 🔄 **Training Mode**: Frontend implementation of review interface.
+- 🔄 **System Notifications**: Native OS notifications for due cards.
+- 🔄 **Tray Integration**: Minimize to tray functionality.
 
 ### Planned
 
-- 📅 Статистика прогресса обучения
-- 📅 Импорт/экспорт курсов
-- 📅 Поддержка медиа в карточках (изображения, аудио)
-- 📅 Поиск по карточкам
-- 📅 Теги и категории
+- 📅 Learning progress statistics dashboard.
+- 📅 Course import/export (JSON/Anki).
+- 📅 Media support in cards (images, audio).
+- 📅 Card search and filtering.
+- 📅 Tags and categories system.
 
 ---
 
 ## 🎬 Current Status
 
-✅ **Фаза 1-2 завершены** (Архитектура и UI Framework)
+✅ **Phases 1-4 Complete** (Architecture, UI, Backend, Settings)
 
-**Что работает:**
+**What works:**
 
-- Полная структура проекта по Feature-Sliced Design
-- Кастомный Title Bar с window controls
-- Vue Router с hash mode для `lmorozanki://`
-- Базовые UI компоненты
-- Все основные страницы с макетами
-- Integration типов для Electron API
-- HTTP клиент с динамическим определением порта
+- **Core**: Electron + Vue 3 + Express integration via IPC/HTTP.
+- **Database**: Fully functional SQLite storage with migrations.
+- **Algorithm**: FSRS logic implemented and exposed via API.
+- **Frontend**:
+    - Full Course management.
+    - Full Card management (including Batch Add).
+    - Settings management (Global & Individual).
+    - Premium UI Theme
 
-**Следующие шаги:**
+**Next steps:**
 
-- Реализация backend API (Фаза 6)
-- Создание БД и схемы данных
-- Алгоритм интервального повторения
-- Системная интеграция (notifications, tray)
+- Implement **Training Page** logic (connect Frontend to FSRS API).
+- Complete **System Notifications** integration.
+- Implement **Tray** minimization logic.
+- Add **Statistics** visualizations.
+
+---
 
 ## Launch and Build
 
 ### Prerequisites
 
-Убедитесь, что у вас установлены:
+Make sure you have installed:
 
-- **Node.js** v18.0.0 или выше
-- **npm** v9.0.0 или выше
+- **Node.js** v22.0.0 or higher
+- **npm** v10.0.0 or higher
 
 ### Installation
 
-1. Клонируйте репозиторий:
+1. Clone the repository:
 
    ```bash
    git clone https://github.com/lmoroz/anki-tiny.git
    cd anki-tiny
    ```
 
-2. Установите зависимости для всех workspaces (один раз из корня проекта):
+2. Install dependencies for all workspaces:
 
    ```bash
    npm install
    ```
 
-   Это установит зависимости как для frontend, так и для backend благодаря npm workspaces.
-
-   > **⚠️ Важно**: После установки зависимостей автоматически выполнится `postinstall` скрипт в
-   > backend, который запустит `electron-rebuild` для сборки нативного модуля `better-sqlite3`. Это может
-   > занять 1-2 минуты при первой установке.
-
 ### Development mode
 
-Теперь все команды запускаются из корня проекта:
+All commands are run from the project root:
 
-1. **Запуск приложения в режиме разработки (Electron + HMR)**
-
-   ```bash
-   npm run dev
-   ```
-
-   Эта команда запустит frontend dev server (Vite) и Electron с hot reload.
-
-2. **Запуск только backend для тестирования API**
+1. **Run full application (Electron + Frontend HMR)**
 
    ```bash
-   npm start --workspace=backend
+   npm run app:dev
    ```
 
-   Сервер будет доступен по адресу `http://localhost:8080`
+   This command automatically rebuilds native dependencies, starts the frontend dev server, and launches the Electron app.
 
-3. **Запуск только frontend для разработки UI**
+2. **Run backend API only**
+
+   ```bash
+   npm run dev --workspace=backend
+   ```
+
+   Starts the Express server with Nodemon (usually on port 3000). Useful for API testing without Electron.
+
+3. **Run frontend only**
 
    ```bash
    npm run dev --workspace=frontend
    ```
 
-   Vite dev server будет доступен по адресу `http://localhost:5173`
+   Starts the Vite dev server (<http://localhost:5173>).
+
+4. **Run both servers (Frontend + Backend API) without Electron**
+
+   ```bash
+   npm run dev
+   ```
+
+   Useful for development in a browser or inspecting both services simultaneously.
 
 ### Building the application (Production Build)
 
-#### Создание установочного файла (exe и installer) одной командой
+#### Create installer (exe and installer) with one command
 
 ```bash
 npm run bundle
 ```
 
-Эта команда:
+This command will:
 
-1. Соберёт frontend (`npm run build` в frontend workspace)
-2. Скомпилирует backend TypeScript код
-3. Создаст установщик через electron-builder
+1. Build frontend (`npm run build` in frontend workspace)
+2. Compile backend TypeScript code
+3. Create installer via electron-builder
 
-Готовый установщик появится в папке `dist`.
+Ready installer will appear in `dist` folder.
 
-### Дополнительные команды
+### Additional commands
 
-- **Линтинг всех workspaces:**
+- **Lint all workspaces:**
 
   ```bash
   npm run lint
   ```
 
-- **Форматирование кода во всех workspaces:**
+- **Format code in all workspaces:**
 
   ```bash
   npm run format
   ```
 
-- **Команды для конкретного workspace:**
+- **Commands for specific workspace:**
 
   ```bash
   npm run <script> --workspace=frontend

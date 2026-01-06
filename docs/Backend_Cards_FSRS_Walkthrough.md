@@ -1,57 +1,57 @@
-# Walkthrough: Backend Cards и FSRS - Завершено ✅
+# Walkthrough: Backend Cards and FSRS - Completed ✅
 
-## Резюме
+## Summary
 
-Успешно реализован полный backend для системы карточек с алгоритмом FSRS (Free Spaced Repetition Scheduler).
+Successfully implemented full backend for card system with FSRS (Free Spaced Repetition Scheduler) algorithm.
 
-### Что создано
+### What was created
 
-- **3 новые таблицы БД** с полной FSRS поддержкой
-- **12 API endpoints** для cards, training и settings
-- **FSRS Service** с кастомными learning steps
-- **Repositories** для работы с данными
+- **3 new DB tables** with full FSRS support
+- **12 API endpoints** for cards, training, and settings
+- **FSRS Service** with custom learning steps
+- **Repositories** for data handling
 - **Validation schemas** (Zod)
 
-### Результаты верификации
+### Verification Results
 
-✅ TypeScript компиляция: **успешно**  
-✅ Prettier форматирование: **успешно**  
-✅ Все критические ошибки: **исправлены**
+✅ TypeScript compilation: **successful**
+✅ Prettier formatting: **successful**
+✅ All critical errors: **fixed**
 
 ---
 
-## Созданные файлы
+## Created Files
 
-### Database (3 файла)
+### Database (3 files)
 
 #### [schema.ts](file:///e:/Develop/anki-tiny/backend/src/services/database/schema.ts)
 
-Добавлены 3 новых интерфейса:
+Added 3 new interfaces:
 
-- `CardsTable` — карточки с FSRS полями
-- `SettingsTable` — глобальные настройки
-- `CourseSettingsTable` — индивидуальные настройки курсов
+- `CardsTable` — cards with FSRS fields
+- `SettingsTable` — global settings
+- `CourseSettingsTable` — individual course settings
 
-**Ключевые FSRS поля в `CardsTable`:**
+**Key FSRS fields in `CardsTable`:**
 
 ```typescript
 {
-  due: string;              // Дата следующего повторения
-  stability: number;        // Стабильность памяти
-  difficulty: number;       // Сложность карточки
-  elapsedDays: number;      // Дней с последнего повторения
-  scheduledDays: number;    // Запланированный интервал
-  reps: number;            // Всего повторений
-  lapses: number;          // Забываний (Again)
+  due: string;              // Next repetition date
+  stability: number;        // Memory stability
+  difficulty: number;       // Card difficulty
+  elapsedDays: number;      // Days since last review
+  scheduledDays: number;    // Scheduled interval
+  reps: number;            // Total repetitions
+  lapses: number;          // Times forgotten (Again)
   state: number;            // 0=New, 1=Learning, 2=Review, 3=Relearning
-  lastReview: string | null; // Последний ответ
-  stepIndex: number;        // Текущий шаг learning
+  lastReview: string | null; // Last answer
+  stepIndex: number;        // Current learning step
 }
 ```
 
 #### [migrations.ts](file:///e:/Develop/anki-tiny/backend/src/services/database/migrations.ts)
 
-Миграции для 3 новых таблиц + индексы:
+Migrations for 3 new tables + indices:
 
 - `cards` (courseId, due, state)
 - `settings`
@@ -59,28 +59,28 @@
 
 #### [database/index.ts](file:///e:/Develop/anki-tiny/backend/src/services/database/index.ts)
 
-Добавлен экспорт `db` Proxy для удобного использования в repositories.
+Added `db` Proxy export for convenient usage in repositories.
 
 ---
 
-### FSRS Service (1 файл)
+### FSRS Service (1 file)
 
 #### [fsrs/index.ts](file:///e:/Develop/anki-tiny/backend/src/services/fsrs/index.ts)
 
-**Основные функции:**
+**Main functions:**
 
-- `initializeFSRS(settings)` — создание FSRS instance с параметрами
-- `calculateNextReview(card, rating, settings, now)` — расчет следующего интервала
-- `handleLearningSteps(card, rating, settings, now)` — кастомная логика для NEW/LEARNING
-- `canShowNewCards(settings, now)` — проверка временных ограничений
-- `initializeNewCard(...)` — создание карточки с FSRS defaults
+- `initializeFSRS(settings)` — create FSRS instance with parameters
+- `calculateNextReview(card, rating, settings, now)` — calculate next interval
+- `handleLearningSteps(card, rating, settings, now)` — custom logic for NEW/LEARNING
+- `canShowNewCards(settings, now)` — time constraints verification
+- `initializeNewCard(...)` — create card with FSRS defaults
 
-**Логика Learning Steps:**
+**Learning Steps Logic:**
 
-1. **NEW → LEARNING**: первый шаг (10 минут)
-2. **LEARNING → LEARNING**: следующий шаг (4 часа)
-3. **LEARNING → REVIEW**: все шаги пройдены, используем FSRS
-4. **Rating.Again**: возврат к первому шагу, `lapses++`
+1. **NEW → LEARNING**: first step (10 minutes)
+2. **LEARNING → LEARNING**: next step (4 hours)
+3. **LEARNING → REVIEW**: all steps passed, use FSRS
+4. **Rating.Again**: reset to first step, `lapses++`
 
 **State Machine:**
 
@@ -96,34 +96,34 @@ stateDiagram-v2
 
 ---
 
-### Repositories (2 файла)
+### Repositories (2 files)
 
 #### [cardRepository.ts](file:///e:/Develop/anki-tiny/backend/src/services/repositories/cardRepository.ts)
 
-**Методы:**
+**Methods:**
 
-- `getCardsByCourseId(courseId)` — все карточки курса
-- `getCardById(id)` — одна карточка
-- `createCard(front, back, courseId, settings)` — создание с FSRS init
-- `updateCard(id, data)` — обновление
-- `deleteCard(id)` — удаление
-- `getDueCards(courseId, now, excludeNew)` — карточки для повторения
-- `getCourseStats(courseId)` — статистика (total, new, learning, review, due)
+- `getCardsByCourseId(courseId)` — all course cards
+- `getCardById(id)` — single card
+- `createCard(front, back, courseId, settings)` — create with FSRS init
+- `updateCard(id, data)` — update
+- `deleteCard(id)` — delete
+- `getDueCards(courseId, now, excludeNew)` — cards for review
+- `getCourseStats(courseId)` — statistics (total, new, learning, review, due)
 
 #### [settingsRepository.ts](file:///e:/Develop/anki-tiny/backend/src/services/repositories/settingsRepository.ts)
 
-**Методы:**
+**Methods:**
 
-- `getGlobalSettings()` — глобальные настройки (создает если нет)
-- `updateGlobalSettings(data)` — обновление глобальных
-- `getCourseSettings(courseId)` — настройки курса
-- `updateCourseSettings(courseId, data)` — создание/обновление
-- `deleteCourseSettings(courseId)` — сброс к глобальным
-- **`getEffectiveSettings(courseId)`** — объединение (приоритет у course settings)
+- `getGlobalSettings()` — global settings (creates if missing)
+- `updateGlobalSettings(data)` — update global
+- `getCourseSettings(courseId)` — course settings
+- `updateCourseSettings(courseId, data)` — create/update
+- `deleteCourseSettings(courseId)` — reset to global
+- **`getEffectiveSettings(courseId)`** — merge (priority to course settings)
 
 ---
 
-### Validation Schemas (2 файла)
+### Validation Schemas (2 files)
 
 #### [schemas/card.ts](file:///e:/Develop/anki-tiny/backend/src/schemas/card.ts)
 
@@ -137,43 +137,43 @@ ReviewCardSchema     // cardId, rating: '1'|'2'|'3'|'4'
 
 ```typescript
 GlobalSettingsSchema     // trainingStartHour, trainingEndHour, etc.
-CourseSettingsSchema     // то же + nullable для наследования
+CourseSettingsSchema     // same + nullable for inheritance
 ```
 
-Validation для `learningSteps`: проверяет что это валидный JSON массив чисел.
+Validation for `learningSteps`: checks that it is a valid JSON array of numbers.
 
 ---
 
-### API Routes (4 файла)
+### API Routes (4 files)
 
 #### [routes/cards.ts](file:///e:/Develop/anki-tiny/backend/src/routes/cards.ts)
 
-| Метод  | Endpoint                       | Описание                   |
+| Method | Endpoint                       | Description                |
 |--------|--------------------------------|----------------------------|
-| GET    | `/api/courses/:courseId/cards` | Список карточек курса      |
-| POST   | `/api/courses/:courseId/cards` | Создать карточку           |
-| GET    | `/api/cards/:id`               | Получить карточку          |
-| PUT    | `/api/cards/:id`               | Обновить карточку          |
-| DELETE | `/api/cards/:id`               | Удалить карточку           |
-| GET    | `/api/courses/:courseId/stats` | Статистика курса           |
+| GET    | `/api/courses/:courseId/cards` | Course card list           |
+| POST   | `/api/courses/:courseId/cards` | Create card                |
+| GET    | `/api/cards/:id`               | Get card                   |
+| PUT    | `/api/cards/:id`               | Update card                |
+| DELETE | `/api/cards/:id`               | Delete card                |
+| GET    | `/api/courses/:courseId/stats` | Course statistics          |
 
 #### [routes/training.ts](file:///e:/Develop/anki-tiny/backend/src/routes/training.ts)
 
-| Метод | Endpoint                         | Описание                              |
-|-------|----------------------------------|---------------------------------------|
-| GET   | `/api/courses/:courseId/due-cards` | Карточки для повторения             |
-| POST  | `/api/training/review`           | Отправка результата (Rating)          |
+| Method | Endpoint                         | Description                           |
+|--------|----------------------------------|---------------------------------------|
+| GET    | `/api/courses/:courseId/due-cards` | Cards for review                   |
+| POST   | `/api/training/review`           | Submit result (Rating)                |
 
-**Логика `/due-cards`:**
+**Logic `/due-cards`:**
 
-1. Проверка времени тренировок (`trainingStartHour` / `trainingEndHour`)
-2. Расчет времени до конца дня
-3. Если < 4 часов до конца:
-   - Исключаем NEW карточки
-   - Возвращаем message: `"Too close to end of day for new cards"`
-4. Иначе возвращаем все due cards
+1. Check training time (`trainingStartHour` / `trainingEndHour`)
+2. Calculate time until end of day
+3. If < 4 hours until end:
+   - Exclude NEW cards
+   - Return message: `"Too close to end of day for new cards"`
+4. Otherwise return all due cards
 
-**Request body для `/training/review`:**
+**Request body for `/training/review`:**
 
 ```json
 {
@@ -184,26 +184,26 @@ Validation для `learningSteps`: проверяет что это валидн
 
 #### [routes/settings.ts](file:///e:/Develop/anki-tiny/backend/src/routes/settings.ts)
 
-| Метод  | Endpoint                           | Описание                         |
+| Method | Endpoint                           | Description                      |
 |--------|------------------------------------|----------------------------------|
-| GET    | `/api/settings`                    | Глобальные настройки             |
-| PUT    | `/api/settings`                    | Обновить глобальные              |
-| GET    | `/api/courses/:courseId/settings`  | Настройки курса + effective      |
-| PUT    | `/api/courses/:courseId/settings`  | Обновить настройки курса         |
-| DELETE | `/api/courses/:courseId/settings`  | Сброс к глобальным               |
+| GET    | `/api/settings`                    | Global settings                  |
+| PUT    | `/api/settings`                    | Update global                    |
+| GET    | `/api/courses/:courseId/settings`  | Course settings + effective      |
+| PUT    | `/api/courses/:courseId/settings`  | Update course settings           |
+| DELETE | `/api/courses/:courseId/settings`  | Reset to global                  |
 
-**Response от GET `/api/courses/:courseId/settings`:**
+**Response from GET `/api/courses/:courseId/settings`:**
 
 ```json
 {
-  "courseSettings": { ... } | null,  // Индивидуальные (если есть)
-  "effectiveSettings": { ... }       // Результат объединения
+  "courseSettings": { ... } | null,  // Individual (if exists)
+  "effectiveSettings": { ... }       // Merged result
 }
 ```
 
 #### [routes/index.ts](file:///e:/Develop/anki-tiny/backend/src/routes/index.ts)
 
-Зарегистрированы все новые роуты:
+Registered all new routes:
 
 ```typescript
 router.use(coursesRouter);
@@ -214,57 +214,57 @@ router.use(settingsRouter);
 
 ---
 
-## Исправленные ошибки
+## Fixed Errors
 
 ### 1. FSRS Types
 
-**Проблема:** `Rating` vs `Grade` несовместимость типов  
-**Решение:** Использование `Rating` enum из `ts-fsrs` + type cast `as any` для `fsrs.next()`
+**Issue:** `Rating` vs `Grade` type incompatibility
+**Solution:** Using `Rating` enum from `ts-fsrs` + type cast `as any` for `fsrs.next()`
 
 ### 2. Zod Schema
 
-**Проблема:** Неверный синтаксис `errorMap` для enum  
-**Решение:** Изменено на `{ message: '...' }`
+**Issue:** Incorrect `errorMap` syntax for enum
+**Solution:** Changed to `{ message: '...' }`
 
 ```typescript
-// Было:
+// Was:
 rating: z.enum(['1', '2', '3', '4'], {
   errorMap: () => ({ message: '...' })
 })
 
-// Стало:
+// Became:
 rating: z.enum(['1', '2', '3', '4'], {
   message: '...'
 })
 ```
 
-### 3. ZodError обработка
+### 3. ZodError handling
 
-**Проблема:** `error.errors` не существует  
-**Решение:** Использование `error.issues`
+**Issue:** `error.errors` does not exist
+**Solution:** Using `error.issues`
 
 ```typescript
 if (error instanceof ZodError) {
-  return res.status(400).json({ 
-    error: 'Validation error', 
-    details: error.issues  // было: error.errors
+  return res.status(400).json({
+    error: 'Validation error',
+    details: error.issues  // was: error.errors
   });
 }
 ```
 
-### 4. Типизация в Settings Routes
+### 4. Typing in Settings Routes
 
-**Проблема:** Сложная типизация для boolean → number конверсии  
-**Решение:** Упрощение до `Record<string, unknown>`
+**Issue:** Complex typing for boolean → number conversion
+**Solution:** Simplification to `Record<string, unknown>`
 
-### 5. Неиспользуемые импорты
+### 5. Unused imports
 
-- Удален `NewCard` из `cardRepository.ts`
-- Переименован `originalCard` в `_originalCard` в FSRS
+- Removed `NewCard` from `cardRepository.ts`
+- Renamed `originalCard` to `_originalCard` in FSRS
 
 ### 6. Code Formatting
 
-Запущен Prettier — все файлы отформатированы.
+Prettier run — all files formatted.
 
 ---
 
@@ -276,13 +276,13 @@ if (error instanceof ZodError) {
 npm run build --workspace=backend
 ```
 
-**Результат:** ✅ Успешно, 0 ошибок
+**Result:** ✅ Success, 0 errors
 
 **Output:**
 
-- electron-builder install-app-deps: успешно
-- tsc compilation: успешно
-- Все native dependencies (better-sqlite3): rebuilt
+- electron-builder install-app-deps: success
+- tsc compilation: success
+- All native dependencies (better-sqlite3): rebuilt
 
 ### ✅ Code Formatting
 
@@ -290,13 +290,13 @@ npm run build --workspace=backend
 npm run format --workspace=backend
 ```
 
-**Результат:** ✅ 42 файла обработаны, 8 изменены
+**Result:** ✅ 42 files processed, 8 changed
 
 ---
 
 ## Database Schema Summary
 
-### Таблица `cards`
+### Table `cards`
 
 ```sql
 CREATE TABLE cards (
@@ -322,9 +322,9 @@ CREATE TABLE cards (
 );
 ```
 
-**Индексы:** courseId, due, state
+**Indices:** courseId, due, state
 
-### Таблица `settings`
+### Table `settings`
 
 ```sql
 CREATE TABLE settings (
@@ -340,7 +340,7 @@ CREATE TABLE settings (
 );
 ```
 
-### Таблица `courseSettings`
+### Table `courseSettings`
 
 ```sql
 CREATE TABLE courseSettings (
@@ -358,7 +358,7 @@ CREATE TABLE courseSettings (
 );
 ```
 
-**Индекс:** courseId
+**Index:** courseId
 
 ---
 
@@ -366,69 +366,69 @@ CREATE TABLE courseSettings (
 
 ### Cards (6 endpoints)
 
-- CRUD операции: Create, Read, Update, Delete
-- Статистика курса
-- FSRS инициализация при создании
+- CRUD operations: Create, Read, Update, Delete
+- Course statistics
+- FSRS initialization on creation
 
 ### Training (2 endpoints)
 
-- Получение due cards с временными ограничениями
-- Отправка review с FSRS расчетами
+- Get due cards with time constraints
+- Submit review with FSRS calculations
 
 ### Settings (5 endpoints)
 
-- Глобальные настройки (GET, PUT)
-- Настройки курса (GET, PUT, DELETE)
-- Наследование от глобальных
+- Global settings (GET, PUT)
+- Course settings (GET, PUT, DELETE)
+- Inheritance from global
 
-**Итого: 12 + 1 (courses/stats) = 13 endpoints**
+**Total: 12 + 1 (courses/stats) = 13 endpoints**
 
 ---
 
-## Следующие шаги
+## Next Steps
 
-### 1. Тестирование Backend
+### 1. Backend Testing
 
-- Запустить приложение: `npm run dev`
-- Проверить создание БД и миграции
-- Протестировать API через Postman/curl
+- Run app: `npm run dev`
+- Check DB creation and migrations
+- Test API via Postman/curl
 
 ### 2. Frontend Integration
 
 - Entity layer (Card types, API client, Pinia store)
 - Widgets (CardList, CardEditor, QuickAddCard)
-- Pages (CoursePage с управлением карточками)
-- TrainingPage с FSRS логикой
+- Pages (CoursePage with card management)
+- TrainingPage with FSRS logic
 
 ### 3. E2E Testing
 
-- Создание карточки
-- Прохождение тренировки
-- Проверка FSRS расчетов
+- Create card
+- Complete session
+- Check FSRS calculations
 
 ---
 
-## Статистика реализации
+## Implementation Statistics
 
-- ✅ **Новых файлов:** 8
-- ✅ **Обновленных файлов:** 3
-- ✅ **Строк кода:** ~1400+
+- ✅ **New files:** 8
+- ✅ **Updated files:** 3
+- ✅ **Lines of code:** ~1400+
 - ✅ **API endpoints:** 13
-- ✅ **Таблиц БД:** 3
+- ✅ **DB tables:** 3
 - ✅ **FSRS States:** 4 (NEW, LEARNING, REVIEW, RELEARNING)
-- ✅ **Исправленных ошибок:** 15+
-- ✅ **Время реализации:** ~2 часа
+- ✅ **Fixed errors:** 15+
+- ✅ **Implementation time:** ~2 hours
 
 ---
 
-## Критические моменты для тестирования
+## Critical Testing Points
 
-1. **FSRS Learning Steps:** проверить переходы NEW → LEARNING → REVIEW
-2. **Временные ограничения:** проверить что NEW карточки не показываются если до конца дня < 4ч
-3. **Settings наследование:** проверить что course settings override глобальные
-4. **FSRS расчеты:** проверить корректность `stability`, `difficulty`, `scheduledDays`
-5. **SQLite boolean:** проверить преобразование 0/1 ↔ boolean
+1. **FSRS Learning Steps:** check NEW → LEARNING → REVIEW transitions
+2. **Time Constraints:** check that NEW cards are not shown if < 4h until end of day
+3. **Settings Inheritance:** check that course settings override global ones
+4. **FSRS Calculations:** check correctness of `stability`, `difficulty`, `scheduledDays`
+5. **SQLite boolean:** check 0/1 ↔ boolean conversion
 
 ---
 
-**Backend готов к интеграции! 🎉**
+**Backend ready for integration! 🎉**

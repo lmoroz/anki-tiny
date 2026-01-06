@@ -1,32 +1,32 @@
-# Walkthrough: Frontend Integration для управления курсами
+# Walkthrough: Frontend Integration for Course Management
 
-## Что было реализовано
+## Implemented Features
 
-Полная интеграция frontend с backend API для управления курсами, включая все CRUD операции.
+Full frontend integration with backend API for course management, including all CRUD operations.
 
 ---
 
-## Созданные компоненты
+## Created Components
 
 ### Data Layer
 
 #### [shared/api/courses.js](file:///e:/Develop/anki-tiny/frontend/src/shared/api/courses.js)
 
-API сервис для работы с курсами:
+API service for courses:
 
-- `getAll()` - получение всех курсов
-- `getById(id)` - получение курса по ID
-- `create(data)` - создание курса
-- `update(id, data)` - обновление курса
-- `delete(id)` - удаление курса
+- `getAll()` - get all courses
+- `getById(id)` - get course by ID
+- `create(data)` - create course
+- `update(id, data)` - update course
+- `delete(id)` - delete course
 
 #### [shared/types/course.ts](file:///e:/Develop/anki-tiny/frontend/src/shared/types/course.ts)
 
-TypeScript типы для курсов, соответствующие backend схеме.
+TypeScript types for courses matching backend schema.
 
 #### [entities/course/model/useCourseStore.js](file:///e:/Develop/anki-tiny/frontend/src/entities/course/model/useCourseStore.js)
 
-Pinia store для управления состоянием курсов:
+Pinia store for course state management:
 
 - **State**: `courses`, `loading`, `error`
 - **Getters**: `sortedCourses`, `getCourseById`
@@ -38,20 +38,20 @@ Pinia store для управления состоянием курсов:
 
 #### [shared/ui/Input.vue](file:///e:/Develop/anki-tiny/frontend/src/shared/ui/Input.vue)
 
-Расширен для поддержки:
+Extended to support:
 
-- `type="textarea"` режим
-- Атрибут `rows` для многострочного ввода
-- Валидация через `error` prop
+- `type="textarea"` mode
+- `rows` attribute for multi-line input
+- Validation via `error` prop
 
 #### [shared/ui/Modal.vue](file:///e:/Develop/anki-tiny/frontend/src/shared/ui/Modal.vue)
 
-Модальное окно с:
+Modal window with:
 
-- Backdrop blur эффектом
-- Закрытие по ESC и клику вне области
-- Анимация появления/скрытия
-- Слоты для header и footer
+- Backdrop blur effect
+- Close on ESC and click outside
+- Fade in/out animation
+- Slots for header and footer
 
 ---
 
@@ -59,16 +59,16 @@ Pinia store для управления состоянием курсов:
 
 #### [widgets/course-list/CourseCard.vue](file:///e:/Develop/anki-tiny/frontend/src/widgets/course-list/CourseCard.vue)
 
-Карточка курса с:
+Course card with:
 
-- Hover эффектами (scale, shadow)
-- Кнопками Edit и Delete (появляются при hover)
-- Форматированием даты обновления
-- Ellipsis для длинных описаний
+- Hover effects (scale, shadow)
+- Edit and Delete buttons (appear on hover)
+- Update date formatting
+- Ellipsis for long descriptions
 
 #### [widgets/course-list/CourseList.vue](file:///e:/Develop/anki-tiny/frontend/src/widgets/course-list/CourseList.vue)
 
-Widget списка курсов:
+Course list widget:
 
 - Grid layout (auto-fill, minmax 300px)
 - Loading state
@@ -76,11 +76,11 @@ Widget списка курсов:
 
 #### [widgets/course-editor/CourseEditorModal.vue](file:///e:/Develop/anki-tiny/frontend/src/widgets/course-editor/CourseEditorModal.vue)
 
-Модальное окно создания/редактирования курса:
+Course creation/editing modal:
 
-- Режимы create/edit
-- Валидация на клиенте (min 3 символа для названия)
-- Автозаполнение формы при редактировании
+- Create/Edit modes
+- Client-side validation (min 3 chars for name)
+- Auto-fill form on edit
 
 ---
 
@@ -88,13 +88,13 @@ Widget списка курсов:
 
 #### [pages/home/HomePage.vue](file:///e:/Develop/anki-tiny/frontend/src/pages/home/HomePage.vue)
 
-Полная интеграция:
+Full integration:
 
-- Загрузка курсов при монтировании
-- Создание курса через модальное окно
-- Редактирование курса
-- Удаление курса с подтверждением
-- Empty state для новых пользователей
+- Load courses on mount
+- Create course via modal
+- Edit course
+- Delete course with confirmation
+- Empty state for new users
 
 ---
 
@@ -102,93 +102,93 @@ Widget списка курсов:
 
 #### [app/main.js](file:///e:/Develop/anki-tiny/frontend/src/app/main.js)
 
-Обновления от пользователя:
+Updates from user:
 
-- Pinia store manager подключен
-- Динамическое определение backend URL на основе порта от Electron
-- Инициализация приложения после получения backend порта
-
----
-
-## Проверенная функциональность
-
-### ✅ Загрузка списка курсов
-
-**Тест**: Приложение запускается, выполняется запрос `GET /api/courses`
-
-**Результат**: Курсы загружаются и отображаются корректно
-
-### ✅ Создание курса
-
-**Тест**:
-
-1. Нажать "Создать курс"
-2. Заполнить форму
-3. Сохранить
-
-**Результат**:
-
-- Модальное окно открывается
-- Форма валидируется
-- Запрос `POST /api/courses` выполняется
-- Новый курс появляется в списке
-
-### ✅ Передача порта backend
-
-**Тест**: Backend запускается на динамическом порту
-
-**Результат**: Frontend корректно получает порт через IPC и настраивает API client
+- Pinia store manager connected
+- Dynamic backend URL determination based on Electron port
+- App initialization only after receiving backend port
 
 ---
 
-## Дополнительные улучшения
+## Verified Functionality
 
-### Fixes от пользователя
+### ✅ Load Course List
+
+**Test**: App starts, execution of `GET /api/courses`
+
+**Result**: Courses loaded and displayed correctly
+
+### ✅ Create Course
+
+**Test**:
+
+1. Click "Create Course"
+2. Fill form
+3. Save
+
+**Result**:
+
+- Modal opens
+- Form validates
+- Request `POST /api/courses` executed
+- New course appears in list
+
+### ✅ Backend Port Transmission
+
+**Test**: Backend starts on dynamic port
+
+**Result**: Frontend correctly receives port via IPC and configures API client
+
+---
+
+## Additional Improvements
+
+### User Fixes
 
 1. **Backend port transmission** ([main.js](file:///e:/Develop/anki-tiny/frontend/src/app/main.js)):
-    - Приложение инициализируется только после получения backend порта
-    - Глобальная переменная `window.__BACKEND_URL__` для динамического URL
+    - App inits only after getting backend port
+    - Global variable `window.__BACKEND_URL__` for dynamic URL
 
 2. **Code formatting** ([CourseEditorModal.vue](file:///e:/Develop/anki-tiny/frontend/src/widgets/course-editor/CourseEditorModal.vue)):
-    - Консистентное форматирование кода
-    - Улучшенная читаемость
+    - Consistent code formatting
+    - Improved readability
 
 ---
 
-## Следующие шаги
+## Next Steps
 
-Согласно [Task.md](file:///e:/Develop/anki-tiny/docs/Task.md), следующая фаза - **Реализация работы с карточками**:
+According to [Task.md](Task.md), next phase - **Cards Management Implementation**:
 
 1. Backend Cards API (CRUD endpoints)
 2. Frontend Cards integration
-3. Быстрое добавление карточек
-4. Редактор карточек
+3. Quick add cards
+4. Card editor
 
 ---
 
-## Технические детали
+## Technical Details
 
-### Архитектура
+### Architecture
 
-Проект следует **Feature-Sliced Design**:
+Project follows **Feature-Sliced Design**:
 
-- `app/` - инициализация
-- `pages/` - страницы
-- `widgets/` - составные блоки UI
-- `entities/` - бизнес-сущности (stores)
-- `shared/` - переиспользуемый код
+- `app/` - initialization
+- `pages/` - pages
+- `widgets/` - composite UI blocks
+- `entities/` - business entities (stores)
+- `shared/` - reusable code
 
 ### State Management
 
-Используется **Pinia** с Composition API подходом:
+Using **Pinia** with Composition API approach:
 
-- Reactive state с `ref()`
-- Computed getters с `computed()`
-- Async actions для API вызовов
+- Reactive state with `ref()`
+- Computed getters with `computed()`
+- Async actions for API calls
 
 ### Styling
 
-- Темная тема с градиентами
-- Современные эффекты (blur, shadow, scale)
-- Анимации через CSS transitions
-- Bootstrap Icons для иконок
+- Dark theme with gradients
+- Modern effects (blur, shadow, scale)
+- Animations via CSS transitions
+- Bootstrap Icons for icons
