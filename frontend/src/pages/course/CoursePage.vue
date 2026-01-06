@@ -5,6 +5,7 @@
   import hljs from 'highlight.js'
   import { useCourseStore } from '@/entities/course/model/useCourseStore'
   import { useCardStore } from '@/entities/card/model/useCardStore'
+  import CourseSettingsModal from '@/widgets/course-settings-modal/CourseSettingsModal.vue'
 
   const route = useRoute()
   const router = useRouter()
@@ -16,6 +17,7 @@
   const isLoading = ref(true)
   const showEditorModal = ref(false)
   const editingCard = ref(null)
+  const showSettingsModal = ref(false)
 
   // Computed
   const course = computed(() => courseStore.getCourseById(courseId))
@@ -115,6 +117,18 @@
     editingCard.value = null
     showEditorModal.value = true
   }
+
+  const handleOpenSettings = () => {
+    showSettingsModal.value = true
+  }
+
+  const handleCloseSettings = () => {
+    showSettingsModal.value = false
+  }
+
+  const handleSettingsSaved = () => {
+    console.log('Settings saved for course:', courseId)
+  }
 </script>
 
 <template>
@@ -126,13 +140,20 @@
     </div>
 
     <div v-else>
-      <div class="page-header">
+      <div class="flex items-center justify-between mb-2">
         <Button
           @click="handleBack"
           variant="ghost"
           size="sm">
           <i class="bi bi-arrow-left" />
           Назад
+        </Button>
+        <Button
+          @click="handleOpenSettings"
+          variant="ghost"
+          size="sm">
+          <i class="bi bi-gear" />
+          Настройки курса
         </Button>
       </div>
 
@@ -149,7 +170,7 @@
             v-if="stats"
             class="stats-grid">
             <Card
-              rounded="10px"
+              rounded="md"
               padding="sm">
               <div class="stat-item">
                 <i class="bi bi-card-list" />
@@ -160,7 +181,7 @@
               </div>
             </Card>
             <Card
-              rounded="10px"
+              rounded="md"
               padding="sm">
               <div class="stat-item">
                 <i class="bi bi-stars" />
@@ -171,7 +192,7 @@
               </div>
             </Card>
             <Card
-              rounded="10px"
+              rounded="md"
               padding="sm">
               <div class="stat-item">
                 <i class="bi bi-arrow-repeat" />
@@ -182,7 +203,7 @@
               </div>
             </Card>
             <Card
-              rounded="10px"
+              rounded="md"
               padding="sm"
               highlight>
               <div class="stat-item highlight">
@@ -240,6 +261,14 @@
       :course-id="courseId"
       @close="handleCloseModal"
       @save="handleSaveCard" />
+
+    <CourseSettingsModal
+      v-if="course"
+      :show="showSettingsModal"
+      :course-id="String(courseId)"
+      :course-name="course.name"
+      @close="handleCloseSettings"
+      @saved="handleSettingsSaved" />
   </div>
 </template>
 
@@ -269,10 +298,6 @@
     to {
       transform: rotate(360deg);
     }
-  }
-
-  .page-header {
-    margin-bottom: 20px;
   }
 
   .course-title {

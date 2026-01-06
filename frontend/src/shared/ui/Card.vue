@@ -14,20 +14,21 @@
     },
     rounded: {
       type: String,
-      default: '2.5rem'
+      default: 'xl',
+      validator: value => ['xl', 'sm', 'md', 'lg', 'full'].includes(value)
     }
   })
 </script>
 
 <template>
   <div
-    class="relative z-20 w-full shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden border border-white/10 transition-all duration-500"
-    :class="[`rounded-[${rounded}]`, 'card', `card-padding-${padding}`, { 'card-hoverable': hoverable }, { 'card-highlighted': highlight }]">
+    :class="[`rounded-${rounded}`, 'card', `card-padding-${padding}`, { 'card-hoverable': hoverable }, { 'card-highlighted': highlight }]"
+    class="relative z-20 w-full shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden border border-white/10 transition-all duration-500">
     <!-- Card Background Layers -->
     <!-- 1. Base dark tint -->
     <div
-      class="absolute inset-0 bg-slate-900/20 backdrop-blur-2xl"
-      :class="[`rounded-[${rounded}]`]" />
+      :class="`rounded-${rounded}`"
+      class="absolute inset-0 bg-slate-900/20 backdrop-blur-2xl" />
 
     <!-- 2. Top-Right Sheen -->
     <div

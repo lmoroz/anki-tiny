@@ -64,7 +64,7 @@
 
 <template>
   <Card
-    rounded="12px"
+    rounded="lg"
     class="card-item"
     hoverable
     :class="{ flipped: isFlipped }"

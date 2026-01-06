@@ -1,6 +1,8 @@
 <script setup>
   import { ref, onMounted } from 'vue'
+  import { useRouter } from 'vue-router'
 
+  const router = useRouter()
   const isMaximized = ref(false)
 
   const handleMinimize = () => {
@@ -16,6 +18,10 @@
     window.electronAPI?.close()
   }
 
+  const handleOpenSettings = () => {
+    router.push('/settings')
+  }
+
   onMounted(() => {
     console.log('[TitleBar] Mounted')
   })
@@ -29,6 +35,12 @@
       </div>
       <div class="title-bar-title">Repetitio</div>
     </div>
+    <button
+      class="settings-btn"
+      @click="handleOpenSettings"
+      title="Настройки">
+      <i class="bi bi-gear" />
+    </button>
     <div class="title-bar-controls">
       <button
         class="title-bar-btn minimize-btn"
@@ -134,5 +146,31 @@
 
   .close-btn i {
     font-size: 13px;
+  }
+
+  .settings-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: transparent;
+    color: #e9ecef;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-size: 14px;
+    -webkit-app-region: no-drag;
+    margin-right: 8px;
+  }
+
+  .settings-btn:hover {
+    background: #f1f3f455;
+    color: #1a73e8;
+  }
+
+  .settings-btn:active {
+    background: #e8eaed;
+    color: #1557b0;
   }
 </style>

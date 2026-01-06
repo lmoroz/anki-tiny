@@ -1,0 +1,220 @@
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import Modal from '@/shared/ui/Modal.vue'
+import SettingsForm from '@/widgets/settings-form/SettingsForm.vue'
+import { useSettingsStore } from '@/entities/settings/model/useSettingsStore.js'
+
+const props = defineProps({
+  show: Boolean,
+  courseId: {
+    type: String,
+    required: true
+  },
+  courseName: String
+})
+
+const emit = defineEmits(['close', 'saved'])
+
+const settingsStore = useSettingsStore()
+const useCustomSettings = ref(false)
+const settings = ref(null)
+const saving = ref(false)
+
+const effectiveSettings = computed(() => {
+  return settingsStore.getEffectiveSettings(props.courseId)
+})
+
+const hasCustom = computed(() => {
+  return settingsStore.hasCustomSettings(props.courseId)
+})
+
+onMounted(async () => {
+  await settingsStore.fetchCourseSettings(props.courseId)
+  useCustomSettings.value = hasCustom.value
+  settings.value = { ...effectiveSettings.value }
+})
+
+async function handleSave(formSettings) {
+  saving.value = true
+  try {
+    if (useCustomSettings.value) {
+      await settingsStore.updateCourseSettings(props.courseId, formSettings)
+    }
+    else {
+      // Если юзер переключил на глобальные, сбросить индивидуальные
+      if (hasCustom.value) {
+        await settingsStore.resetCourseSettings(props.courseId)
+      }
+    }
+    emit('saved')
+    emit('close')
+  }
+  catch (error) {
+    console.error('Failed to save settings:', error)
+  }
+  finally {
+    saving.value = false
+  }
+}
+
+async function handleReset() {
+  if (confirm('Сбросить настройки к глобальным?')) {
+    await settingsStore.resetCourseSettings(props.courseId)
+    settings.value = { ...settingsStore.globalSettings }
+    useCustomSettings.value = false
+  }
+}
+
+function toggleCustomSettings(value) {
+  useCustomSettings.value = value
+  if (!value) {
+    settings.value = { ...settingsStore.globalSettings }
+  }
+}
+</script>
+
+<template>
+  <Modal
+    :show="show"
+    @close="emit('close')">
+    <template #header>
+      <h2>Настройки курса: {{ courseName }}</h2>
+    </template>
+
+    <div class="course-settings-modal">
+      <!-- Переключатель -->
+      <div class="settings-mode-toggle">
+        <label class="radio-label">
+          <input
+            type="radio"
+            :checked="!useCustomSettings"
+            @change="toggleCustomSettings(false)" />
+          <span>Использовать глобальные настройки</span>
+        </label>
+        <label class="radio-label">
+          <input
+            type="radio"
+            :checked="useCustomSettings"
+            @change="toggleCustomSettings(true)" />
+          <span>Индивидуальные настройки</span>
+        </label>
+      </div>
+
+      <!-- Форма -->
+      <SettingsForm
+        v-if="settings"
+        v-model="settings"
+        :readonly="!useCustomSettings"
+        @save="handleSave" />
+
+      <!-- Кнопка сброса -->
+      <button
+        v-if="hasCustom"
+        class="btn-danger"
+        @click="handleReset">
+        Сбросить к глобальным
+      </button>
+    </div>
+
+    <template #footer>
+      <button
+        class="btn-secondary"
+        @click="emit('close')">
+        Отмена
+      </button>
+      <button
+        class="btn-primary"
+        :disabled="saving || !useCustomSettings"
+        @click="handleSave(settings)">
+        {{ saving ? 'Сохранение...' : 'Сохранить' }}
+      </button>
+    </template>
+  </Modal>
+</template>
+
+<style scoped>
+.course-settings-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.settings-mode-toggle {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #202124;
+}
+
+.radio-label input[type='radio'] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.btn-danger {
+  padding: 10px 24px;
+  background: #d93025;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-danger:hover {
+  background: #b02a21;
+  box-shadow: 0 2px 8px rgba(217, 48, 37, 0.3);
+}
+
+.btn-secondary {
+  padding: 10px 24px;
+  background: #f1f3f4;
+  color: #202124;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: #e8eaed;
+}
+
+.btn-primary {
+  padding: 10px 24px;
+  background: #1a73e8;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #1557b0;
+  box-shadow: 0 2px 8px rgba(26, 115, 232, 0.3);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+</style>

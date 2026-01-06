@@ -71,13 +71,13 @@
     <template v-if="props.stacked">
       <!-- Stack Layer 2 (Bottom-most - Darkest) -->
       <div
-        class="absolute inset-0 bg-[#2563eb] translate-y-[12px] scale-x-[0.93] z-0 transition-transform duration-200 group-active:translate-y-[8px] shadow-[0_2px_2px_-1px_rgba(0,0,0,1)] border-b border-b-gray-800/80 opacity-20"
-        :class="`rounded-${props.rounded}`" />
+        :class="`rounded-${props.rounded}`"
+        class="absolute inset-0 bg-[#2563eb] translate-y-[12px] scale-x-[0.93] z-0 transition-transform duration-200 group-active:translate-y-[8px] shadow-[0_2px_2px_-1px_rgba(0,0,0,1)] border-b border-b-gray-800/80 opacity-20" />
 
       <!-- Stack Layer 1 (Middle - Dark) -->
       <div
-        class="absolute inset-0 bg-[#2563eb] translate-y-[6px] scale-x-[0.965] z-10 transition-transform duration-200 group-active:translate-y-[4px] shadow-[0_2px_2px_-1px_rgba(0,0,0,1)] border-b border-b-gray-800/80 opacity-30"
-        :class="`rounded-${props.rounded}`" />
+        :class="`rounded-${props.rounded}`"
+        class="absolute inset-0 bg-[#2563eb] translate-y-[6px] scale-x-[0.965] z-10 transition-transform duration-200 group-active:translate-y-[4px] shadow-[0_2px_2px_-1px_rgba(0,0,0,1)] border-b border-b-gray-800/80 opacity-30" />
     </template>
 
     <!-- Main Surface (Top - Bright Gradient) -->

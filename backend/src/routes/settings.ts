@@ -20,7 +20,7 @@ router.get('/settings', async (req: Request, res: Response) => {
       enableFuzz: settings.enableFuzz === 1,
     };
 
-    res.json({ settings: result });
+    res.json(result);
   } catch (error) {
     console.error('Error fetching settings:', error);
     res.status(500).json({ error: 'Failed to fetch settings' });
@@ -48,7 +48,7 @@ router.put('/settings', async (req: Request, res: Response) => {
       enableFuzz: settings.enableFuzz === 1,
     };
 
-    res.json({ settings: result });
+    res.json(result);
   } catch (error) {
     if (error instanceof ZodError) {
       return res.status(400).json({ error: 'Validation error', details: error.issues });

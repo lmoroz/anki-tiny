@@ -5,6 +5,88 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/),
 и проект придерживается [Semantic Versioning](https://semver.org/lang/ru/).
 
+## [0.3.0] - 2026-01-06 17:40
+
+### Added
+
+#### Feature: Settings Management System
+
+**Entity Layer:**
+- `frontend/src/shared/api/settings.js` — API client for settings endpoints
+  - `getGlobalSettings()`, `updateGlobalSettings()`
+  - `getCourseSettings()`, `updateCourseSettings()`, `resetCourseSettings()`
+- `frontend/src/shared/types/settings.ts` — TypeScript interfaces для настроек
+  - GlobalSettings, CourseSettings, UpdateSettingsDTO, SettingsValidation
+- `frontend/src/entities/settings/model/useSettingsStore.js` — Pinia store с логикой наследования
+  - State: globalSettings, courseSettings (Map)
+  - Getters: getEffectiveSettings(), hasCustomSettings()
+  - Actions: fetch/update/reset для global и course настроек
+  - Fallback pattern: курсы используют глобальные настройки по умолчанию
+
+**UI Components:**
+- `frontend/src/shared/ui/TimeRangePicker.vue` — компонент выбора временного диапазона
+  - Два селектора (начало/конец дня) 0-23 часа
+  - Визуальная timeline шкала с активным диапазоном
+  - Метки времени: 0:00, 6:00, 12:00, 18:00, 24:00
+
+**Widgets:**
+- `frontend/src/widgets/settings-form/SettingsForm.vue` — форма редактирования настроек
+  - Интеграция TimeRangePicker
+  - Real-time валидация временных диапазонов
+  - Input для minTimeBeforeEnd (1-12 часов)
+  - Checkbox для системных уведомлений
+  - Preview секция с расчетом эффективного расписания
+- `frontend/src/widgets/course-settings-modal/CourseSettingsModal.vue` — модал настроек курса
+  - Переключатель: "Глобальные" / "Индивидуальные"
+  - Интеграция SettingsForm (readonly в режиме глобальных)
+  - Кнопка "Сбросить к глобальным"
+
+**Pages:**
+- `frontend/src/pages/settings/SettingsPage.vue` — главная страница настроек
+  - Секция глобальных настроек с SettingsForm
+  - Список курсов с badges (Global/Custom)
+  - Кнопка "Настроить" для каждого курса
+  - Loading states и error handling
+
+### Changed
+
+- `frontend/src/pages/course/CoursePage.vue` — добавлена интеграция настроек курса
+  - Кнопка "Настройки курса" в header рядом с "Назад"
+  - Интеграция CourseSettingsModal
+  - Handlers: handleOpenSettings(), handleCloseSettings(), handleSettingsSaved()
+  - Updated page-header styles для flex layout
+
+### Documentation
+
+- **docs/SettingsPage_Walkthrough.md** — comprehensive documentation
+  - Overview of implemented components
+  - Entity Layer, UI Components, Widgets, Pages
+  - Architecture highlights (Settings Inheritance Pattern, Validation Logic)
+  - Testing summary (Code Quality, Manual Testing Checklist)
+  - Files created/modified (~951 lines of Vue/JS/TS code)
+  - Known limitations and next steps
+
+### Technical Details
+
+**Validation Rules:**
+- `trainingStartHour` < `trainingEndHour`
+- `minTimeBeforeEnd` от 1 до 12 часов
+- Диапазон тренировок >= `minTimeBeforeEnd`
+
+**Settings Inheritance Pattern:**
+```javascript
+getEffectiveSettings: (state) => (courseId) => {
+  if (!courseId) return state.globalSettings
+  return state.courseSettings.get(courseId) || state.globalSettings
+}
+```
+
+**Code Quality:**
+- ✅ ESLint passed
+- ✅ No TypeScript errors
+- ✅ All imports use `@` alias
+- ✅ Vue components auto-imported
+
 ## [0.2.1] - 2026-01-06 15:49
 
 ### Added

@@ -1,194 +1,247 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import Card from '@/shared/ui/Card.vue';
-import Input from '@/shared/ui/Input.vue';
-import Button from '@/shared/ui/Button.vue';
+  import { ref, onMounted, computed } from 'vue'
+  import { useRouter } from 'vue-router'
+  import { useSettingsStore } from '@/entities/settings/model/useSettingsStore.js'
+  import { useCourseStore } from '@/entities/course/model/useCourseStore.js'
 
-const settings = ref({
-  trainingStartHour: 8,
-  trainingEndHour: 22,
-  minTimeBeforeEnd: 4
-});
+  const router = useRouter()
+  const settingsStore = useSettingsStore()
+  const courseStore = useCourseStore()
 
-const isLoading = ref(true);
-const isSaving = ref(false);
+  const globalSettings = ref(null)
+  const loading = ref(true)
 
-onMounted(() => {
-  // TODO: Загрузка настроек из API
-  setTimeout(() => {
-    isLoading.value = false;
-  }, 300);
-});
+  // Дефолтные значения настроек
+  const DEFAULT_SETTINGS = {
+    trainingStartHour: 8,
+    trainingEndHour: 22,
+    minTimeBeforeEnd: 4,
+    notificationsEnabled: true,
+    enableFuzz: true
+  }
 
-const handleSave = async () => {
-  isSaving.value = true;
-  // TODO: Сохранение настроек в API
-  setTimeout(() => {
-    isSaving.value = false;
-    console.log('Settings saved:', settings.value);
-  }, 500);
-};
+  onMounted(async () => {
+    try {
+      await Promise.all([settingsStore.fetchGlobalSettings(), courseStore.fetchCourses()])
+      // Используем настройки из store или дефолтные значения
+      globalSettings.value = { ...(settingsStore.globalSettings || DEFAULT_SETTINGS) }
+    } catch (error) {
+      console.error('Failed to load settings:', error)
+      // При ошибке используем дефолтные значения
+      globalSettings.value = { ...DEFAULT_SETTINGS }
+    } finally {
+      loading.value = false
+    }
+  })
+
+  function handleBack() {
+    router.push('/')
+  }
+
+  async function handleSaveGlobal(settings) {
+    try {
+      await settingsStore.updateGlobalSettings(settings)
+      alert('Глобальные настройки сохранены!')
+    } catch (error) {
+      alert('Ошибка сохранения: ' + error.message)
+    }
+  }
+
+  function openCourseSettings(courseId) {
+    // Открыть modal или перейти на страницу курса
+    console.log('Open settings for course:', courseId)
+  }
+
+  const sortedCourses = computed(() => courseStore.sortedCourses)
 </script>
 
 <template>
-  <div class="page-container">
+  <div class="settings-page">
+    <div class="items-center justify-start mb-2">
+      <Button
+        @click="handleBack"
+        variant="ghost"
+        size="sm">
+        <i class="bi bi-arrow-left" />
+        Назад
+      </Button>
+    </div>
     <div class="page-header">
-      <h1 class="page-title">Настройки</h1>
-      <p class="page-subtitle">Глобальные параметры приложения</p>
+      <h1>Настройки</h1>
     </div>
 
-    <div v-if="isLoading" class="loading-state">
-      <div class="spinner"/>
+    <div
+      v-if="loading"
+      class="loading">
+      Загрузка настроек...
     </div>
 
-    <div v-else class="settings-content">
-      <Card padding="lg">
-        <h2 class="section-title">Время тренировок</h2>
-        <p class="section-description">
-          Настройте временные рамки, в которые приложение будет предлагать новые карточки
-        </p>
+    <div
+      v-else
+      class="settings-content">
+      <!-- Глобальные настройки -->
+      <section class="settings-section">
+        <Card>
+          <h2>Глобальные настройки</h2>
+          <p class="section-description">Эти настройки применяются ко всем курсам по умолчанию. Вы можете переопределить их для отдельных курсов.</p>
+          <SettingsForm
+            v-if="globalSettings"
+            v-model="globalSettings"
+            @save="handleSaveGlobal" />
+        </Card>
+      </section>
 
-        <div class="settings-group">
-          <Input
-            v-model="settings.trainingStartHour"
-            type="number"
-            label="Начало дня (час)"
-            placeholder="8"
-          />
-          <Input
-            v-model="settings.trainingEndHour"
-            type="number"
-            label="Конец дня (час)"
-            placeholder="22"
-          />
-        </div>
+      <!-- Настройки курсов -->
+      <section class="settings-section">
+        <Card>
+          <h2>Настройки курсов</h2>
+          <p class="section-description">Настройте индивидуальные параметры для конкретных курсов</p>
 
-        <div class="info-box">
-          <i class="bi bi-info-circle"/>
-          <p>
-            Приложение не будет предлагать новые карточки, если до конца дня осталось меньше 
-            {{ settings.minTimeBeforeEnd }} часов (первый интервал повторения)
-          </p>
-        </div>
-      </Card>
-
-      <Card padding="lg" class="settings-section">
-        <h2 class="section-title">Интервальное повторение</h2>
-        <p class="section-description">
-          Параметры алгоритма запоминания (можно переопределить для каждого курса)
-        </p>
-
-        <div class="info-box">
-          <i class="bi bi-info-circle"/>
-          <p>
-            Настройки алгоритма будут доступны в следующей версии
-          </p>
-        </div>
-      </Card>
-
-      <div class="settings-actions">
-        <Button @click="handleSave" variant="primary" size="lg" :disabled="isSaving">
-          <i class="bi bi-check-lg"/>
-          {{ isSaving ? 'Сохранение...' : 'Сохранить настройки' }}
-        </Button>
-      </div>
+          <div class="courses-list">
+            <div
+              v-for="course in sortedCourses"
+              :key="course.id"
+              class="course-settings-item">
+              <div class="course-info">
+                <h3>{{ course.name }}</h3>
+                <span
+                  v-if="settingsStore.hasCustomSettings(course.id)"
+                  class="badge custom">
+                  Индивидуальные
+                </span>
+                <span
+                  v-else
+                  class="badge inherited">
+                  Глобальные
+                </span>
+              </div>
+              <button
+                class="btn-secondary"
+                @click="openCourseSettings(course.id)">
+                Настроить
+              </button>
+            </div>
+          </div>
+        </Card>
+      </section>
     </div>
   </div>
 </template>
 
 <style scoped>
-.page-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 32px 24px;
-}
+  .settings-page {
+    padding: 24px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
 
-.page-header {
-  margin-bottom: 32px;
-}
+  .page-header {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
 
-.page-title {
-  font-size: 32px;
-  font-weight: 700;
-  color: #f1f5f9;
-  margin-bottom: 8px;
-}
+  .page-header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin: 0;
+  }
 
-.page-subtitle {
-  font-size: 15px;
-  color: #94a3b8;
-}
+  .loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+    color: #94a3b8;
+    font-size: 16px;
+  }
 
-.loading-state {
-  display: flex;
-  justify-content: center;
-  padding: 80px 20px;
-}
+  .settings-content {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
 
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid rgba(148, 163, 184, 0.2);
-  border-top-color: #3b82f6;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
+  .settings-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+  .settings-section h2 {
+    margin: 0 0 8px 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #f1f5f9;
+  }
 
-.settings-content {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
+  .section-description {
+    color: #94a3b8;
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
 
-.settings-section {
-  margin-top: 0;
-}
+  .courses-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+  }
 
-.section-title {
-  font-size: 20px;
-  font-weight: 600;
-  color: #f1f5f9;
-  margin-bottom: 8px;
-}
+  .course-settings-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background: rgba(148, 163, 184, 0.1);
+    border-radius: 8px;
+  }
 
-.section-description {
-  font-size: 14px;
-  color: #94a3b8;
-  margin-bottom: 24px;
-}
+  .course-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
 
-.settings-group {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-  margin-bottom: 20px;
-}
+  .course-info h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+    color: #f1f5f9;
+  }
 
-.info-box {
-  display: flex;
-  gap: 12px;
-  padding: 16px;
-  background: rgba(59, 130, 246, 0.1);
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  border-radius: 8px;
-  font-size: 13px;
-  color: #93c5fd;
-  line-height: 1.5;
-}
+  .badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+  }
 
-.info-box i {
-  font-size: 18px;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
+  .badge.custom {
+    background: rgba(59, 130, 246, 0.2);
+    color: #93c5fd;
+  }
 
-.settings-actions {
-  display: flex;
-  justify-content: flex-end;
-  padding-top: 8px;
-}
+  .badge.inherited {
+    background: rgba(148, 163, 184, 0.2);
+    color: #cbd5e1;
+  }
+
+  .btn-secondary {
+    padding: 8px 16px;
+    background: rgba(148, 163, 184, 0.15);
+    color: #e2e8f0;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-secondary:hover {
+    background: rgba(148, 163, 184, 0.25);
+  }
 </style>

@@ -107,7 +107,30 @@
 - [x] **Pages Integration**
     - [x] CoursePage - интеграция управления карточками (CRUD operations)
     - [ ] TrainingPage - интерфейс тренировки с FSRS (следующий этап)
-    - [ ] SettingsPage - глобальные и индивидуальные настройки (следующий этап)
+- [x] SettingsPage - глобальные и индивидуальные настройки
+
+## Фаза 5: Страница настроек (SettingsPage) ✅
+
+### Backend ✅
+- [x] API Ecdpoints (GET/PUT Settings, Course Settings)
+- [x] Validation (Zod schemas)
+
+### Frontend ✅
+- [x] **Entity Layer**
+    - [x] Settings API Client
+    - [x] Pinia Store (Inheritance logic)
+    - [x] TypeScript Types
+- [x] **Widgets**
+    - [x] SettingsForm (Validation, Preview)
+    - [x] CourseSettingsModal (Override/Reset)
+    - [x] TimeRangePicker Component
+- [x] **Pages**
+    - [x] SettingsPage (Global & Courses list)
+    - [x] CoursePage Integration (Settings button)
+- [x] **Features**
+    - [x] Dark Theme Adaptation
+    - [x] Time Range Validation
+    - [x] Default Settings Fallback
 
 ---
 
