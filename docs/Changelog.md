@@ -5,6 +5,22 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.4.4] - 2026-01-07 13:23
+
+### Added
+- **Course Page Redesign**:
+  - Implemented responsive two-column layout for desktop (≥1024px).
+  - Added slide-out cards panel for mobile/tablet (<1024px).
+  - Integrated full FSRS statistics on cards (Stability, Difficulty, Reps, Lapses).
+  - Added timestamps (Created, Last Review, Due) to card items.
+  - Implemented `focus-trap` for better accessibility in mobile panel.
+  - Added smooth scrolling to "Quick Add Card" widget when creating a new card.
+
+### Fixed
+- Fixed mobile panel header overlap with application header.
+- Fixed desktop cards column overflow issue.
+- Fixed "Create Card" button functionality in mobile panel.
+
 ## [0.4.3] - 2026-01-07 12:08
 
 ### Added

@@ -1,11 +1,15 @@
 <script setup>
-  import { ref } from 'vue'
+  import { ref, computed } from 'vue'
   import { CardState } from '@/shared/types/card'
 
   const props = defineProps({
     card: {
       type: Object,
       required: true
+    },
+    compact: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -48,17 +52,30 @@
     const diffMs = date - now
     const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
 
-    if (diffDays < 0) {
-      return 'Просрочено'
-    } else if (diffDays === 0) {
-      return 'Сегодня'
-    } else if (diffDays === 1) {
-      return 'Завтра'
-    } else if (diffDays < 7) {
-      return `Через ${diffDays} дней`
-    } else {
-      return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
-    }
+    if (diffDays < 0) return 'Просрочено'
+    else if (diffDays === 0) return 'Сегодня'
+    else if (diffDays === 1) return 'Завтра'
+    else if (diffDays < 7) return `Через ${diffDays} дней`
+    else return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
+  }
+
+  const formatRelativeTime = dateString => {
+    if (!dateString) return null
+    
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffMs = now - date
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+
+    if (diffDays === 0) return 'Сегодня'
+    else if (diffDays === 1) return 'Вчера'
+    else if (diffDays < 7) return `${diffDays} дней назад`
+    else return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
+  }
+
+  const formatCreatedDate = dateString => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
   }
 </script>
 
@@ -67,7 +84,7 @@
     rounded="lg"
     class="card-item"
     hoverable
-    :class="{ flipped: isFlipped }"
+    :class="{ flipped: isFlipped, compact }"
     @click="toggleFlip">
     <div class="card-content">
       <div class="card-front">
@@ -98,10 +115,42 @@
         </div>
 
         <div class="card-footer">
-          <span class="due-date">
-            <i class="bi bi-calendar3" />
-            {{ formatDate(card.due) }}
-          </span>
+          <!-- FSRS Metrics -->
+          <div class="card-stats">
+            <span class="stat-item" title="Стабильность запоминания">
+              <i class="bi bi-graph-up" aria-label="Стабильность" />
+              {{ card.stability?.toFixed(1) || '0.0' }}
+            </span>
+            <span class="stat-item" title="Сложность карточки">
+              <i class="bi bi-speedometer2" aria-label="Сложность" />
+              {{ card.difficulty?.toFixed(1) || '0.0' }}
+            </span>
+            <span class="stat-item" title="Количество повторений">
+              <i class="bi bi-arrow-repeat" aria-label="Повторений" />
+              {{ card.reps || 0 }}
+            </span>
+            <span class="stat-item" title="Количество ошибок">
+              <i class="bi bi-x-circle" aria-label="Ошибок" />
+              {{ card.lapses || 0 }}
+            </span>
+          </div>
+
+          <!-- Timestamps -->
+          <div class="card-timestamps">
+            <span class="timestamp-item" title="Следующее повторение">
+              <i class="bi bi-calendar3" aria-label="Следующее" />
+              Следующее: {{ formatDate(card.due) }}
+            </span>
+            <span v-if="card.lastReview" class="timestamp-item" title="Последнее повторение">
+              <i class="bi bi-clock-history" aria-label="Последнее" />
+              Последнее: {{ formatRelativeTime(card.lastReview) }}
+            </span>
+            <span class="timestamp-item" title="Дата создания">
+              <i class="bi bi-plus-circle" aria-label="Создано" />
+              Создано: {{ formatCreatedDate(card.createdAt) }}
+            </span>
+          </div>
+
           <span class="flip-hint">
             <i class="bi bi-arrow-repeat" />
             Показать ответ
@@ -133,9 +182,13 @@
   .card-item {
     perspective: 1000px;
     cursor: pointer;
-    min-height: 140px;
+    min-height: 180px;
     transition: transform 0.6s;
     transform-style: preserve-3d;
+  }
+
+  .card-item.compact {
+    min-height: 100px;
   }
 
   .card-item.flipped {
@@ -145,18 +198,27 @@
   .card-content {
     width: 100%;
     height: 100%;
-    min-height: 140px;
+    min-height: 180px;
+  }
+
+  .card-item.compact .card-content {
+    min-height: 100px;
   }
 
   .card-front,
   .card-back {
     position: absolute;
     width: 100%;
-    min-height: 140px;
+    min-height: 180px;
     display: flex;
     flex-direction: column;
     transition: all 0.25s ease;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+
+  .card-item.compact .card-front,
+  .card-item.compact .card-back {
+    min-height: 100px;
   }
 
   .card-back {
@@ -186,6 +248,11 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+  }
+
+  .card-item.compact .state-badge {
+    padding: 3px 8px;
+    font-size: 10px;
   }
 
   .badge-new {
@@ -241,6 +308,11 @@
     transition: all 0.2s ease;
   }
 
+  .card-item.compact .action-btn {
+    width: 28px;
+    height: 28px;
+  }
+
   .action-btn:hover {
     background: var(--action-btn-bg-hover);
     color: var(--action-btn-text-hover);
@@ -274,6 +346,12 @@
     text-overflow: ellipsis;
   }
 
+  .card-item.compact .card-text {
+    font-size: 14px;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
   .card-back .card-text {
     -webkit-line-clamp: 4;
     line-clamp: 4;
@@ -281,28 +359,105 @@
 
   .card-footer {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    gap: 8px;
     padding-top: 12px;
     border-top: 1px solid var(--color-border-light);
   }
 
-  .due-date,
+  .card-item.compact .card-footer {
+    padding-top: 8px;
+    gap: 6px;
+  }
+
+  /* FSRS Metrics */
+  .card-stats {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+
+  .card-item.compact .card-stats {
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--color-text-secondary);
+  }
+
+  .card-item.compact .stat-item {
+    font-size: 11px;
+  }
+
+  .stat-item i {
+    font-size: 14px;
+  }
+
+  .card-item.compact .stat-item i {
+    font-size: 12px;
+  }
+
+  /* Timestamps */
+  .card-timestamps {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+
+  .card-item.compact .card-timestamps {
+    gap: 3px;
+    margin-bottom: 6px;
+  }
+
+  .timestamp-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--color-text-secondary);
+  }
+
+  .card-item.compact .timestamp-item {
+    font-size: 11px;
+    gap: 4px;
+  }
+
+  .timestamp-item i {
+    font-size: 12px;
+  }
+
+  .card-item.compact .timestamp-item i {
+    font-size: 11px;
+  }
+
   .flip-hint {
     display: flex;
     align-items: center;
     gap: 6px;
     font-size: var(--text-caption-size);
     color: var(--color-text-secondary);
+    opacity: 0.7;
+    align-self: flex-end;
   }
 
-  .due-date i,
+  .card-item.compact .flip-hint {
+    font-size: 11px;
+    gap: 4px;
+  }
+
   .flip-hint i {
     font-size: 14px;
   }
 
-  .flip-hint {
-    opacity: 0.7;
+  .card-item.compact .flip-hint i {
+    font-size: 12px;
   }
 
   .card-item:hover .flip-hint {

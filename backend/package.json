@@ -1,6 +1,6 @@
 {
   "name": "repetitio-backend",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Backend for Repetitio",
   "author": "Morozhnikova Larisa",
   "main": "dist/electron/main.js",
@@ -76,3 +76,4 @@
     "node": "22.14.0"
   }
 }
+

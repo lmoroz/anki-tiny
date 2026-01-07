@@ -1,6 +1,6 @@
 {
   "name": "repetitio",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Repetitio - Desktop application for spaced repetition learning",
   "author": "Morozhnikova Larisa",
   "private": true,
@@ -23,3 +23,4 @@
     "npm": ">=9.0.0"
   }
 }
+

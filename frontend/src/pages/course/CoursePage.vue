@@ -1,11 +1,12 @@
 <script setup>
-  import { ref, onMounted, computed } from 'vue'
+  import { ref, onMounted, computed, onUnmounted, watch, nextTick, useTemplateRef } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
+  import { useMediaQuery } from '@vueuse/core'
+  import { useFocusTrap } from '@vueuse/integrations/useFocusTrap'
   import MarkdownIt from 'markdown-it'
   import hljs from 'highlight.js'
   import { useCourseStore } from '@/entities/course/model/useCourseStore'
   import { useCardStore } from '@/entities/card/model/useCardStore'
-  import CourseSettingsModal from '@/widgets/course-settings-modal/CourseSettingsModal.vue'
 
   const route = useRoute()
   const router = useRouter()
@@ -18,6 +19,13 @@
   const showEditorModal = ref(false)
   const editingCard = ref(null)
   const showSettingsModal = ref(false)
+  const quickAddCardRef = ref(null)
+
+  // Responsive layout state
+  const isDesktop = useMediaQuery('(min-width: 1024px)')
+  const isCardsPanelOpen = ref(false)
+  const cardsPanelRef = useTemplateRef('cardsPanel')
+  let focusTrap
 
   // Computed
   const course = computed(() => courseStore.getCourseById(courseId))
@@ -46,6 +54,12 @@
     return md.render(course.value?.description)
   })
 
+  const handleKeydown = e => {
+    if (e.key === 'Escape' && isCardsPanelOpen.value) {
+      closeCardsPanel()
+    }
+  }
+
   onMounted(async () => {
     try {
       // Загружаем данные курса если его нет в store
@@ -57,6 +71,17 @@
       console.error('Failed to load course data:', err)
     } finally {
       isLoading.value = false
+    }
+
+    // Add keyboard listener for panel
+    window.addEventListener('keydown', handleKeydown)
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener('keydown', handleKeydown)
+    document.body.style.overflow = ''
+    if (focusTrap) {
+      focusTrap.deactivate()
     }
   })
 
@@ -82,7 +107,9 @@
   }
 
   const handleDeleteCard = async card => {
-    const confirmed = confirm(`Удалить карточку?\n\nВопрос: ${card.front.substring(0, 50)}${card.front.length > 50 ? '...' : ''}`)
+    const confirmed = confirm(`Удалить карточку?
+
+Вопрос: ${card.front.substring(0, 50)}${card.front.length > 50 ? '...' : ''}`)
 
     if (confirmed) {
       try {
@@ -96,7 +123,7 @@
   const handleSaveCard = async data => {
     try {
       if (editingCard.value) {
-        // Режим редактирования
+        //Режим редактирования
         await cardStore.updateCard(editingCard.value.id, data)
       } else {
         // Режим создания
@@ -118,6 +145,17 @@
     showEditorModal.value = true
   }
 
+  // Scroll to QuickAddCard and close mobile panel
+  const handleCreateCardFromList = () => {
+    if (!isDesktop.value) {
+      closeCardsPanel()
+    }
+    // Scroll to QuickAddCard widget
+    setTimeout(() => {
+      quickAddCardRef.value?.$el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }, 100)
+  }
+
   const handleOpenSettings = () => {
     showSettingsModal.value = true
   }
@@ -129,6 +167,37 @@
   const handleSettingsSaved = () => {
     console.log('Settings saved for course:', courseId)
   }
+
+  // MobilePanel controls
+  const openCardsPanel = () => {
+    isCardsPanelOpen.value = true
+    document.body.style.overflow = 'hidden'
+  }
+
+  const closeCardsPanel = () => {
+    isCardsPanelOpen.value = false
+    document.body.style.overflow = ''
+  }
+
+  // Watchers
+  watch(isCardsPanelOpen, async isOpen => {
+    if (isOpen && !isDesktop.value) {
+      await nextTick()
+      if (cardsPanelRef.value) {
+        focusTrap = useFocusTrap(cardsPanelRef, {
+          clickOutsideDeactivates: true,
+          escapeDeactivates: false, // We handle Escape manually in handleKeydown 
+          fallbackFocus: '.panel-close-btn'
+        })
+        focusTrap.activate()
+      }
+    } else {
+      if (focusTrap) {
+        focusTrap.deactivate()
+        focusTrap = null
+      }
+    }
+  })
 </script>
 
 <template>
@@ -157,101 +226,165 @@
         </Button>
       </div>
 
-      <Card
-        padding="lg"
-        class="mb-16">
-        <h1 class="course-title text-3xl font-bold text-white leading-tight tracking-tight drop-shadow-sm">{{ course?.name }}</h1>
-        <div
-          class="course-description rounded-[12px] p-3 text-gray-100 leading-relaxed shadow-xl bg-gray-500/20 border border-white/30 backdrop-blur-md bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.15)_0%,transparent_50%)]"
-          v-html="parsedDescription" />
+      <!-- Responsive Grid Layout -->
+      <div class="course-page-grid">
+        <!-- Left Column / Full Width on Mobile: Course Info -->
+        <div class="course-info-section">
+          <Card
+            padding="lg"
+            class="mb-6">
+            <h1 class="course-title text-3xl font-bold text-white leading-tight tracking-tight drop-shadow-sm">{{ course?.name }}</h1>
+            <div
+              class="course-description rounded-[12px] p-3 text-gray-100 leading-relaxed shadow-xl bg-gray-500/20 border border-white/30 backdrop-blur-md bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.15)_0%,transparent_50%)]"
+              v-html="parsedDescription" />
 
-        <div class="course-stats">
-          <div
-            v-if="stats"
-            class="stats-grid">
-            <Card
-              rounded="md"
-              padding="sm">
-              <div class="stat-item">
-                <i class="bi bi-card-list" />
-                <div class="stat-content">
-                  <span class="stat-value">{{ stats.total }}</span>
-                  <span class="stat-label">Всего карточек</span>
-                </div>
+            <div class="course-stats">
+              <div
+                v-if="stats"
+                class="stats-grid">
+                <Card
+                  rounded="md"
+                  padding="sm">
+                  <div class="stat-item">
+                    <i class="bi bi-card-list" />
+                    <div class="stat-content">
+                      <span class="stat-value">{{ stats.total }}</span>
+                      <span class="stat-label">Всего карточек</span>
+                    </div>
+                  </div>
+                </Card>
+                <Card
+                  rounded="md"
+                  padding="sm">
+                  <div class="stat-item">
+                    <i class="bi bi-stars" />
+                    <div class="stat-content">
+                      <span class="stat-value">{{ stats.newCards }}</span>
+                      <span class="stat-label">Новых</span>
+                    </div>
+                  </div>
+                </Card>
+                <Card
+                  rounded="md"
+                  padding="sm">
+                  <div class="stat-item">
+                    <i class="bi bi-arrow-repeat" />
+                    <div class="stat-content">
+                      <span class="stat-value">{{ stats.reviewCards }}</span>
+                      <span class="stat-label">На повторении</span>
+                    </div>
+                  </div>
+                </Card>
+                <Card
+                  rounded="md"
+                  padding="sm"
+                  highlight>
+                  <div class="stat-item highlight">
+                    <i class="bi bi-calendar-check" />
+                    <div class="stat-content">
+                      <span class="stat-value">{{ stats.dueToday }}</span>
+                      <span class="stat-label">Сегодня</span>
+                    </div>
+                  </div>
+                </Card>
               </div>
-            </Card>
-            <Card
-              rounded="md"
-              padding="sm">
-              <div class="stat-item">
-                <i class="bi bi-stars" />
-                <div class="stat-content">
-                  <span class="stat-value">{{ stats.newCards }}</span>
-                  <span class="stat-label">Новых</span>
-                </div>
-              </div>
-            </Card>
-            <Card
-              rounded="md"
-              padding="sm">
-              <div class="stat-item">
-                <i class="bi bi-arrow-repeat" />
-                <div class="stat-content">
-                  <span class="stat-value">{{ stats.reviewCards }}</span>
-                  <span class="stat-label">На повторении</span>
-                </div>
-              </div>
-            </Card>
-            <Card
-              rounded="md"
-              padding="sm"
-              highlight>
-              <div class="stat-item highlight">
-                <i class="bi bi-calendar-check" />
-                <div class="stat-content">
-                  <span class="stat-value">{{ stats.dueToday }}</span>
-                  <span class="stat-label">Сегодня</span>
-                </div>
-              </div>
-            </Card>
+            </div>
+
+            <div class="course-actions">
+              <Button
+                @click="handleStartTraining"
+                size="lg"
+                full-width
+                :disabled="!stats || stats.dueToday === 0">
+                <span class="text-lg font-semibold text-white drop-shadow-md tracking-wide">
+                  <i class="bi bi-play-fill" />
+                  {{ stats && stats.dueToday > 0 ? `Начать тренировку (${stats.dueToday})` : 'Нет карточек для повторения' }}
+                </span>
+              </Button>
+            </div>
+          </Card>
+
+          <!-- QuickAddCard in left column -->
+          <QuickAddCard
+            ref="quickAddCardRef"
+            :course-id="courseId"
+            @added="handleQuickAdd" />
+        </div>
+
+        <!-- Right Column (Desktop): Cards Section -->
+        <div
+          v-if="isDesktop"
+          class="cards-section">
+          <div class="section-header">
+            <h2 class="section-title">Карточки</h2>
+            <Button
+              @click="handleCreateCardFromList"
+              variant="secondary"
+              size="sm">
+              <i class="bi bi-plus-lg" />
+              Создать карточку
+            </Button>
+          </div>
+
+          <CardList
+            :cards="cards"
+            :loading="cardsLoading"
+            :compact="true"
+            @edit="handleEditCard"
+            @delete="handleDeleteCard" />
+        </div>
+      </div>
+
+      <!-- Mobile: Floating Action Button -->
+      <Button
+        v-if="!isDesktop && !isCardsPanelOpen"
+        variant="primary"
+        size="lg"
+        rounded="full"
+        class="fab"
+        @click="openCardsPanel"
+        aria-label="Показать список карточек">
+        <i class="bi bi-list-ul" />
+        Показать карточки ({{ cards.length }})
+      </Button>
+
+      <!-- Mobile: Slide-out Panel -->
+      <div
+        v-if="!isDesktop && isCardsPanelOpen"
+        class="cards-panel-container">
+        <div
+          class="panel-backdrop"
+          @click="closeCardsPanel" />
+        <div
+          ref="cardsPanel"
+          class="cards-panel"
+          :class="{ open: isCardsPanelOpen }">
+          <div class="panel-header">
+            <h2 class="panel-title">Карточки</h2>
+            <Button
+              class="panel-close-btn"
+              @click="closeCardsPanel"
+              aria-label="Закрыть панель">
+              <i class="bi bi-x-lg" />
+            </Button>
+          </div>
+          <div class="panel-content">
+            <Button
+              @click="handleCreateCardFromList"
+              variant="secondary"
+              size="sm"
+              full-width
+              class="mb-4">
+              <i class="bi bi-plus-lg" />
+              Создать карточку
+            </Button>
+            <CardList
+              :cards="cards"
+              :loading="cardsLoading"
+              @edit="handleEditCard"
+              @delete="handleDeleteCard" />
           </div>
         </div>
-
-        <div class="course-actions">
-          <Button
-            @click="handleStartTraining"
-            size="lg"
-            full-width
-            :disabled="!stats || stats.dueToday === 0">
-            <span class="text-lg font-semibold text-white drop-shadow-md tracking-wide">
-              <i class="bi bi-play-fill" />
-              {{ stats && stats.dueToday > 0 ? `Начать тренировку (${stats.dueToday})` : 'Нет карточек для повторения' }}
-            </span>
-          </Button>
-        </div>
-      </Card>
-
-      <div class="cards-section">
-        <div class="section-header">
-          <h2 class="section-title">Карточки</h2>
-          <Button
-            @click="handleCreateCard"
-            variant="secondary"
-            size="sm">
-            <i class="bi bi-plus-lg" />
-            Создать карточку
-          </Button>
-        </div>
-
-        <QuickAddCard
-          :course-id="courseId"
-          @added="handleQuickAdd" />
-
-        <CardList
-          :cards="cards"
-          :loading="cardsLoading"
-          @edit="handleEditCard"
-          @delete="handleDeleteCard" />
       </div>
     </div>
 
@@ -274,7 +407,7 @@
 
 <style scoped>
   .page-container {
-    max-width: 900px;
+    max-width: 1440px;
     margin: 0 auto;
     padding: 32px 24px;
   }
@@ -297,6 +430,19 @@
   @keyframes spin {
     to {
       transform: rotate(360deg);
+    }
+  }
+
+  /* Responsive Grid */
+  .course-page-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  @media (min-width: 1024px) {
+    .course-page-grid {
+      grid-template-columns: 2fr 1fr;
     }
   }
 
@@ -358,7 +504,17 @@
   }
 
   .cards-section {
-    margin-top: 32px;
+    margin-top: 0;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  @media (max-width: 1023px) {
+    .cards-section {
+      display: none;
+    }
   }
 
   .section-header {
@@ -373,5 +529,115 @@
     font-weight: 600;
     color: var(--color-text-primary);
     margin: 0;
+  }
+
+  /* Mobile FAB */
+  .fab {
+    position: fixed;
+    right: 50%;
+    bottom: 12px;
+    transform: translateX(50%);
+    z-index: 998;
+    display: flex;
+  }
+
+  .fab i {
+    font-size: 18px;
+  }
+
+  @media (min-width: 1024px) {
+    .fab {
+      display: none;
+    }
+  }
+
+  /* Mobile Slide-out Panel */
+  .cards-panel-container {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+  }
+
+  .panel-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+  }
+
+  .cards-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 400px;
+    background: var(--color-bg-modal);
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.3);
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  @media (min-width: 768px) {
+    .cards-panel {
+      width: 85%;
+    }
+  }
+
+  .cards-panel.open {
+    transform: translateX(0);
+  }
+
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 60px 20px 20px 20px;
+    border-bottom: 1px solid var(--color-border-light);
+    position: sticky;
+    top: 0;
+    background: var(--color-bg-modal);
+    z-index: 1;
+  }
+
+  .panel-title {
+    font-size: var(--text-section-title-size);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0;
+  }
+
+  .panel-close-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 8px;
+    background: var(--action-btn-bg);
+    color: var(--color-text-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .panel-close-btn:hover {
+    background: var(--action-btn-bg-hover);
+    transform: scale(1.05);
+  }
+
+  .panel-close-btn i {
+    font-size: 16px;
+  }
+
+  .panel-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
   }
 </style>

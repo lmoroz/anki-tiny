@@ -1,148 +1,193 @@
-# Walkthrough: Replace Time Selects Implementation
+# Course Layout Redesign Walkthrough
 
-## Objective
-Replace standard HTML `<select>` elements in the time range picker with scroll-based pickers, enabling minute-precision time selection (15-minute intervals) and improving the UI/UX to match modern mobile patterns.
+## Обзор изменений
 
-## Implementation Summary
+Реализован адаптивный редизайн страницы курса с двухколоночным layout для desktop и slide-out панелью для mobile/tablet устройств. Добавлена полная статистика FSRS на карточках.
 
-### 1. Frontend Components
+## Что было реализовано
 
-#### ScrollTimePicker.vue
-Created a universal wrapper component for `vue-scroll-picker` library:
-- Props: `modelValue`, `min`, `max`, `step`, `suffix`, `formatDigits`, `disabled`
-- Dynamically generates options based on min/max/step values
-- Fully integrated with design system (CSS variables for theming)
-- Supports both light and dark themes
-- Responsive design (height adjusts on mobile)
+### 1. Responsive двухколоночный layout (Desktop ≥1024px)
 
-**File:** [ScrollTimePicker.vue](file:///e:/Develop/anki-tiny/frontend/src/shared/ui/ScrollTimePicker.vue)
+**Левая колонка (~60% ширины)**:
+- Название и описание курса
+- Статистика (всего карточек, новых, на повторении, сегодня)
+- Кнопка "Начать тренировку"
+- Виджет QuickAddCard для быстрого добавления
 
-#### TimeRangePicker.vue
-Refactored to use **4 ScrollTimePicker instances**:
-- Start Hours (0-23) + Start Minutes (0-59)
-- End Hours (0-23) + End Minutes (0-59)
-- Converted API from hour-based (0-23) to **minute-based (0-1439)**
-- Maintains timeline visualization with minute precision
-- All event handlers convert hours+minutes ↔ total minutes
+**Правая колонка (~40% ширины)**:
+- Компактный список всех карточек курса
+- Кнопка "Создать карточку"
 
-**File:** [TimeRangePicker.vue](file:///e:/Develop/anki-tiny/frontend/src/shared/ui/TimeRangePicker.vue)
+### 2. Расширенная статистика FSRS на карточках
 
-#### SettingsForm.vue
-Updated to work with minute-based time fields:
-- Uses `trainingStartTime`/`trainingEndTime` instead of `trainingStartHour`/`trainingEndHour`
-- Added `formatTime(minutes)` helper to display HH:MM format
-- Updated validation logic for minute-based duration
-- Preview section shows time in HH:MM format
+Каждая карточка теперь отображает:
 
-**File:** [SettingsForm.vue](file:///e:/Develop/anki-tiny/frontend/src/widgets/settings-form/SettingsForm.vue)
+**FSRS метрики** (с иконками):
+- 📈 **Stability** — стабильность запоминания
+- ⚡ **Difficulty** — сложность карточки  
+- 🔁 **Reps** — количество повторений
+- ❌ **Lapses** — количество ошибок
 
-### 2. Backend Updates
+**Временные метки**:
+- 📅 **Следующее** — дата следующего повторения
+- 🕐 **Последнее** — когда последний раз повторяли (относительное время)
+- ➕ **Создано** — дата создания карточки
 
-#### Database Migration 005
-Created migration `convert_time_to_minutes`:
-- Added `trainingStartTime`, `trainingEndTime` columns (INTEGER) to `settings` and `courseSettings` tables
-- Migrated existing data: `trainingStartTime = trainingStartHour * 60`
-- Migrated existing data: `trainingEndTime = trainingEndHour * 60`
-- Set default values: 480 (8:00), 1320 (22:00)
-- Kept old columns for backward compatibility
+### 3. Mobile slide-out panel (<1024px)
 
-**File:** [migrations.ts:L108-L147](file:///e:/Develop/anki-tiny/backend/src/services/database/migrations.ts#L108-L147)
+**Одноколоночный layout** на mobile:
+- Видна только информация о курсе
+- FAB (Floating Action Button) справа внизу: "Показать карточки (N)"
 
-#### Schema Updates
-Updated TypeScript interfaces:
-- `SettingsTable`: Added `trainingStartTime`, `trainingEndTime` (minutes from midnight)
-- `CourseSettingsTable`: Added nullable fields for course-specific settings
-- Marked old fields as `DEPRECATED`
+**Slide-out панель**:
+- Открывается при клике на FAB
+- Плавная анимация (слайд справа налево, 300ms)
+- Backdrop с blur эффектом
+- Кнопка "Создать карточку" внутри панели
+- Полный список карточек
 
-**File:** [schema.ts](file:///e:/Develop/anki-tiny/backend/src/services/database/schema.ts)
+**Три способа закрытия панели**:
+1. Клик по backdrop (затемненная область)
+2. Кнопка × в правом верхнем углу панели
+3. Клавиша Escape
 
-#### Zod Validation
-Updated schemas to validate minute-based fields:
-- `GlobalSettingsSchema`: `trainingStartTime`/`trainingEndTime` with range 0-1439
-- `CourseSettingsSchema`: Nullable minute-based fields
+## Технические детали
 
-**File:** [settings.ts](file:///e:/Develop/anki-tiny/backend/src/schemas/settings.ts)
+### Изменённые компоненты
 
-#### FSRSSettings Interface & Logic
-Updated FSRS integration:
-- Changed `FSRSSettings` interface to use `trainingStartTime`/`trainingEndTime` (minutes)
-- Updated `canShowNewCards()` to check current time in minutes
-- Updated `settingsRepository.getEffectiveSettings()` to return minute-based fields
-- Fixed `training.ts` route to validate time using minutes
+#### `CoursePage.vue`
+- Добавлен `useMediaQuery` для определения breakpoint (1024px)
+- Реализован state management для mobile панели (`isCardsPanelOpen`)
+- Добавлена keyboard navigation (Escape для закрытия)
+- Обновлен template с responsive grid layout
+- Увеличен `max-width` контейнера до 1440px
+- **Focus Trap**: Использован `createFocusTrap` из пакета `focus-trap`
 
-**Files:**
-- [fsrs/index.ts:L17-L24](file:///e:/Develop/anki-tiny/backend/src/services/fsrs/index.ts#L17-L24)
-- [fsrs/index.ts:L186-L196](file:///e:/Develop/anki-tiny/backend/src/services/fsrs/index.ts#L186-L196)
-- [settingsRepository.ts:L107-L133](file:///e:/Develop/anki-tiny/backend/src/services/repositories/settingsRepository.ts#L107-L133)
-- [training.ts:L23-L33](file:///e:/Develop/anki-tiny/backend/src/routes/training.ts#L23-L33)
+#### `CardList.vue`
+- Добавлен prop `compact` для поддержки компактного режима
+- Передаёт `compact` в `CardItem`
 
-## Visual Result
+#### `CardItem.vue`
+- Добавлены все FSRS метрики с иконками
+- Добавлены timestamps (created, lastReview, due)
+- Реализован compact mode (уменьшенные размеры для desktop правой колонки)
+- Добавлены helper функции:
+  - `formatRelativeTime()` — "Сегодня", "Вчера", "N дней назад"
+  - `formatCreatedDate()` — короткий формат даты
 
-### Final Design: Light & Airy Time Pickers
+### CSS особенности
 
-After user feedback, the time pickers were redesigned with a lighter, more airy aesthetic:
+**Responsive grid**:
+```css
+.course-page-grid {
+  display: grid;
+  grid-template-columns: 1fr; /* mobile */
+}
 
-**Before:** Heavy blurred rectangles with faint text
-**After:** Clean design with horizontal lines, gradients, and white text
+@media (min-width: 1024px) {
+  .course-page-grid {
+    grid-template-columns: 2fr 1fr; /* desktop: 60/40 split */
+  }
+}
+```
 
-![Final Time Pickers Design](file://C:/Users/I%20am/.gemini/antigravity/brain/1e4c85c6-96c2-4e5d-b2ff-a18fe5fa614d/new_time_pickers_design_1767714325614.png)
+**Slide-out панель**:
+- `transform: translateX(100%)` → `translateX(0)` при открытии
+- `transition: transform 0.3s ease` для плавности
+- `backdrop-filter: blur(4px)` для эффекта глубины
 
-#### Design Features:
-- ✨ Two horizontal almost-white lines defining the selection area
-- 🌫️ Top and bottom gradient overlays (fade from opaque to transparent)
-- ⚪ Selected value in bright white text
-- 👻 Non-selected values in semi-transparent white
-- 🎯 Clean, weightless appearance
-- ⏰ **Minutes: Full range 0-59 with step 1** (previously 0, 15, 30, 45)
+**Compact mode для карточек**:
+- `min-height: 100px` (вместо 180px)
+- `font-size: 14px` (вместо 16px)
+- `-webkit-line-clamp: 2` (вместо 3) для текста вопроса
 
-### Demo Recording
+## Проверка функциональности
 
-The full interaction flow is captured here:
+### Desktop (≥1024px)
+✅ Две колонки видны рядом  
+✅ Карточки компактные в правой колонке  
+✅ Все FSRS метрики отображаются  
+✅ Timestamps корректно форматируются  
+✅ **Правая колонка имеет скролл** - карточки не обрезаны снизу
+✅ **Кнопка "Создать карточку"** скроллит к QuickAddCard
 
-![Redesigned Time Pickers Demo](file://C:/Users/I%20am/.gemini/antigravity/brain/1e4c85c6-96c2-4e5d-b2ff-a18fe5fa614d/redesigned_time_pickers_1767714306966.webp)
+### Tablet/Mobile (<1024px)
+✅ Одна колонка (только course info)  
+✅ FAB отображается  
+✅ Панель открывается/закрывается   
+✅ Backdrop работает  
+✅ Кнопка × работает  
+✅ Escape закрывает панель  
+✅ **Заголовок панели не перекрывается** app header
+✅ **Кнопка "Создать карточку"** закрывает панель и скроллит к QuickAddCard
 
-## Verification
+### Accessibility
+✅ ARIA labels на FAB и кнопке закрытия
+✅ Tooltips на всех иконках метрик
+✅ Keyboard navigation (Escape key)
+✅ **Focus Trap**: Используется `focus-trap` для удержания фокуса внутри мобильной панели при открытии.
 
-### ✅ Functional Testing
-- [x] Scroll pickers are visible and styled correctly
-- [x] All 4 pickers (start hours, start minutes, end hours, end minutes) work independently
-- [x] Mouse wheel scrolling changes values smoothly
-- [x] Timeline visualization updates in real-time
-- [x] Time is displayed with minute precision (HH:MM)
-- [x] Preview section shows correct time range (e.g., "10:15 до 19:00")
-- [x] Backend migration applied successfully
-- [x] No console errors during interaction
+> **Note**: Focus trap реализован с использованием пакета `focus-trap`.
 
-### ✅ Backend Testing
-- [x] Database migration `005_convert_time_to_minutes` executed successfully
-- [x] Settings API returns minute-based fields
-- [x] FSRS `canShowNewCards()` validates time correctly with minutes
-- [x] Training route validates training hours using minutes
+---
 
-## Success Criteria Met
+## Исправленные баги
 
-All criteria from [proposal.md](file:///e:/Develop/anki-tiny/openspec/changes/replace-time-selects/proposal.md) have been achieved:
+После первоначальной реализации были обнаружены и исправлены три критические проблемы:
 
-1. ✅ `vue-scroll-picker` successfully integrated
-2. ✅ `TimeRangePicker` uses scroll pickers instead of `<select>`
-3. ✅ All existing functionality preserved (validation, timeline)
-4. ✅ Component works correctly in light/dark themes
-5. ✅ API remains backward-compatible (props/events)
-6. ✅ Timeline visualization updated for minute precision
-7. ✅ No regressions in `SettingsPage` or `CourseSettingsModal`
+### 1. Mobile Panel Header Overlap
 
-## Files Changed
+**Проблема**: Заголовок "Карточки" в мобильной панели попадал под заголовок приложения.
 
-### Frontend
-- `frontend/package.json` - Added `vue-scroll-picker` dependency
-- `frontend/src/shared/ui/ScrollTimePicker.vue` - New component ✨
-- `frontend/src/shared/ui/TimeRangePicker.vue` - Refactored ♻️
-- `frontend/src/widgets/settings-form/SettingsForm.vue` - Updated 🔧
+**Решение**: Добавлен `padding-top: 60px` для `.panel-header`, чтобы заголовок не перекрывался верхней панелью приложения.
 
-### Backend
-- `backend/src/services/database/migrations.ts` - Added migration 005 ✨
-- `backend/src/services/database/schema.ts` - Updated schema 🔧
-- `backend/src/schemas/settings.ts` - Updated Zod schemas 🔧
-- `backend/src/services/fsrs/index.ts` - Updated FSRSSettings interface 🔧
-- `backend/src/services/repositories/settingsRepository.ts` - Updated repository 🔧
-- `backend/src/routes/training.ts` - Fixed time validation 🐛
+```css
+.panel-header {
+  padding: 60px 20px 20px 20px; /* Was: 20px */
+}
+```
+
+### 2. Desktop Cards Column Overflow
+
+**Проблема**: Карточки в правой колонке обрезались снизу экрана.
+
+**Решение**: Добавлены `max-height` и `overflow-y: auto` для `.cards-section`, чтобы колонка имела собственный скролл.
+
+```css
+.cards-section {
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+```
+
+### 3. Нефункциональная кнопка "Создать карточку"
+
+**Проблема**: Кнопка "+ Создать карточку" над списком карточек ничего не делала.
+
+**Решение**: 
+- Создана функция `handleCreateCardFromList()`, которая:
+  - Закрывает мобильную панель (если открыта)
+  - Скроллит к виджету QuickAddCard
+- Обновлены обработчики кнопок в desktop и mobile панели
+
+```javascript
+const handleCreateCardFromList = () => {
+  if (!isDesktop.value) {
+    closeCardsPanel()
+  }
+  setTimeout(() => {
+    quickAddCardRef.value?.$el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, 100)
+}
+```
+
+---
+
+## Следующие шаги
+
+Все задачи выполнены. Изменения готовы к:
+1. ✅ Обновлению Changelog
+2. ✅ Merge в основную ветку
+3. ✅ Архивированию OpenSpec change

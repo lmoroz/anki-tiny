@@ -1,7 +1,7 @@
 {
   "name": "repetitio-frontend",
   "private": true,
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Frontend for Repetitio",
   "author": "Morozhnikova Larisa",
   "type": "module",
@@ -15,6 +15,7 @@
     "@okikio/animate": "^2.3.1",
     "@types/markdown-it": "^14.1.2",
     "@vueuse/core": "^14.1.0",
+    "@vueuse/integrations": "^14.1.0",
     "axios": "^1.13.2",
     "bootstrap-icons": "^1.13.1",
     "highlight.js": "^11.11.1",
@@ -43,3 +44,4 @@
     "vite": "^7.2.4"
   }
 }
+

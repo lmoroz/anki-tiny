@@ -9,6 +9,10 @@ const props = defineProps({
   loading: {
     type: Boolean,
     default: false
+  },
+  compact: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -40,6 +44,7 @@ const handleDelete = (card) => {
         v-for="card in cards"
         :key="card.id"
         :card="card"
+        :compact="compact"
         @edit="handleEdit"
         @delete="handleDelete"
       />

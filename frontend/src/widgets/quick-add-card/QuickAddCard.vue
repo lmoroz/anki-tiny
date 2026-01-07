@@ -163,7 +163,7 @@
 </script>
 
 <template>
-  <Card class="mb-8">
+  <Card>
     <div class="card-header">
       <h3 class="section-title text-shadow-white text-white">
         <StackedCardsIcon class="w-20 h-20 shrink-0" />
