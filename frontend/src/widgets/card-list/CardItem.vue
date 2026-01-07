@@ -11,7 +11,6 @@
   })
 
   const emit = defineEmits(['edit', 'delete'])
-  const isDesktop = useMediaQuery('(min-width: 1025px)')
   const isMobile = useMediaQuery('(max-width: 768px)')
 
   const cardPadding = computed(() => {
@@ -26,6 +25,7 @@
 
   const handleEdit = e => {
     e.stopPropagation()
+    console.log('handleEdit in CatdItem', props.card)
     emit('edit', props.card)
   }
 

@@ -145,17 +145,6 @@
     showEditorModal.value = true
   }
 
-  // Scroll to QuickAddCard and close mobile panel
-  const handleCreateCardFromList = () => {
-    if (!isDesktop.value) {
-      closeCardsPanel()
-    }
-    // Scroll to QuickAddCard widget
-    setTimeout(() => {
-      quickAddCardRef.value?.$el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    }, 100)
-  }
-
   const handleOpenSettings = () => {
     showSettingsModal.value = true
   }
@@ -315,11 +304,11 @@
         <div
           v-if="isDesktop"
           class="cards-section flex flex-col overflow-hidden">
-          <div class="section-header">
+          <div class="section-header flex items-center justify-between mb-[16px] px-2">
             <h2 class="section-title">Карточки</h2>
             <Button
-              @click="handleCreateCardFromList"
-              variant="secondary"
+              @click="handleCreateCard"
+              variant="ghost"
               size="sm">
               <i class="bi bi-plus-lg" />
               Создать карточку
@@ -361,7 +350,7 @@
           <div class="panel-header flex items-center justify-between sticky top-0 z-1 pt-[60px] pb-[6px] ps-[12px] z-20">
             <h2 class="panel-title">Карточки</h2>
             <Button
-              @click="handleCreateCardFromList"
+              @click="handleCreateCard"
               variant="ghost"
               size="sm"
               full-width>
@@ -387,7 +376,8 @@
     </div>
 
     <CardEditorModal
-      v-if="showEditorModal"
+      v-if="editingCard !== false"
+      :show="showEditorModal"
       :card="editingCard"
       :course-id="courseId"
       @close="handleCloseModal"
@@ -504,13 +494,6 @@
     .cards-section {
       display: none;
     }
-  }
-
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
   }
 
   .section-title {

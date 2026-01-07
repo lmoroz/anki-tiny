@@ -5,6 +5,76 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.4.4] - 2026-01-07 17:28
+
+### Added
+
+#### OpenSpec: Card Edit Visual Feedback Proposal
+
+- **OpenSpec Change Created**: `card-edit-form`
+  - Proposal for adding visual feedback when editing/creating cards
+  - Motivation: users need clear confirmation of which card was edited/created
+  
+- **Proposal Structure** (`openspec/changes/card-edit-form/`)
+  - **proposal.md** (5.8 KB)
+    - Context: identifying UX issues (no visual feedback, poor mobile experience)
+    - Solution: use existing `CardEditorModal` + scroll to card + bounce animation
+    - Success criteria: 7 points covering edit/create flows
+    - Open questions answered: progress reset fields, animation type, scroll parameters
+    - Alternatives considered: inline form rejected in favor of existing modal
+  - **design.md** (12 KB)
+    - Component changes: `CardList.vue`, `CoursePage.vue`
+    - New method: `scrollToCardWithBounce(cardId)`
+    - CSS animation: `bounce-in-bck` (1s duration, 7 keyframes)
+    - API changes: `PUT /cards/:id` with `resetProgress` parameter
+    - Data flow diagrams for edit and create scenarios
+    - Edge cases: card not found, dual CardList instances (desktop/mobile)
+  - **tasks.md** (8.5 KB, 9 tasks, ~2.5 hours)
+    - Task 1: Backend support for progress reset (15 min)
+    - Task 2: CardList scroll + animation method (30 min)
+    - Tasks 3-4: CoursePage integration (35 min)
+    - Tasks 5-7: Manual testing (50 min)
+    - Tasks 8-9: Documentation + validation (20 min)
+  - **specs/course-ui/spec.md** (7 KB)
+    - MODIFIED requirements: Card Management Interface (4 scenarios)
+    - ADDED requirements: Progress Reset on Edit (2 scenarios)
+    - Implementation notes: API contract, CSS animation, data flow
+
+- **Key Features Documented**
+  - **Visual Feedback**:
+    - Automatic scroll to edited/created card: `scrollIntoView({ behavior: 'smooth', block: 'start' })`
+    - Bounce animation: `bounce-in-bck` (1s, transform scale from 7 to 1 with intermediate bounces)
+    - Accessibility: respects `prefers-reduced-motion: reduce`
+  - **Progress Reset**:
+    - When editing card: reset `state`, `stability`, `difficulty`, `reps`, `lapses`, `due`
+    - Card becomes "new" (state = New, due = now + 4h)
+    - Automatic on save (cannot be disabled)
+  - **Minimal Changes**:
+    - No new components (uses existing `CardEditorModal`)
+    - Only 3 files modified: `CardList.vue`, `CoursePage.vue`, `backend/src/routes/cards.ts`
+    - Complexity reduced: Low (1-2 hours) vs original Medium (3-5 hours)
+
+- **User Adjustments** (post-proposal)
+  - Animation timeout increased from 1000ms to 2000ms for better visibility
+  - Decision to use existing modal instead of creating new inline form
+  - All open questions resolved with specific implementation details
+
+### Technical Details
+
+- **OpenSpec Validation**: ✅ Passed `npx @fission-ai/openspec validate card-edit-form --strict`
+- **Change Status**: 0/9 tasks (proposal stage, ready for user review and approval)
+- **Files Created**: 4
+  - `openspec/changes/card-edit-form/proposal.md`
+  - `openspec/changes/card-edit-form/design.md`
+  - `openspec/changes/card-edit-form/tasks.md`
+  - `openspec/changes/card-edit-form/specs/course-ui/spec.md`
+- **No Code Changes Yet**: Pure planning/proposal phase
+
+### Next Steps
+
+- User review and approval of proposal
+- Implementation via `/openspec-apply` workflow after approval
+
 ## [0.4.4] - 2026-01-07 15:59
 
 ### Changed

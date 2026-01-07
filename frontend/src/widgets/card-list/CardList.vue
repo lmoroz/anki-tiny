@@ -1,9 +1,6 @@
 <script setup>
   import { ref, useTemplateRef, onMounted, onUnmounted } from 'vue'
 
-  const scrollContainer = useTemplateRef('cardList')
-  const showTopFade = ref(false)
-  const showBottomFade = ref(true)
   const checkScroll = () => {
     const el = scrollContainer.value
     if (!el) {
@@ -36,7 +33,12 @@
 
   const emit = defineEmits(['edit', 'delete'])
 
+  const scrollContainer = useTemplateRef('cardList')
+  const showTopFade = ref(false)
+  const showBottomFade = ref(true)
+
   const handleEdit = card => {
+    console.log('handleEdit in CatdList', card)
     emit('edit', card)
   }
 
