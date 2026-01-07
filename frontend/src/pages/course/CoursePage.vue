@@ -22,7 +22,7 @@
   const quickAddCardRef = ref(null)
 
   // Responsive layout state
-  const isDesktop = useMediaQuery('(min-width: 1024px)')
+  const isDesktop = useMediaQuery('(min-width: 1025px)')
   const isCardsPanelOpen = ref(false)
   const cardsPanelRef = useTemplateRef('cardsPanel')
   let focusTrap
@@ -186,7 +186,7 @@
       if (cardsPanelRef.value) {
         focusTrap = useFocusTrap(cardsPanelRef, {
           clickOutsideDeactivates: true,
-          escapeDeactivates: false, // We handle Escape manually in handleKeydown 
+          escapeDeactivates: false, // We handle Escape manually in handleKeydown
           fallbackFocus: '.panel-close-btn'
         })
         focusTrap.activate()
@@ -233,12 +233,12 @@
           <Card
             padding="lg"
             class="mb-6">
-            <h1 class="course-title text-3xl font-bold text-white leading-tight tracking-tight drop-shadow-sm">{{ course?.name }}</h1>
+            <h1 class="course-title lg:mb-2 md:mb-1 sm:mb-1 text-3xl font-bold text-white leading-tight tracking-tight drop-shadow-sm">{{ course?.name }}</h1>
             <div
-              class="course-description rounded-[12px] p-3 text-gray-100 leading-relaxed shadow-xl bg-gray-500/20 border border-white/30 backdrop-blur-md bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.15)_0%,transparent_50%)]"
+              class="course-description lg:mb-2 md:mb-1 sm:mb-1 rounded-[12px] p-3 text-gray-100 leading-relaxed shadow-xl bg-gray-500/20 border border-white/30 backdrop-blur-md bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.15)_0%,transparent_50%)]"
               v-html="parsedDescription" />
 
-            <div class="course-stats">
+            <div class="course-stats lg:mb-2 md:mb-1 sm:mb-1">
               <div
                 v-if="stats"
                 class="stats-grid">
@@ -314,7 +314,7 @@
         <!-- Right Column (Desktop): Cards Section -->
         <div
           v-if="isDesktop"
-          class="cards-section">
+          class="cards-section flex flex-col overflow-hidden">
           <div class="section-header">
             <h2 class="section-title">Карточки</h2>
             <Button
@@ -329,7 +329,6 @@
           <CardList
             :cards="cards"
             :loading="cardsLoading"
-            :compact="true"
             @edit="handleEditCard"
             @delete="handleDeleteCard" />
         </div>
@@ -359,31 +358,30 @@
           ref="cardsPanel"
           class="cards-panel"
           :class="{ open: isCardsPanelOpen }">
-          <div class="panel-header">
+          <div class="panel-header flex items-center justify-between sticky top-0 z-1 pt-[60px] pb-[6px] ps-[12px] z-20">
             <h2 class="panel-title">Карточки</h2>
             <Button
-              class="panel-close-btn"
+              @click="handleCreateCardFromList"
+              variant="ghost"
+              size="sm"
+              full-width>
+              <i class="bi bi-plus-lg" />
+              Создать карточку
+            </Button>
+            <Button
+              variant="ghost"
               @click="closeCardsPanel"
+              class="panel-close-btn"
               aria-label="Закрыть панель">
               <i class="bi bi-x-lg" />
             </Button>
           </div>
-          <div class="panel-content">
-            <Button
-              @click="handleCreateCardFromList"
-              variant="secondary"
-              size="sm"
-              full-width
-              class="mb-4">
-              <i class="bi bi-plus-lg" />
-              Создать карточку
-            </Button>
-            <CardList
-              :cards="cards"
-              :loading="cardsLoading"
-              @edit="handleEditCard"
-              @delete="handleDeleteCard" />
-          </div>
+          <CardList
+            class="panel-content flex-1 pl-[10px]"
+            :cards="cards"
+            :loading="cardsLoading"
+            @edit="handleEditCard"
+            @delete="handleDeleteCard" />
         </div>
       </div>
     </div>
@@ -440,14 +438,13 @@
     gap: 24px;
   }
 
-  @media (min-width: 1024px) {
+  @media (min-width: 1025px) {
     .course-page-grid {
       grid-template-columns: 2fr 1fr;
     }
   }
 
   .course-title {
-    margin-bottom: 12px;
     letter-spacing: -0.02em;
     font-size: var(--text-page-title-size);
   }
@@ -455,12 +452,7 @@
   .course-description {
     font-size: var(--text-body-lg-size);
     color: var(--color-text-secondary);
-    margin-bottom: 24px;
     line-height: 1.6;
-  }
-
-  .course-stats {
-    margin-bottom: 24px;
   }
 
   .stats-grid {
@@ -504,11 +496,8 @@
   }
 
   .cards-section {
-    margin-top: 0;
-    max-height: calc(100vh - 100px);
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
+    max-height: calc(100vh - 140px);
+    height: calc(100vh - 140px);
   }
 
   @media (max-width: 1023px) {
@@ -545,7 +534,7 @@
     font-size: 18px;
   }
 
-  @media (min-width: 1024px) {
+  @media (min-width: 1025px) {
     .fab {
       display: none;
     }
@@ -594,15 +583,8 @@
   }
 
   .panel-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 60px 20px 20px 20px;
     border-bottom: 1px solid var(--color-border-light);
-    position: sticky;
-    top: 0;
     background: var(--color-bg-modal);
-    z-index: 1;
   }
 
   .panel-title {
@@ -610,34 +592,5 @@
     font-weight: 600;
     color: var(--color-text-primary);
     margin: 0;
-  }
-
-  .panel-close-btn {
-    width: 32px;
-    height: 32px;
-    border: none;
-    border-radius: 8px;
-    background: var(--action-btn-bg);
-    color: var(--color-text-primary);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-  }
-
-  .panel-close-btn:hover {
-    background: var(--action-btn-bg-hover);
-    transform: scale(1.05);
-  }
-
-  .panel-close-btn i {
-    font-size: 16px;
-  }
-
-  .panel-content {
-    flex: 1;
-    padding: 20px;
-    overflow-y: auto;
   }
 </style>

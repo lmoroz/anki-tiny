@@ -13,6 +13,10 @@
       type: Boolean,
       default: false
     },
+    noShadow: {
+      type: Boolean,
+      default: false
+    },
     rounded: {
       type: String,
       default: 'xl',
@@ -21,16 +25,23 @@
   })
 
   const paddingMap = {
-    sm: 'p-4',
-    md: 'p-6',
+    sm: 'p-2',
+    md: 'p-4',
     lg: 'p-8'
   }
 </script>
 
 <template>
   <div
-    :class="[`rounded-${rounded}`, paddingMap[padding], { 'card-hoverable': hoverable }, { 'card-highlighted': highlight }]"
-    class="relative z-20 w-full shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden border border-white/10 transition-all duration-500">
+    :class="[
+      'card',
+      `rounded-${rounded}`,
+      paddingMap[padding],
+      { 'card-hoverable': hoverable },
+      { 'card-highlighted': highlight },
+      { 'shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)]': !noShadow }
+    ]"
+    class="relative z-20 w-full overflow-hidden border border-white/10 transition-all duration-500">
     <!-- Card Background Layers -->
     <!-- 1. Base dark tint -->
     <div
@@ -48,7 +59,7 @@
       v-if="highlight"
       class="absolute -top-[20%] -right-[20%] w-[80%] h-[80%] bg-[radial-gradient(circle,rgba(255,255,255,0.7)_0%,transparent_50%)] blur-2xl pointer-events-none" />
     <!-- Content Container -->
-    <div class="relative z-10 flex flex-col gap-8">
+    <div class="card-content relative z-10 flex flex-col gap-10 md:gap-8 sm:gap-6">
       <slot />
     </div>
   </div>

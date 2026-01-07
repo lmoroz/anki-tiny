@@ -67,7 +67,7 @@
 
       <!-- Top Layer (Actual Textarea) -->
       <textarea
-        class="relative z-10 w-full h-72 rounded-2xl p-6 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-400/40 focus:border-blue-400/40 resize-none transition-all text-lg leading-relaxed shadow-xl border border-white/10 bg-gray-700 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.15)_0%,transparent_50%)]"
+        class="relative z-10 w-full rounded-2xl px-6 py-3 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-400/40 focus:border-blue-400/40 resize-none transition-all text-lg leading-relaxed shadow-xl border border-white/10 bg-gray-700 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.15)_0%,transparent_50%)]"
         :value="modelValue"
         :placeholder="placeholder"
         :disabled="disabled"

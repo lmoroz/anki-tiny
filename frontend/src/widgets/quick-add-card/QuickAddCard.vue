@@ -1,7 +1,6 @@
 <script setup>
-  import { ref } from 'vue'
-  import Input from '@/shared/ui/Input.vue'
-  import Button from '@/shared/ui/Button.vue'
+  import { computed, ref } from 'vue'
+  import { useMediaQuery } from '@vueuse/core'
 
   const props = defineProps({
     courseId: {
@@ -11,6 +10,12 @@
   })
 
   const emit = defineEmits(['added'])
+  const isDesktop = useMediaQuery('(min-width: 1025px)')
+  const isMobile = useMediaQuery('(max-width: 768px)')
+
+  const batchRows = computed(() => {
+    return isDesktop.value ? 8 : isMobile.value ? 3 : 5
+  })
 
   const mode = ref('single')
   const formData = ref({
@@ -191,7 +196,7 @@
 
     <div
       v-if="mode === 'single'"
-      class="quick-form">
+      class="quick-form lg:gap-2 md:gap-1 sm:gap-1 flex flex-col">
       <div class="form-row">
         <div class="form-col">
           <Input
@@ -225,16 +230,16 @@
 
     <div
       v-else
-      class="batch-form">
+      class="batch-form lg:gap-2 md:gap-1 sm:gap-1 flex flex-col">
       <Input
         v-model="batchText"
         type="textarea"
         stacked
-        label="Карточки (каждая строка — новая карточка)"
+        label=""
         placeholder="банты | бАнты
 бороду | бОроду (вин. п., только в этой форме ед.ч. ударение на 1-ом слоге)
 бухгалтеров | бухгАлтеров"
-        :rows="10"
+        :rows="batchRows"
         :error="errors.batch" />
 
       <div
@@ -283,7 +288,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 28px;
     gap: 20px;
   }
 
@@ -337,13 +341,6 @@
 
   .mode-btn.active i {
     color: var(--mode-switcher-text-active);
-  }
-
-  .quick-form,
-  .batch-form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
   }
 
   .form-row {

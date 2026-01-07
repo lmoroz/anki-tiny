@@ -89,6 +89,16 @@
     --text-caption-size: 12px;
     --text-label-size: 11px;
 
+    @media (max-width: 768px) {
+        --text-page-title-size: 24px;
+        --text-section-title-size: 14px;
+        --text-body-lg-size: 13px;
+        --text-body-md-size: 12px;
+        --text-body-sm-size: 11px;
+        --text-caption-size: 10px;
+        --text-label-size: 10px;
+    }
+
     /* Card colors */
     --card-highlight-border: rgba(255, 255, 255, 0.5);
     --card-shadow-hover: rgba(0, 0, 0, 0.12);
@@ -116,6 +126,21 @@
 
 * {
     box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    border-radius: 5px;
+    background: transparent;
+    padding: 0 2px;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    background: var(--color-bg-modal);
 }
 
 #app,

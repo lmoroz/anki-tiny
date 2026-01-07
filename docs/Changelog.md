@@ -5,18 +5,60 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.4.4] - 2026-01-07 15:59
+
+### Changed
+
+#### UI: Enhanced Card List with Scroll Indicators (Manual Changes)
+
+- **CardList.vue — Плавные градиентные индикаторы прокрутки**
+    - Реализованы fade-эффекты (градиенты) сверху и снизу списка карточек
+    - Градиенты динамически появляются/исчезают в зависимости от позиции скролла
+    - Добавлено отслеживание скролла через `useTemplateRef` и обработчик `checkScroll`
+    - Улучшен layout с использованием Tailwind CSS utility classes (`flex`, `overflow-y-auto`, `snap-y`)
+    - Удален избыточный prop `compact` для упрощения API компонента
+
+- **QuickAddCard.vue — Адаптивная высота textarea**
+    - Textarea в batch-режиме теперь адаптируется к размеру экрана
+    - Используется `@vueuse/core` (`useMediaQuery`) для определения устройства
+    - Высота textarea:
+        - Desktop (≥1025px): 8 строк
+        - Tablet (769-1024px): 5 строк
+        - Mobile (≤768px): 3 строки
+    - Убран фиксированный label для более чистого UI
+    - Оптимизированы gap-классы для разных breakpoints
+    - Удалены дублирующие CSS-правила
+
+### Technical Details
+
+- **Files Modified**: 7
+    - `frontend/src/widgets/card-list/CardList.vue` (major refactoring)
+    - `frontend/src/widgets/card-list/CardItem.vue` (minor styling)
+    - `frontend/src/widgets/quick-add-card/QuickAddCard.vue` (adaptive textarea)
+    - `frontend/src/pages/course/CoursePage.vue` (minor)
+    - `frontend/src/shared/ui/Card.vue` (minor)
+    - `frontend/src/shared/ui/Input.vue` (minor)
+    - `frontend/src/app/assets/css/styles.css` (minor)
+
+- **User Experience**:
+    - ✅ Визуальная индикация возможности прокрутки списка карточек
+    - ✅ Улучшенная адаптивность интерфейса добавления карточек
+    - ✅ Более эргономичное использование экрана на мобильных устройствах
+
 ## [0.4.4] - 2026-01-07 13:23
 
 ### Added
+
 - **Course Page Redesign**:
-  - Implemented responsive two-column layout for desktop (≥1024px).
-  - Added slide-out cards panel for mobile/tablet (<1024px).
-  - Integrated full FSRS statistics on cards (Stability, Difficulty, Reps, Lapses).
-  - Added timestamps (Created, Last Review, Due) to card items.
-  - Implemented `focus-trap` for better accessibility in mobile panel.
-  - Added smooth scrolling to "Quick Add Card" widget when creating a new card.
+    - Implemented responsive two-column layout for desktop (≥1024px).
+    - Added slide-out cards panel for mobile/tablet (<1024px).
+    - Integrated full FSRS statistics on cards (Stability, Difficulty, Reps, Lapses).
+    - Added timestamps (Created, Last Review, Due) to card items.
+    - Implemented `focus-trap` for better accessibility in mobile panel.
+    - Added smooth scrolling to "Quick Add Card" widget when creating a new card.
 
 ### Fixed
+
 - Fixed mobile panel header overlap with application header.
 - Fixed desktop cards column overflow issue.
 - Fixed "Create Card" button functionality in mobile panel.
@@ -96,7 +138,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ## [0.4.3] - 2026-01-07 11:31
 
 ### Added
-
 
 #### Settings: Learning Steps Parameter in UI
 
