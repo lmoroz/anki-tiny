@@ -21,7 +21,13 @@ export const ReviewCardSchema = z.object({
   }),
 });
 
+// Схема для массового удаления карточек
+export const BatchDeleteSchema = z.object({
+  cardIds: z.array(z.number().int().positive()).min(1, 'At least one card ID is required').max(100, 'Maximum 100 cards can be deleted at once'),
+});
+
 // Типы для TypeScript
 export type CreateCardInput = z.infer<typeof CreateCardSchema>;
 export type UpdateCardInput = z.infer<typeof UpdateCardSchema>;
 export type ReviewCardInput = z.infer<typeof ReviewCardSchema>;
+export type BatchDeleteInput = z.infer<typeof BatchDeleteSchema>;

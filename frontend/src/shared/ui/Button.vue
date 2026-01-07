@@ -21,6 +21,10 @@
       type: Boolean,
       default: false
     },
+    ghost: {
+      type: Boolean,
+      default: false
+    },
     fullWidth: {
       type: Boolean,
       default: false
@@ -40,7 +44,14 @@
     return [...additional]
   })
   const innerClasses = computed(() => {
-    let additional = ['btn', `btn-${props.size}`, { 'btn-full-width': props.fullWidth }, { 'btn-disabled': props.disabled }, `rounded-${props.rounded}`]
+    let additional = [
+      'btn',
+      `btn-${props.size}`,
+      { 'btn-full-width': props.fullWidth },
+      { 'btn-disabled': props.disabled },
+      `rounded-${props.rounded}`,
+      { ghost: props.ghost }
+    ]
     if (props.stacked && props.variant === 'primary') {
       additional.push(
         ...`relative z-20 bg-gradient-to-b from-[var(--btn-primary-gradient-from)] to-[var(--btn-primary-gradient-to)] hover:to-[var(--btn-primary-gradient-from)]  py-4 px-12 border-t border-t-white/20 border-b border-b-gray-800/50  shadow-[0_10px_20px_-5px_var(--btn-primary-shadow),inset_0_1px_0_var(--btn-primary-inner-shadow)] transition-transform duration-200 group-active:translate-y-[2px]`.split(
@@ -49,7 +60,9 @@
       )
     } else if (props.variant === 'primary') {
       additional.push(
-        'bg-gradient-to-b from-[var(--btn-primary-gradient-from)] to-[var(--btn-primary-gradient-to)] shadow-[0_10px_20px_-5px_var(--btn-primary-shadow),inset_0_1px_0_var(--btn-primary-inner-shadow)]'.split(' ')
+        'bg-gradient-to-b from-[var(--btn-primary-gradient-from)] to-[var(--btn-primary-gradient-to)] shadow-[0_10px_20px_-5px_var(--btn-primary-shadow),inset_0_1px_0_var(--btn-primary-inner-shadow)]'.split(
+          ' '
+        )
       )
     } else additional.push(`btn-${props.variant}`)
     return additional
@@ -64,10 +77,10 @@
 
 <template>
   <button
-    class="!select-none"
     :class="buttonClasses"
-    @click="handleClick"
-    :disabled="disabled">
+    :disabled="disabled"
+    class="!select-none"
+    @click="handleClick">
     <template v-if="props.stacked">
       <!-- Stack Layer 2 (Bottom-most - Darkest) -->
       <div
@@ -82,8 +95,8 @@
 
     <!-- Main Surface (Top - Bright Gradient) -->
     <div
-      class="text-white !select-none"
-      :class="innerClasses">
+      :class="innerClasses"
+      class="text-white !select-none">
       <slot />
     </div>
   </button>
@@ -149,6 +162,17 @@
 
   .btn-danger:hover {
     background: var(--btn-danger-bg-hover);
+    box-shadow: 0 2px 8px var(--btn-danger-shadow-hover);
+  }
+
+  .btn-danger.ghost {
+    color: var(--color-danger);
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .btn-danger.ghost:hover {
+    color: var(--btn-danger-bg-hover);
     box-shadow: 0 2px 8px var(--btn-danger-shadow-hover);
   }
 

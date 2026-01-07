@@ -56,7 +56,8 @@ And NO manual `padding:` declarations should exist in `<style scoped>`.
 
 ### Requirement: Shared UI Component Styling
 
-Shared UI components (`shared/ui/*`) MUST be refactored to eliminate hardcoded styles and use the unified styling system.
+Shared UI components (`shared/ui/*`) MUST be refactored to eliminate hardcoded styles and use the unified styling
+system.
 
 #### Scenario: Button component refactoring
 
@@ -91,7 +92,8 @@ And it MUST use a CSS variable like `--color-bg-modal` or Tailwind dark backgrou
 
 ### Requirement: Widget Styling
 
-Widget components (`widgets/*`) MUST be refactored to use semantic color tokens and reduce reliance on `<style scoped>` blocks.
+Widget components (`widgets/*`) MUST be refactored to use semantic color tokens and reduce reliance on `<style scoped>`
+blocks.
 
 #### Scenario: State badge colors
 

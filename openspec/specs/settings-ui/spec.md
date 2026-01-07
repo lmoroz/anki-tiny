@@ -3,7 +3,9 @@
 ## Purpose
 
 TBD - created by archiving change add-settings-page. Update Purpose after archive.
+
 ## Requirements
+
 ### Requirement: SettingsPage Layout
 
 The system SHALL provide a clear, organized settings interface with global and course-specific sections.

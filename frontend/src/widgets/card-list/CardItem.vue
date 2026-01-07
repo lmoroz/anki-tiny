@@ -7,10 +7,18 @@
     card: {
       type: Object,
       required: true
+    },
+    selectionMode: {
+      type: Boolean,
+      default: false
+    },
+    selected: {
+      type: Boolean,
+      default: false
     }
   })
 
-  const emit = defineEmits(['edit', 'delete'])
+  const emit = defineEmits(['edit', 'delete', 'toggle-select'])
   const isMobile = useMediaQuery('(max-width: 768px)')
   const isTablet = useMediaQuery('(max-width: 1024px)')
 
@@ -21,7 +29,12 @@
   const isFlipped = ref(false)
 
   const toggleFlip = () => {
-    isFlipped.value = !isFlipped.value
+    if (props.selectionMode) {
+      emit('toggle-select')
+    }
+    else {
+      isFlipped.value = !isFlipped.value
+    }
   }
 
   const handleEdit = e => {
@@ -89,7 +102,7 @@
     class="card-item"
     hoverable
     no-shadow
-    :class="{ flipped: isFlipped }"
+    :class="{ flipped: isFlipped, selected: selected }"
     @click="toggleFlip">
     <div class="card-front">
       <div class="card-header">
@@ -98,7 +111,15 @@
           :class="getStateBadge(card.state).class">
           {{ getStateBadge(card.state).text }}
         </span>
+        <!-- Selection Mode: Show Checkbox -->
+        <CardCheckbox
+          v-if="selectionMode"
+          :checked="selected"
+          @click.stop="emit('toggle-select')"
+        />
+        <!-- Normal Mode: Show Edit/Delete -->
         <div
+          v-else
           class="card-actions"
           :class="{ visible: isTablet || isFlipped }">
           <button
@@ -219,8 +240,12 @@
     perspective: 1000px;
     cursor: pointer;
     min-height: 180px;
-    transition: transform 0.6s;
+    transition: transform 0.6s, opacity 0.2s ease;
     transform-style: preserve-3d;
+  }
+
+  .card-item.selected {
+    opacity: 0.6;
   }
 
   .card-item.flipped {

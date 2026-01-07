@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { cardRepository } from '../services/repositories/cardRepository';
 import { settingsRepository } from '../services/repositories/settingsRepository';
-import { CreateCardSchema, UpdateCardSchema } from '../schemas/card';
+import { CreateCardSchema, UpdateCardSchema, BatchDeleteSchema } from '../schemas/card';
 import { Card } from '../services/database/schema';
 import { ZodError } from 'zod';
 
@@ -162,6 +162,49 @@ router.delete('/cards/:id', async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error deleting card:', error);
     res.status(500).json({ error: 'Failed to delete card' });
+  }
+});
+
+/**
+ * DELETE /api/courses/:courseId/cards/batch
+ * Массовое удаление карточек
+ */
+router.delete('/courses/:courseId/cards/batch', async (req: Request, res: Response) => {
+  try {
+    const courseId = parseInt(req.params.courseId, 10);
+
+    if (isNaN(courseId)) return res.status(400).json({ error: 'Invalid course ID' });
+
+    const validatedData = BatchDeleteSchema.parse(req.body);
+
+    const deletedCount = await cardRepository.deleteCardsBatch(validatedData.cardIds, courseId);
+
+    res.json({ success: true, deletedCount });
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return res.status(400).json({ error: 'Validation error', details: error.issues });
+    }
+    console.error('Error batch deleting cards:', error);
+    res.status(500).json({ error: 'Failed to batch delete cards' });
+  }
+});
+
+/**
+ * DELETE /api/courses/:courseId/cards
+ * Удалить все карточки курса
+ */
+router.delete('/courses/:courseId/cards', async (req: Request, res: Response) => {
+  try {
+    const courseId = parseInt(req.params.courseId, 10);
+
+    if (isNaN(courseId)) return res.status(400).json({ error: 'Invalid course ID' });
+
+    const deletedCount = await cardRepository.deleteAllCards(courseId);
+
+    res.json({ success: true, deletedCount });
+  } catch (error) {
+    console.error('Error deleting all cards:', error);
+    res.status(500).json({ error: 'Failed to delete all cards' });
   }
 });
 

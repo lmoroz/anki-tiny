@@ -76,6 +76,24 @@ export class CardRepository {
   }
 
   /**
+   * Удалить несколько карточек одной транзакцией
+   */
+  async deleteCardsBatch(ids: number[], courseId: number): Promise<number> {
+    const result = await db.deleteFrom('cards').where('id', 'in', ids).where('courseId', '=', courseId).executeTakeFirst();
+
+    return Number(result.numDeletedRows ?? 0);
+  }
+
+  /**
+   * Удалить все карточки курса
+   */
+  async deleteAllCards(courseId: number): Promise<number> {
+    const result = await db.deleteFrom('cards').where('courseId', '=', courseId).executeTakeFirst();
+
+    return Number(result.numDeletedRows ?? 0);
+  }
+
+  /**
    * Получить карточки, готовые к повторению
    */
   async getDueCards(courseId: number, now: Date, excludeNew = false): Promise<Card[]> {

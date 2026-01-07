@@ -5,6 +5,103 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.4.6] - 2026-01-07 21:32
+
+### Added
+
+#### Feature: Batch Card Delete
+
+- **Selection Mode UI**
+    - Custom checkbox component (`CardCheckbox.vue`) with gradient styling on selection
+    - Selection mode toggle button in card list header (desktop & mobile)
+    - Visual feedback: selected cards have 0.6 opacity
+    - Cards don't flip when clicked in selection mode (clicks toggle selection instead)
+    - "Delete Selected (N)" button (disabled when N=0)
+    - "Cancel" button to exit selection mode
+    - Checkbox positioned in top-right corner (replaces Edit/Delete buttons in selection mode)
+
+- **Delete All Cards**
+    - "Clear" button in card list header (red/danger variant)
+    - Confirmation dialog with warning message
+    - Single operation to delete all cards in a course
+
+- **Backend API**
+    - `DELETE /api/courses/:courseId/cards/batch` — batch delete endpoint
+        - Request body: `{ cardIds: number[] }`
+        - Validation: min 1, max 100 cards per batch
+        - Transactional deletion (all or nothing)
+        - Returns `{ success: true, deletedCount: number }`
+    - `DELETE /api/courses/:courseId/cards` — delete all cards endpoint
+        - Deletes all cards for specified course
+        - Returns deleted count
+    - Zod validation schema: `BatchDeleteSchema` with limits enforcement
+
+- **Frontend Implementation**
+    - `CardCheckbox.vue` component (20x20px, custom design)
+        - Gradient background when checked: `linear-gradient(135deg, var(--color-primary), var(--color-accent))`
+        - ARIA labels for accessibility
+        - Keyboard navigation support (Space key toggle)
+        - Dark theme compatible
+    - `CardItem.vue` enhancements
+        - New props: `selectionMode`, `selected`
+        - Conditional rendering: checkbox vs Edit/Delete buttons
+        - Click handler switches between flip and selection toggle
+        - Opacity transition (200ms ease)
+    - `CardList.vue` updates
+        - Pass-through selection props to CardItem
+        - New emit: `toggle-select`
+    - `CoursePage.vue` state management
+        - `isSelectionMode` ref (boolean)
+        - `selectedCardIds` ref (Set for O(1) operations)
+        - Handlers: `handleToggleCardSelection`, `handleBatchDelete`, `handleDeleteAllCards`, `exitSelectionMode`
+        - Selection UI in both desktop section header and mobile panel
+    - `cardsApi` methods
+        - `deleteBatch(courseId, cardIds)` — POST with data payload
+        - `deleteAll(courseId)` — DELETE all
+    - `useCardStore` actions
+        - `deleteBatchCards(ids, courseId)` — removes from local state, fetches fresh stats
+        - `deleteAllCards(courseId)` — clears local array, updates stats
+
+### Changed
+
+- **Card Repository** (`cardRepository.ts`)
+    - Added `deleteCardsBatch(ids, courseId)` — SQL WHERE IN with transaction
+    - Added `deleteAllCards(courseId)` — single DELETE query
+    - Both methods return deleted count via `numDeletedRows`
+
+### Fixed
+
+- Initial implementation issues:
+    - Removed TypeScript syntax from CardCheckbox (project uses JavaScript)
+    - Removed i18n `$t()` call (internationalization not implemented)
+    - Added missing "Clear" button to UI (was implemented as handler only)
+
+### Technical Details
+
+- **OpenSpec Status**:
+    - ✅ All 30+ implementation tasks completed
+    - ✅ All 7 testing tasks completed
+    - ✅ All 4 UI/UX polish tasks completed
+    - ✅ Change archived as `2026-01-07-add-batch-card-delete`
+    - ✅ Spec `course-ui` updated: +3 requirements (Batch Delete, Delete All, Custom Checkbox)
+
+- **Files Modified**: 9
+    - Backend (3): `cardRepository.ts`, `cards.ts`, `card.ts` (schemas)
+    - Frontend (6): `CardCheckbox.vue` (new), `CardItem.vue`, `CardList.vue`, `CoursePage.vue`, `cards.js` (API), `useCardStore.js`
+
+- **Code Quality**:
+    - ✅ No lint errors
+    - ✅ Transactional database operations
+    - ✅ Proper state synchronization (local + server)
+    - ✅ Accessibility features (ARIA labels, keyboard navigation)
+
+- **User Experience**:
+    - ✅ Works on desktop and mobile (slide-out panel)
+    - ✅ Real-time counter in "Delete (N)" button
+    - ✅ Confirmation dialogs prevent accidental deletions
+    - ✅ Statistics auto-update after deletion
+    - ✅ Smooth animations and visual feedback
+
 ## [0.4.5] - 2026-01-07 20:30
 
 ### Added
@@ -12,66 +109,66 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 #### OpenSpec: Batch Card Delete Proposal
 
 - **OpenSpec Change Created**: `add-batch-card-delete`
-  - Comprehensive proposal for batch card deletion functionality
-  - Motivation: inefficient to delete cards one by one when cleaning up course content
-  
+    - Comprehensive proposal for batch card deletion functionality
+    - Motivation: inefficient to delete cards one by one when cleaning up course content
+
 - **Proposal Structure** (`openspec/changes/add-batch-card-delete/`)
-  - **proposal.md** (2.4 KB)
-    - Overview: batch card deletion with checkboxes + delete all cards feature
-    - Motivation: current one-by-one deletion is inconvenient for bulk operations
-    - Goals: selection mode, visual feedback, batch delete, delete all
-    - Success criteria: 7 points covering selection, deletion, backend support
-  - **design.md** (15.2 KB)
-    - Backend API: two endpoints for batch delete and delete all
-      - `DELETE /api/courses/:courseId/cards/batch` (with cardIds array)
-      - `DELETE /api/courses/:courseId/cards` (delete all cards)
-    - Frontend UI: selection mode with custom checkboxes
-      - `CardCheckbox.vue` component (20x20px, gradient when checked)
-      - `CardItem.vue` changes: selectionMode prop, opacity 0.6 when selected
-      - `CoursePage.vue`: selection state, toggle/batch delete handlers
-    - UX considerations: visual feedback, transitions, accessibility
-    - Error handling: SQL transactions, network errors
-  - **tasks.md** (3.8 KB, 8 phases, 30+ subtasks)
-    - Phase 1: Backend API endpoints (5 tasks)
-    - Phase 2: Frontend UI components for selection mode (6 tasks)
-    - Phase 3: CoursePage selection mode (7 tasks)
-    - Phase 4: Delete all cards feature (4 tasks)
-    - Phase 5: API client integration (4 tasks)
-    - Phase 6: Testing (7 tasks)
-    - Phase 7: UI/UX polish (4 tasks)
-  - **specs/course-ui/spec.md** (delta)
-    - ADDED requirements:
-      - Batch Card Delete (4 scenarios: entering mode, selecting, deleting, exiting)
-      - Delete All Cards (2 scenarios: accessing, deleting)
-      - Custom Checkbox Component (3 scenarios: unchecked, checked, dark theme)
-    - MODIFIED requirements:
-      - Enhanced Card Statistics: added selection mode behavior
+    - **proposal.md** (2.4 KB)
+        - Overview: batch card deletion with checkboxes + delete all cards feature
+        - Motivation: current one-by-one deletion is inconvenient for bulk operations
+        - Goals: selection mode, visual feedback, batch delete, delete all
+        - Success criteria: 7 points covering selection, deletion, backend support
+    - **design.md** (15.2 KB)
+        - Backend API: two endpoints for batch delete and delete all
+            - `DELETE /api/courses/:courseId/cards/batch` (with cardIds array)
+            - `DELETE /api/courses/:courseId/cards` (delete all cards)
+        - Frontend UI: selection mode with custom checkboxes
+            - `CardCheckbox.vue` component (20x20px, gradient when checked)
+            - `CardItem.vue` changes: selectionMode prop, opacity 0.6 when selected
+            - `CoursePage.vue`: selection state, toggle/batch delete handlers
+        - UX considerations: visual feedback, transitions, accessibility
+        - Error handling: SQL transactions, network errors
+    - **tasks.md** (3.8 KB, 8 phases, 30+ subtasks)
+        - Phase 1: Backend API endpoints (5 tasks)
+        - Phase 2: Frontend UI components for selection mode (6 tasks)
+        - Phase 3: CoursePage selection mode (7 tasks)
+        - Phase 4: Delete all cards feature (4 tasks)
+        - Phase 5: API client integration (4 tasks)
+        - Phase 6: Testing (7 tasks)
+        - Phase 7: UI/UX polish (4 tasks)
+    - **specs/course-ui/spec.md** (delta)
+        - ADDED requirements:
+            - Batch Card Delete (4 scenarios: entering mode, selecting, deleting, exiting)
+            - Delete All Cards (2 scenarios: accessing, deleting)
+            - Custom Checkbox Component (3 scenarios: unchecked, checked, dark theme)
+        - MODIFIED requirements:
+            - Enhanced Card Statistics: added selection mode behavior
 
 - **Key Features Documented**
-  - **Selection Mode**:
-    - Custom checkboxes (not native browser checkboxes)
-    - Selected cards have reduced opacity (0.6)
-    - Cards don't flip in selection mode
-    - "Delete selected (N)" button (disabled when N=0)
-    - "Cancel" button to exit selection mode
-  - **Delete All**:
-    - Separate "Delete all cards" button
-    - Confirmation dialog with warning
-    - Single operation to clear entire course
-  - **Backend**:
-    - Transactional batch delete (all or nothing)
-    - Validation: max 100 cards per batch, cards belong to course
-    - Returns deleted count in response
+    - **Selection Mode**:
+        - Custom checkboxes (not native browser checkboxes)
+        - Selected cards have reduced opacity (0.6)
+        - Cards don't flip in selection mode
+        - "Delete selected (N)" button (disabled when N=0)
+        - "Cancel" button to exit selection mode
+    - **Delete All**:
+        - Separate "Delete all cards" button
+        - Confirmation dialog with warning
+        - Single operation to clear entire course
+    - **Backend**:
+        - Transactional batch delete (all or nothing)
+        - Validation: max 100 cards per batch, cards belong to course
+        - Returns deleted count in response
 
 ### Technical Details
 
 - **OpenSpec Validation**: ✅ Passed `npx @fission-ai/openspec validate add-batch-card-delete --strict`
 - **Change Status**: 0/30+ tasks (proposal stage, ready for user review and approval)
 - **Files Created**: 4
-  - `openspec/changes/add-batch-card-delete/proposal.md`
-  - `openspec/changes/add-batch-card-delete/design.md`
-  - `openspec/changes/add-batch-card-delete/tasks.md`
-  - `openspec/changes/add-batch-card-delete/specs/course-ui/spec.md`
+    - `openspec/changes/add-batch-card-delete/proposal.md`
+    - `openspec/changes/add-batch-card-delete/design.md`
+    - `openspec/changes/add-batch-card-delete/tasks.md`
+    - `openspec/changes/add-batch-card-delete/specs/course-ui/spec.md`
 - **No Code Changes Yet**: Pure planning/proposal phase
 
 ### Next Steps
@@ -86,7 +183,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 #### Feature: Visual Feedback for Card Edit/Create
 
 - **Visual feedback after card creation/edit**: automatic scroll to card with bounce animation
-- **Card progress reset on edit**: card becomes "new" with fresh FSRS metrics (state, stability, difficulty, reps, lapses reset)
+- **Card progress reset on edit**: card becomes "new" with fresh FSRS metrics (state, stability, difficulty, reps,
+  lapses reset)
 - **CardList.vue now exposes `scrollToCardWithBounce()` method**:
     - Scrolls to card using `scrollIntoView({ behavior: 'smooth', block: 'start' })`
     - Applies `bounce-in-bck` CSS animation (2s duration)
@@ -147,62 +245,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 #### OpenSpec: Card Edit Visual Feedback Proposal
 
 - **OpenSpec Change Created**: `card-edit-form`
-  - Proposal for adding visual feedback when editing/creating cards
-  - Motivation: users need clear confirmation of which card was edited/created
-  
+    - Proposal for adding visual feedback when editing/creating cards
+    - Motivation: users need clear confirmation of which card was edited/created
+
 - **Proposal Structure** (`openspec/changes/card-edit-form/`)
-  - **proposal.md** (5.8 KB)
-    - Context: identifying UX issues (no visual feedback, poor mobile experience)
-    - Solution: use existing `CardEditorModal` + scroll to card + bounce animation
-    - Success criteria: 7 points covering edit/create flows
-    - Open questions answered: progress reset fields, animation type, scroll parameters
-    - Alternatives considered: inline form rejected in favor of existing modal
-  - **design.md** (12 KB)
-    - Component changes: `CardList.vue`, `CoursePage.vue`
-    - New method: `scrollToCardWithBounce(cardId)`
-    - CSS animation: `bounce-in-bck` (1s duration, 7 keyframes)
-    - API changes: `PUT /cards/:id` with `resetProgress` parameter
-    - Data flow diagrams for edit and create scenarios
-    - Edge cases: card not found, dual CardList instances (desktop/mobile)
-  - **tasks.md** (8.5 KB, 9 tasks, ~2.5 hours)
-    - Task 1: Backend support for progress reset (15 min)
-    - Task 2: CardList scroll + animation method (30 min)
-    - Tasks 3-4: CoursePage integration (35 min)
-    - Tasks 5-7: Manual testing (50 min)
-    - Tasks 8-9: Documentation + validation (20 min)
-  - **specs/course-ui/spec.md** (7 KB)
-    - MODIFIED requirements: Card Management Interface (4 scenarios)
-    - ADDED requirements: Progress Reset on Edit (2 scenarios)
-    - Implementation notes: API contract, CSS animation, data flow
+    - **proposal.md** (5.8 KB)
+        - Context: identifying UX issues (no visual feedback, poor mobile experience)
+        - Solution: use existing `CardEditorModal` + scroll to card + bounce animation
+        - Success criteria: 7 points covering edit/create flows
+        - Open questions answered: progress reset fields, animation type, scroll parameters
+        - Alternatives considered: inline form rejected in favor of existing modal
+    - **design.md** (12 KB)
+        - Component changes: `CardList.vue`, `CoursePage.vue`
+        - New method: `scrollToCardWithBounce(cardId)`
+        - CSS animation: `bounce-in-bck` (1s duration, 7 keyframes)
+        - API changes: `PUT /cards/:id` with `resetProgress` parameter
+        - Data flow diagrams for edit and create scenarios
+        - Edge cases: card not found, dual CardList instances (desktop/mobile)
+    - **tasks.md** (8.5 KB, 9 tasks, ~2.5 hours)
+        - Task 1: Backend support for progress reset (15 min)
+        - Task 2: CardList scroll + animation method (30 min)
+        - Tasks 3-4: CoursePage integration (35 min)
+        - Tasks 5-7: Manual testing (50 min)
+        - Tasks 8-9: Documentation + validation (20 min)
+    - **specs/course-ui/spec.md** (7 KB)
+        - MODIFIED requirements: Card Management Interface (4 scenarios)
+        - ADDED requirements: Progress Reset on Edit (2 scenarios)
+        - Implementation notes: API contract, CSS animation, data flow
 
 - **Key Features Documented**
-  - **Visual Feedback**:
-    - Automatic scroll to edited/created card: `scrollIntoView({ behavior: 'smooth', block: 'start' })`
-    - Bounce animation: `bounce-in-bck` (1s, transform scale from 7 to 1 with intermediate bounces)
-    - Accessibility: respects `prefers-reduced-motion: reduce`
-  - **Progress Reset**:
-    - When editing card: reset `state`, `stability`, `difficulty`, `reps`, `lapses`, `due`
-    - Card becomes "new" (state = New, due = now + 4h)
-    - Automatic on save (cannot be disabled)
-  - **Minimal Changes**:
-    - No new components (uses existing `CardEditorModal`)
-    - Only 3 files modified: `CardList.vue`, `CoursePage.vue`, `backend/src/routes/cards.ts`
-    - Complexity reduced: Low (1-2 hours) vs original Medium (3-5 hours)
+    - **Visual Feedback**:
+        - Automatic scroll to edited/created card: `scrollIntoView({ behavior: 'smooth', block: 'start' })`
+        - Bounce animation: `bounce-in-bck` (1s, transform scale from 7 to 1 with intermediate bounces)
+        - Accessibility: respects `prefers-reduced-motion: reduce`
+    - **Progress Reset**:
+        - When editing card: reset `state`, `stability`, `difficulty`, `reps`, `lapses`, `due`
+        - Card becomes "new" (state = New, due = now + 4h)
+        - Automatic on save (cannot be disabled)
+    - **Minimal Changes**:
+        - No new components (uses existing `CardEditorModal`)
+        - Only 3 files modified: `CardList.vue`, `CoursePage.vue`, `backend/src/routes/cards.ts`
+        - Complexity reduced: Low (1-2 hours) vs original Medium (3-5 hours)
 
 - **User Adjustments** (post-proposal)
-  - Animation timeout increased from 1000ms to 2000ms for better visibility
-  - Decision to use existing modal instead of creating new inline form
-  - All open questions resolved with specific implementation details
+    - Animation timeout increased from 1000ms to 2000ms for better visibility
+    - Decision to use existing modal instead of creating new inline form
+    - All open questions resolved with specific implementation details
 
 ### Technical Details
 
 - **OpenSpec Validation**: ✅ Passed `npx @fission-ai/openspec validate card-edit-form --strict`
 - **Change Status**: 0/9 tasks (proposal stage, ready for user review and approval)
 - **Files Created**: 4
-  - `openspec/changes/card-edit-form/proposal.md`
-  - `openspec/changes/card-edit-form/design.md`
-  - `openspec/changes/card-edit-form/tasks.md`
-  - `openspec/changes/card-edit-form/specs/course-ui/spec.md`
+    - `openspec/changes/card-edit-form/proposal.md`
+    - `openspec/changes/card-edit-form/design.md`
+    - `openspec/changes/card-edit-form/tasks.md`
+    - `openspec/changes/card-edit-form/specs/course-ui/spec.md`
 - **No Code Changes Yet**: Pure planning/proposal phase
 
 ### Next Steps
@@ -855,8 +953,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ```javascript
 getEffectiveSettings: (state) => (courseId) => {
-  if (!courseId) return state.globalSettings
-  return state.courseSettings.get(courseId) || state.globalSettings
+    if (!courseId) return state.globalSettings
+    return state.courseSettings.get(courseId) || state.globalSettings
 }
 ```
 
@@ -1300,7 +1398,7 @@ getEffectiveSettings: (state) => (courseId) => {
 
 - **Fixed all markdown linting errors in documentation**:
     - `Implementation_Plan.md` — split long lines, fixed heading hierarchy (h5→h4),
-       added language for code block
+      added language for code block
     - `Frontend_Integration_Plan.md` — split long lines, fixed blockquotes
     - `Testing_API.md` — added blank lines around code blocks (MD031)
     - `Walkthrough.md` — removed trailing punctuation from headers, split long lines

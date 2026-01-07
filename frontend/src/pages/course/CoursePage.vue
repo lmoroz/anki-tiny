@@ -29,6 +29,10 @@
   const cardsPanelRef = useTemplateRef('cardsPanel')
   let focusTrap
 
+  // Selection Mode State
+  const isSelectionMode = ref(false)
+  const selectedCardIds = ref(new Set())
+
   // Computed
   const course = computed(() => courseStore.getCourseById(courseId))
   const cards = computed(() => cardStore.getCardsByCourse(courseId))
@@ -121,6 +125,48 @@
         console.error('Failed to delete card:', err)
       }
     }
+  }
+
+  const handleToggleCardSelection = card => {
+    if (selectedCardIds.value.has(card.id)) {
+      selectedCardIds.value.delete(card.id)
+    } else {
+      selectedCardIds.value.add(card.id)
+    }
+    // Force reactivity
+    selectedCardIds.value = new Set(selectedCardIds.value)
+  }
+
+  const handleBatchDelete = async () => {
+    const count = selectedCardIds.value.size
+    const confirmed = confirm(`Удалить выбранные карточки (${count})?`)
+
+    if (confirmed) {
+      try {
+        await cardStore.deleteBatchCards(Array.from(selectedCardIds.value), courseId)
+        exitSelectionMode()
+      } catch (err) {
+        console.error('Failed to batch delete cards:', err)
+      }
+    }
+  }
+
+  const handleDeleteAllCards = async () => {
+    const count = cards.value.length
+    const confirmed = confirm(`Вы уверены, что хотите удалить ВСЕ карточки курса (${count})?\n\nЭто действие необратимо!`)
+
+    if (confirmed) {
+      try {
+        await cardStore.deleteAllCards(courseId)
+      } catch (err) {
+        console.error('Failed to delete all cards:', err)
+      }
+    }
+  }
+
+  const exitSelectionMode = () => {
+    isSelectionMode.value = false
+    selectedCardIds.value.clear()
   }
 
   const handleSaveCard = async data => {
@@ -224,16 +270,16 @@
     <div v-else>
       <div class="flex items-center justify-between mb-2">
         <Button
-          @click="handleBack"
+          size="sm"
           variant="ghost"
-          size="sm">
+          @click="handleBack">
           <i class="bi bi-arrow-left" />
           Назад
         </Button>
         <Button
-          @click="handleOpenSettings"
+          size="sm"
           variant="ghost"
-          size="sm">
+          @click="handleOpenSettings">
           <i class="bi bi-gear" />
           Настройки курса
         </Button>
@@ -244,8 +290,8 @@
         <!-- Left Column / Full Width on Mobile: Course Info -->
         <div class="course-info-section">
           <Card
-            padding="lg"
-            class="mb-6">
+            class="mb-6"
+            padding="lg">
             <h1 class="course-title lg:mb-2 md:mb-1 sm:mb-1 text-3xl font-bold text-white leading-tight tracking-tight drop-shadow-sm">{{ course?.name }}</h1>
             <div
               v-if="course?.description"
@@ -257,8 +303,8 @@
                 v-if="stats"
                 class="stats-grid">
                 <Card
-                  rounded="md"
-                  padding="sm">
+                  padding="sm"
+                  rounded="md">
                   <div class="stat-item">
                     <i class="bi bi-card-list" />
                     <div class="stat-content">
@@ -268,8 +314,8 @@
                   </div>
                 </Card>
                 <Card
-                  rounded="md"
-                  padding="sm">
+                  padding="sm"
+                  rounded="md">
                   <div class="stat-item">
                     <i class="bi bi-stars" />
                     <div class="stat-content">
@@ -279,8 +325,8 @@
                   </div>
                 </Card>
                 <Card
-                  rounded="md"
-                  padding="sm">
+                  padding="sm"
+                  rounded="md">
                   <div class="stat-item">
                     <i class="bi bi-arrow-repeat" />
                     <div class="stat-content">
@@ -290,9 +336,9 @@
                   </div>
                 </Card>
                 <Card
-                  rounded="md"
+                  highlight
                   padding="sm"
-                  highlight>
+                  rounded="md">
                   <div class="stat-item highlight">
                     <i class="bi bi-calendar-check" />
                     <div class="stat-content">
@@ -306,10 +352,10 @@
 
             <div class="course-actions">
               <Button
-                @click="handleStartTraining"
-                size="lg"
+                :disabled="!stats || stats.dueToday === 0"
                 full-width
-                :disabled="!stats || stats.dueToday === 0">
+                size="lg"
+                @click="handleStartTraining">
                 <span class="text-lg font-semibold text-white drop-shadow-md tracking-wide">
                   <i class="bi bi-play-fill" />
                   {{ stats && stats.dueToday > 0 ? `Начать тренировку (${stats.dueToday})` : 'Нет карточек для повторения' }}
@@ -329,92 +375,173 @@
         <div
           v-if="isDesktop"
           class="cards-section flex flex-col overflow-hidden">
-          <div class="section-header flex items-center justify-between mb-[16px] px-2">
-            <h2 class="section-title">Карточки</h2>
-            <Button
-              @click="handleCreateCard"
-              variant="ghost"
-              size="sm">
-              <i class="bi bi-plus-lg" />
-              Создать карточку
-            </Button>
+          <div class="section-header flex items-center justify-between mb-[16px] px-2 gap-2">
+            <h2 class="section-title flex-1 mr-auto">Карточки</h2>
+            <div class="flex gap-2">
+              <Button
+                v-if="!isSelectionMode && cards.length > 0"
+                ghost
+                size="sm"
+                title="Очистить"
+                variant="danger"
+                @click="handleDeleteAllCards">
+                <i class="bi bi-trash3" />
+                Очистить
+              </Button>
+              <Button
+                v-if="!isSelectionMode && cards.length > 0"
+                size="sm"
+                variant="ghost"
+                @click="isSelectionMode = true">
+                <i class="bi bi-check-square" />
+                Выбрать
+              </Button>
+              <template v-else-if="isSelectionMode">
+                <Button
+                  :disabled="selectedCardIds.size === 0"
+                  size="sm"
+                  variant="danger"
+                  @click="handleBatchDelete">
+                  <i class="bi bi-trash" />
+                  Удалить ({{ selectedCardIds.size }})
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  @click="exitSelectionMode">
+                  <i class="bi bi-x" />
+                  Отменить
+                </Button>
+              </template>
+              <Button
+                v-if="!isSelectionMode"
+                size="sm"
+                variant="ghost"
+                @click="handleCreateCard">
+                <i class="bi bi-plus-lg" />
+                Создать
+              </Button>
+            </div>
           </div>
 
           <CardList
             ref="cardListDesktopRef"
             :cards="cards"
             :loading="cardsLoading"
+            :selected-ids="selectedCardIds"
+            :selection-mode="isSelectionMode"
+            @delete="handleDeleteCard"
             @edit="handleEditCard"
-            @delete="handleDeleteCard" />
+            @toggle-select="handleToggleCardSelection" />
         </div>
       </div>
 
       <!-- Mobile: Floating Action Button -->
       <Button
-        v-if="!isDesktop && !isCardsPanelOpen"
-        variant="primary"
-        size="lg"
-        rounded="full"
+        v-if="!isDesktop && !isCardsPanelOpen && cards.length"
+        aria-label="Показать список карточек"
         class="fab"
-        @click="openCardsPanel"
-        aria-label="Показать список карточек">
+        rounded="full"
+        size="lg"
+        variant="primary"
+        @click="openCardsPanel">
         <i class="bi bi-list-ul" />
         Показать карточки ({{ cards.length }})
       </Button>
 
       <!-- Mobile: Slide-out Panel -->
-      <div
-        v-if="!isDesktop && isCardsPanelOpen"
-        class="cards-panel-container">
+      <div class="cards-panel-container">
         <div
-          class="panel-backdrop"
+          v-if="!isDesktop && isCardsPanelOpen"
+          class="panel-backdrop pointer-events-all"
           @click="closeCardsPanel" />
         <div
           ref="cardsPanel"
-          class="cards-panel"
-          :class="{ open: isCardsPanelOpen }">
-          <div class="panel-header flex items-center justify-between sticky top-0 z-1 pt-[60px] pb-[6px] ps-[12px] z-20">
-            <h2 class="panel-title">Карточки</h2>
+          :class="{ open: isCardsPanelOpen }"
+          class="cards-panel pointer-events-all">
+          <div class="panel-header flex items-center justify-between sticky top-0 z-1 py-[6px] ps-[12px] z-20 gap-3">
+            <h2 class="panel-title mr-auto">Карточки</h2>
+            <div class="flex">
+              <Button
+                v-if="!isSelectionMode && cards.length > 0"
+                ghost
+                size="sm"
+                title="Очистить"
+                variant="danger"
+                @click="handleDeleteAllCards">
+                <i class="bi bi-trash3" />
+              </Button>
+              <Button
+                v-if="!isSelectionMode && cards.length > 0"
+                size="sm"
+                variant="ghost"
+                @click="isSelectionMode = true">
+                <i class="bi bi-check-square" />
+                Выбрать
+              </Button>
+              <template v-else-if="isSelectionMode">
+                <Button
+                  :disabled="selectedCardIds.size === 0"
+                  size="sm"
+                  variant="danger"
+                  @click="handleBatchDelete">
+                  <i class="bi bi-trash" />
+                  Удалить ({{ selectedCardIds.size }})
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  @click="exitSelectionMode">
+                  <i class="bi bi-x" />
+                  Отменить
+                </Button>
+              </template>
+              <Button
+                v-if="!isSelectionMode"
+                full-width
+                size="sm"
+                variant="ghost"
+                @click="handleCreateCard">
+                <i class="bi bi-plus-lg" />
+                Создать
+              </Button>
+            </div>
             <Button
-              @click="handleCreateCard"
-              variant="ghost"
+              aria-label="Закрыть панель"
+              class="panel-close-btn ml-auto"
               size="sm"
-              full-width>
-              <i class="bi bi-plus-lg" />
-              Создать карточку
-            </Button>
-            <Button
               variant="ghost"
-              @click="closeCardsPanel"
-              class="panel-close-btn"
-              aria-label="Закрыть панель">
+              @click="closeCardsPanel">
               <i class="bi bi-x-lg" />
             </Button>
           </div>
           <CardList
             ref="cardListMobileRef"
-            class="panel-content flex-1 pl-[10px]"
             :cards="cards"
             :loading="cardsLoading"
+            :selected-ids="selectedCardIds"
+            :selection-mode="isSelectionMode"
+            class="panel-content flex-1 pl-[10px]"
+            @delete="handleDeleteCard"
             @edit="handleEditCard"
-            @delete="handleDeleteCard" />
+            @toggle-select="handleToggleCardSelection" />
         </div>
       </div>
     </div>
 
     <CardEditorModal
       v-if="editingCard !== false"
-      :show="showEditorModal"
       :card="editingCard"
       :course-id="courseId"
+      :show="showEditorModal"
       @close="handleCloseModal"
       @save="handleSaveCard" />
 
     <CourseSettingsModal
       v-if="course"
-      :show="showSettingsModal"
       :course-id="courseId"
       :course-name="course.name"
+      :show="showSettingsModal"
       @close="handleCloseSettings"
       @saved="handleSettingsSaved" />
   </div>
@@ -555,6 +682,7 @@
     position: fixed;
     inset: 0;
     z-index: 999;
+    pointer-events: none;
   }
 
   .panel-backdrop {
@@ -563,26 +691,32 @@
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(4px);
     z-index: 999;
+    pointer-events: all;
   }
 
   .cards-panel {
     position: fixed;
-    top: 0;
+    opacity: 0;
+    top: 36px;
     right: 0;
     bottom: 0;
     width: 100%;
     max-width: 400px;
     background: var(--color-bg-modal);
     box-shadow: -4px 0 24px rgba(0, 0, 0, 0.3);
+    will-change: transform, opacity;
     transform: translateX(100%);
-    transition: transform 0.3s ease;
+    transition:
+      transform 0.3s ease,
+      opacity 0.3s ease;
     z-index: 1000;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    pointer-events: all;
   }
 
-  @media (min-width: 768px) {
+  @media (min-width: 769px) {
     .cards-panel {
       width: 85%;
     }
@@ -590,6 +724,7 @@
 
   .cards-panel.open {
     transform: translateX(0);
+    opacity: 1;
   }
 
   .panel-header {
@@ -601,6 +736,5 @@
     font-size: var(--text-section-title-size);
     font-weight: 600;
     color: var(--color-text-primary);
-    margin: 0;
   }
 </style>

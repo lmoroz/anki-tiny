@@ -41,6 +41,24 @@ export const cardsApi = {
   },
 
   /**
+   * Массовое удаление карточек
+   */
+  async deleteBatch(courseId, cardIds) {
+    const response = await api.delete(`/courses/${courseId}/cards/batch`, {
+      data: { cardIds }
+    })
+    return response.data
+  },
+
+  /**
+   * Удалить все карточки курса
+   */
+  async deleteAll(courseId) {
+    const response = await api.delete(`/courses/${courseId}/cards`)
+    return response.data
+  },
+
+  /**
    * Получить статистику курса
    */
   async getCourseStats(courseId) {

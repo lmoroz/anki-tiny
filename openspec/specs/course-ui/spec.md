@@ -1,13 +1,18 @@
 # course-ui Specification
 
 ## Purpose
+
 TBD - created by archiving change redesign-course-layout. Update Purpose after archive.
+
 ## Requirements
+
 ### Requirement: Responsive Two-Column Layout
 
-The system SHALL provide a responsive two-column layout on desktop screens (≥1024px) for efficient use of screen space, while maintaining a single-column layout with hidden cards list on mobile/tablet devices (<1024px).
+The system SHALL provide a responsive two-column layout on desktop screens (≥1024px) for efficient use of screen space,
+while maintaining a single-column layout with hidden cards list on mobile/tablet devices (<1024px).
 
-**Rationale**: The current single-column layout leaves unused space on desktop screens (\u003e1024px), reducing the efficiency of card management.
+**Rationale**: The current single-column layout leaves unused space on desktop screens (\u003e1024px), reducing the
+efficiency of card management.
 
 #### Scenario: Desktop Layout
 
@@ -46,9 +51,11 @@ The system SHALL provide a responsive two-column layout on desktop screens (≥1
 
 ### Requirement: Slide-Out Cards Panel (Mobile)
 
-The system SHALL provide a slide-out panel from the right side for displaying cards list on mobile/tablet devices (<1024px) to allow quick access without losing course context.
+The system SHALL provide a slide-out panel from the right side for displaying cards list on mobile/tablet devices (<
+1024px) to allow quick access without losing course context.
 
-**Rationale**: Long scroll through the card list on mobile is inconvenient; the panel allows quick navigation through cards without losing course context.
+**Rationale**: Long scroll through the card list on mobile is inconvenient; the panel allows quick navigation through
+cards without losing course context.
 
 #### Scenario: Opening Cards Panel
 
@@ -87,9 +94,11 @@ The system SHALL provide a slide-out panel from the right side for displaying ca
 
 ### Requirement: Enhanced Card Statistics
 
-The system SHALL display comprehensive FSRS algorithm statistics (stability, difficulty, reps, lapses) and timestamps (created, last review, due) on each card item for full transparency of the learning process.
+The system SHALL display comprehensive FSRS algorithm statistics (stability, difficulty, reps, lapses) and timestamps (
+created, last review, due) on each card item for full transparency of the learning process.
 
-**Rationale**: Users should understand how the algorithm evaluates their progress. Hidden metrics (stability, difficulty, reps, lapses) reduce trust in the system.
+**Rationale**: Users should understand how the algorithm evaluates their progress. Hidden metrics (stability,
+difficulty, reps, lapses) reduce trust in the system.
 
 #### Scenario: Displaying Card Statistics
 
@@ -114,6 +123,29 @@ The system SHALL display comprehensive FSRS algorithm statistics (stability, dif
     - Relative time: "Today", "Yesterday", "2 days ago"
     - If `lastReview` null → do not display "Last: ..." string
 
+#### Scenario: Card Actions in Normal Mode
+
+- **GIVEN** user is NOT in selection mode
+- **WHEN** card is displayed
+- **THEN**:
+    - Edit button (pencil icon) is visible in the upper right corner
+    - Delete button (trash icon) is visible in the upper right corner
+    - Both buttons are initially hidden (opacity 0)
+    - Both buttons become visible on card hover
+- **AND** clicking Edit button opens card editor modal
+- **AND** clicking Delete button shows confirmation and deletes card
+
+#### Scenario: Card Actions in Selection Mode
+
+- **GIVEN** user IS in selection mode (`selectionMode prop = true`)
+- **WHEN** card is displayed
+- **THEN**:
+    - Edit and Delete buttons are hidden
+    - Custom checkbox is visible in the upper right corner (where buttons were)
+    - Checkbox shows checked/unchecked state based on `selected` prop
+- **AND** clicking card toggles selection instead of flipping
+- **AND** checkbox emits `@toggle-select` event on click
+
 #### Scenario: Compact Card Mode (Desktop)
 
 - **GIVEN** user on desktop (≥1024px), cards in the right column
@@ -127,12 +159,14 @@ The system SHALL display comprehensive FSRS algorithm statistics (stability, dif
 - **AND** compact mode is applied only to the right column on desktop
 - **AND** all metrics remain readable
 - **AND** tooltips work
+- **AND** checkboxes in selection mode are same size (20x20px) for touch target consistency
 
 ---
 
 ### Requirement: Accessibility for Statistics
 
-The system SHALL provide accessibility support for statistics display through tooltips on hover and ARIA attributes for screen readers.
+The system SHALL provide accessibility support for statistics display through tooltips on hover and ARIA attributes for
+screen readers.
 
 **Rationale**: Icons without explanations may be unclear to new users or users of screen readers.
 
@@ -183,16 +217,16 @@ changes, the user should re-learn it from scratch to ensure proper retention.
 - **WHEN** `PUT /api/courses/:courseId/cards/:cardId` is called with
   `{ front: "new question", back: "new answer", resetProgress: true }`
 - **THEN** backend updates card with:
-  - `front` = "new question"
-  - `back` = "new answer"
-  - `state` = `CardState.New`
-  - `stability` = `null`
-  - `difficulty` = `null`
-  - `reps` = 0
-  - `lapses` = 0
-  - `lastReview` = `null`
-  - `due` = current time + 4 hours (first learning interval)
-  - `interval` = `null`
+    - `front` = "new question"
+    - `back` = "new answer"
+    - `state` = `CardState.New`
+    - `stability` = `null`
+    - `difficulty` = `null`
+    - `reps` = 0
+    - `lapses` = 0
+    - `lastReview` = `null`
+    - `due` = current time + 4 hours (first learning interval)
+    - `interval` = `null`
 - **AND** response returns updated card with all fields
 
 #### Scenario: Frontend Progress Reset Display
@@ -200,14 +234,146 @@ changes, the user should re-learn it from scratch to ensure proper retention.
 - **GIVEN** card was edited and progress reset
 - **WHEN** card list is refreshed
 - **THEN**:
-  - Card displays state badge "Новая" (green)
-  - Stability value shows "0.0"
-  - Difficulty value shows "0.0"
-  - Reps value shows "0"
-  - Lapses value shows "0"
-  - Due date shows time relative to current (e.g., "Через 4 часа", "Сегодня")
-  - Last review timestamp is hidden (since `lastReview` is null)
+    - Card displays state badge "Новая" (green)
+    - Stability value shows "0.0"
+    - Difficulty value shows "0.0"
+    - Reps value shows "0"
+    - Lapses value shows "0"
+    - Due date shows time relative to current (e.g., "Через 4 часа", "Сегодня")
+    - Last review timestamp is hidden (since `lastReview` is null)
 - **AND** card is now eligible for training as a new card
+
+---
+
+### Requirement: Batch Card Delete
+
+The system SHALL provide a selection mode for cards with the ability to delete multiple cards in a single operation.
+
+**Rationale**: Deleting cards one by one is inefficient when users need to remove multiple outdated or incorrect cards
+from a course.
+
+#### Scenario: Entering Selection Mode
+
+- **GIVEN** user is viewing the course page with cards
+- **WHEN** user clicks the "Выбрать карточки" button
+- **THEN**:
+    - Selection mode is activated (`isSelectionMode = true`)
+    - All cards display checkboxes in the upper right corner (replacing Edit/Delete buttons)
+    - Cards no longer flip when clicked
+    - UI shows "Удалить выбранные (0)" button (disabled)
+    - UI shows "Отменить" button
+- **AND** the button labeled "Выбрать карточки" is hidden
+- **AND** the "Create Card" button remains visible
+
+#### Scenario: Selecting Cards
+
+- **GIVEN** selection mode is active
+- **WHEN** user clicks on a card
+- **THEN**:
+    - Card is toggled between selected/unselected state
+    - Selected card has `opacity: 0.6`
+    - Checkbox shows checked state (gradient background with checkmark icon)
+    - Counter in "Удалить выбранные (N)" button updates
+- **AND** clicking the checkbox itself also toggles selection
+- **AND** card does NOT flip to show the answer
+
+#### Scenario: Deleting Selected Cards
+
+- **GIVEN** selection mode is active, 3 cards are selected
+- **WHEN** user clicks "Удалить выбранные (3)" button
+- **THEN**:
+    - Browser confirmation dialog appears: `Удалить выбранные карточки (3)?`
+- **WHEN** user confirms deletion
+- **THEN**:
+    - Backend API `DELETE /api/courses/:courseId/cards/batch` is called with `{ cardIds: [1, 2, 3] }`
+    - Cards are removed from the UI
+    - Selection mode is exited (`isSelectionMode = false`)
+    - Selected card IDs are cleared
+    - Course statistics are updated
+- **AND** if deletion fails, error is shown and selection mode remains active
+
+#### Scenario: Exiting Selection Mode
+
+- **GIVEN** selection mode is active
+- **WHEN** user clicks "Отменить" button
+- **THEN**:
+    - Selection mode is deactivated (`isSelectionMode = false`)
+    - Checkboxes are hidden
+    - Edit/Delete buttons reappear on cards
+    - Cards flip normally on click
+    - Selected card IDs are cleared
+- **AND** opacity of previously selected cards returns to normal
+
+---
+
+### Requirement: Delete All Cards
+
+The system SHALL provide a "Delete All Cards" action to remove all cards from a course in a single operation.
+
+**Rationale**: Users may need to completely clear a course to start over or remove test data.
+
+#### Scenario: Accessing Delete All Cards
+
+- **GIVEN** user is viewing the course page
+- **WHEN** user views the cards section header or course actions menu
+- **THEN**:
+    - "Удалить все карточки" button is visible
+    - Button has `bi-trash3` icon
+    - Button has `danger` variant styling
+
+#### Scenario: Deleting All Cards
+
+- **GIVEN** course has 50 cards
+- **WHEN** user clicks "Удалить все карточки" button
+- **THEN**:
+    - Confirmation dialog appears: `Вы уверены, что хотите удалить ВСЕ карточки курса (50)?\n\nЭто действие необратимо!`
+- **WHEN** user confirms deletion
+- **THEN**:
+    - Backend API `DELETE /api/courses/:courseId/cards` is called
+    - All cards are removed from the UI
+    - Course statistics show 0 cards
+    - Empty state message is displayed
+- **AND** if deletion fails, error notification is shown
+
+---
+
+### Requirement: Custom Checkbox Component
+
+The system SHALL provide a custom checkbox component for card selection with consistent styling across light and dark
+themes.
+
+**Rationale**: Native browser checkboxes do not match the application's design system and may render inconsistently
+across platforms.
+
+#### Scenario: Unchecked Checkbox Display
+
+- **GIVEN** custom checkbox is rendered in unchecked state
+- **WHEN** checkbox is displayed
+- **THEN**:
+    - Checkbox is 20x20px square
+    - Border is 2px solid using `var(--color-border)`
+    - Border radius is 4px
+    - Background is transparent
+    - Cursor is `pointer` on hover
+
+#### Scenario: Checked Checkbox Display
+
+- **GIVEN** custom checkbox is rendered in checked state
+- **WHEN** checkbox is displayed
+- **THEN**:
+    - Background is gradient from `var(--color-primary)` to `var(--color-accent)`
+    - Border color changes to `var(--color-primary)`
+    - White checkmark icon (`bi-check`, 14px) is centered
+    - Transition animation is smooth (200ms ease)
+
+#### Scenario: Checkbox in Dark Theme
+
+- **GIVEN** application is in dark theme
+- **WHEN** checkbox is rendered (checked or unchecked)
+- **THEN**:
+    - Border color uses theme-specific `var(--color-border)` value
+    - Gradient colors use theme-specific `var(--color-primary)` and `var(--color-accent)`
+    - Checkbox remains clearly visible and accessible
 
 ---
 

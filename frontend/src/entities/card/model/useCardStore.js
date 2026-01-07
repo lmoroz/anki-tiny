@@ -14,11 +14,11 @@ export const useCardStore = defineStore('card', () => {
 
   // Getters
   const getCardsByCourse = computed(() => {
-    return (courseId) => cardsByCourse.value[courseId] || []
+    return courseId => cardsByCourse.value[courseId] || []
   })
 
   const getCourseStats = computed(() => {
-    return (courseId) => stats.value[courseId] || null
+    return courseId => stats.value[courseId] || null
   })
 
   // Actions
@@ -54,16 +54,16 @@ export const useCardStore = defineStore('card', () => {
     error.value = null
     try {
       const newCard = await cardsApi.create(courseId, data)
-      
+
       // Добавляем карточку в локальное состояние
       if (!cardsByCourse.value[courseId]) {
         cardsByCourse.value[courseId] = []
       }
       cardsByCourse.value[courseId].push(newCard)
-      
+
       // Обновляем статистику
       await fetchCourseStats(courseId)
-      
+
       return newCard
     } catch (err) {
       error.value = err.response?.data?.error || 'Ошибка создания карточки'
@@ -79,7 +79,7 @@ export const useCardStore = defineStore('card', () => {
     error.value = null
     try {
       const updatedCard = await cardsApi.update(id, data)
-      
+
       // Обновляем карточку в локальном состоянии
       for (const courseId in cardsByCourse.value) {
         const index = cardsByCourse.value[courseId].findIndex(c => c.id === id)
@@ -88,7 +88,7 @@ export const useCardStore = defineStore('card', () => {
           break
         }
       }
-      
+
       return updatedCard
     } catch (err) {
       error.value = err.response?.data?.error || 'Ошибка обновления карточки'
@@ -104,17 +104,63 @@ export const useCardStore = defineStore('card', () => {
     error.value = null
     try {
       await cardsApi.delete(id)
-      
+
       // Удаляем карточку из локального состояния
       if (cardsByCourse.value[courseId]) {
         cardsByCourse.value[courseId] = cardsByCourse.value[courseId].filter(c => c.id !== id)
       }
-      
+
       // Обновляем статистику
       await fetchCourseStats(courseId)
     } catch (err) {
       error.value = err.response?.data?.error || 'Ошибка удаления карточки'
       console.error('[Card Store] Failed to delete card:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function deleteBatchCards(ids, courseId) {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await cardsApi.deleteBatch(courseId, ids)
+
+      // Удаляем карточки из локального состояния
+      if (cardsByCourse.value[courseId]) {
+        cardsByCourse.value[courseId] = cardsByCourse.value[courseId].filter(c => !ids.includes(c.id))
+      }
+
+      // Обновляем статистику
+      await fetchCourseStats(courseId)
+
+      return response.deletedCount
+    } catch (err) {
+      error.value = err.response?.data?.error || 'Ошибка массового удаления'
+      console.error('[Card Store] Failed to batch delete cards:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function deleteAllCards(courseId) {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await cardsApi.deleteAll(courseId)
+
+      // Очищаем локальное состояние
+      cardsByCourse.value[courseId] = []
+
+      // Обновляем статистику
+      await fetchCourseStats(courseId)
+
+      return response.deletedCount
+    } catch (err) {
+      error.value = err.response?.data?.error || 'Ошибка удаления карточек'
+      console.error('[Card Store] Failed to delete all cards:', err)
       throw err
     } finally {
       loading.value = false
@@ -135,6 +181,8 @@ export const useCardStore = defineStore('card', () => {
     fetchCourseStats,
     createCard,
     updateCard,
-    deleteCard
+    deleteCard,
+    deleteBatchCards,
+    deleteAllCards
   }
 })

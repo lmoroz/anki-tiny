@@ -12,10 +12,18 @@
     loading: {
       type: Boolean,
       default: false
+    },
+    selectionMode: {
+      type: Boolean,
+      default: false
+    },
+    selectedIds: {
+      type: Set,
+      default: () => new Set()
     }
   })
 
-  const emit = defineEmits(['edit', 'delete'])
+  const emit = defineEmits(['edit', 'delete', 'toggle-select'])
 
   const scrollContainer = useTemplateRef('cardsGrid')
   useFades(scrollContainer)
@@ -23,6 +31,8 @@
   const handleEdit = card => emit('edit', card)
 
   const handleDelete = card => emit('delete', card)
+
+  const handleToggleSelect = card => emit('toggle-select', card)
 
   const scrollToCardWithBounce = cardId => {
     const cardElement = scrollContainer.value?.querySelector(`[data-card-id="${cardId}"]`)
@@ -72,8 +82,11 @@
         :key="card.id"
         :data-card-id="card.id"
         :card="card"
+        :selection-mode="selectionMode"
+        :selected="selectedIds.has(card.id)"
         @edit="handleEdit"
-        @delete="handleDelete" />
+        @delete="handleDelete"
+        @toggle-select="handleToggleSelect(card)" />
     </div>
     <div
       class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#08193D] to-transparent z-20 pointer-events-none transition-opacity duration-300"

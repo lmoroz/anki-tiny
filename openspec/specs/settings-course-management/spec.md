@@ -8,7 +8,8 @@ TBD - created by archiving change add-settings-page. Update Purpose after archiv
 
 ### Requirement: View Course Settings
 
-The system SHALL allow users to view settings for individual courses, showing whether they use global defaults or custom values.
+The system SHALL allow users to view settings for individual courses, showing whether they use global defaults or custom
+values.
 
 #### Scenario: Course uses global settings
 

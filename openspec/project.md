@@ -96,13 +96,13 @@ else doOneThing();
 **Правильно:**
 
 ```ts
-import { useApiClient } from '@/shared/api/client';
+import {useApiClient} from '@/shared/api/client';
 ```
 
 **Неправильно:**
 
 ```ts
-import { useApiClient } from '../shared/api/client';
+import {useApiClient} from '../shared/api/client';
 import BaseButton from '@/components/BaseButton.vue'; // компоненты автоимпорт
 ```
 
