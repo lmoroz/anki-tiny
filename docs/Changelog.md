@@ -5,6 +5,90 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.4.6] - 2026-01-07 22:15
+
+### Added
+
+#### OpenSpec: Replace System Dialogs Proposal
+
+- **OpenSpec Change Created**: `replace-dialogs`
+    - Comprehensive proposal for replacing native `alert()` and `confirm()` dialogs with custom UI components
+    - Motivation: native dialogs block UI, lack customization, don't match design system, are hard to test
+
+- **Proposal Structure** (`openspec/changes/replace-dialogs/`)
+    - **proposal.md** (3.9 KB)
+        - Problem: 4 issues with system dialogs (inconsistent UX, blocking behavior, limited customization, testing)
+        - Solution: vue3-toastify for alerts + custom ConfirmDialog for confirmations
+        - Current usages documented: 4× `alert()`, 5× `confirm()`
+        - Benefits: consistent styling, theme support, better accessibility, testability
+    - **design.md** (17.5 KB)
+        - Architecture: Mermaid diagram showing flow (toast vs confirm)
+        - Toast setup: global configuration in `main.ts`, theme: 'auto', 3s autoClose
+        - ConfirmDialog component: 20+ props, animations (fadeIn/slideIn 300ms), backdrop support
+        - useConfirm composable: Promise-based API, dynamic mounting, cleanup after close
+        - Migration strategy: 3 phases (setup, replace alert, replace confirm)
+        - Migration tables: 4 files for alert(), 5 files for confirm() with line numbers and code examples
+    - **tasks.md** (9.2 KB, 5 phases, 15+ subtasks)
+        - Phase 1: Setup Components (configure toast, create ConfirmDialog, create useConfirm)
+        - Phase 2: Replace alert() (SettingsPage.vue, HomePage.vue)
+        - Phase 3: Replace confirm() (CourseSettingsModal.vue, HomePage.vue, CoursePage.vue)
+        - Phase 4: Enhancement & Accessibility (ARIA, focus trap, Escape key, theme testing)
+        - Phase 5: Documentation & Cleanup (lint, remove legacy code)
+    - **specs/ui-notifications/spec.md** (NEW spec, 13.9 KB)
+        - 5 requirements with SHALL keywords
+        - Toast Notifications: 3 scenarios (success, error, dark theme)
+        - Confirm Dialog: 6 scenarios (basic, advanced, backdrop close, Escape, light/dark theme)
+        - Accessibility: 3 scenarios (ARIA, focus trap, keyboard navigation)
+        - API Integration: 2 requirements (global toast config, useConfirm composable)
+
+- **Key Features Documented**
+    - **vue3-toastify** (already installed in package.json)
+        - Position: top-right
+        - AutoClose: 3000ms
+        - Theme: auto (adapts to prefers-color-scheme)
+        - Usage: `toast.success()`, `toast.error()`
+    - **ConfirmDialog.vue**
+        - Props: title, message, confirmText, cancelText, resolve, close
+        - Animations: fadeIn (backdrop), slideIn (content), 300ms ease
+        - Styling: CSS variables from design system (`--color-background`, `--color-text`)
+        - Closes on: backdrop click, Escape key, button click
+    - **useConfirm() composable**
+        - API: `const {confirm} = useConfirm(); const result = await confirm('message' | options)`
+        - Returns: Promise<boolean> (true = confirmed, false = cancelled)
+        - Dynamic mounting: creates/destroys DOM container on each call
+        - Cleanup: removes VNode and container after close
+
+- **Migration Plan**
+    - **alert() replacements (4 places)**:
+        - `SettingsPage.vue:48` → `toast.success('Глобальные настройки сохранены!')`
+        - `SettingsPage.vue:50` → `toast.error('Ошибка сохранения: ' + error.message)`
+        - `HomePage.vue:40` → `toast.error('Ошибка при удалении курса...')`
+        - `HomePage.vue:58` → `toast.error('Ошибка при сохранении курса...')`
+    - **confirm() replacements (5 places)**:
+        - `CourseSettingsModal.vue:81` → `await useConfirm().confirm('Сбросить настройки к глобальным?')`
+        - `HomePage.vue:34` → `await useConfirm().confirm({title: 'Удаление курса', ...})`
+        - `CoursePage.vue:117` → `await useConfirm().confirm('Удалить карточку?')`
+        - `CoursePage.vue:142` → `await useConfirm().confirm({title: 'Удаление карточек', ...})`
+        - `CoursePage.vue:156` → `await useConfirm().confirm({title: 'Удаление всех карточек', ...})`
+
+### Technical Details
+
+- **OpenSpec Validation**: ✅ Passed `npx @fission-ai/openspec validate replace-dialogs --strict`
+- **Change Status**: 0/15+ tasks (proposal stage, ready for user review and approval)
+- **Files Created**: 4
+    - `openspec/changes/replace-dialogs/proposal.md`
+    - `openspec/changes/replace-dialogs/design.md`
+    - `openspec/changes/replace-dialogs/tasks.md`
+    - `openspec/changes/replace-dialogs/specs/ui-notifications/spec.md` (NEW spec)
+- **No Code Changes Yet**: Pure planning/proposal phase
+- **User Formatting**: Applied code style fixes (indentation, line wrapping) to all OpenSpec documents
+
+### Next Steps
+
+- User review and approval of proposal
+- Implementation via `/openspec-apply` workflow after approval
+- New spec `ui-notifications` will be created upon archiving
+
 ## [0.4.6] - 2026-01-07 21:32
 
 ### Added
@@ -87,7 +171,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 - **Files Modified**: 9
     - Backend (3): `cardRepository.ts`, `cards.ts`, `card.ts` (schemas)
-    - Frontend (6): `CardCheckbox.vue` (new), `CardItem.vue`, `CardList.vue`, `CoursePage.vue`, `cards.js` (API), `useCardStore.js`
+    - Frontend (6): `CardCheckbox.vue` (new), `CardItem.vue`, `CardList.vue`, `CoursePage.vue`, `cards.js` (API),
+      `useCardStore.js`
 
 - **Code Quality**:
     - ✅ No lint errors
