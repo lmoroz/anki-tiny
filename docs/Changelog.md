@@ -5,13 +5,140 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.4.7] - 2026-01-07 23:49
+
+### Added
+
+#### OpenSpec: Training Limits Proposal
+
+Created comprehensive OpenSpec proposal for implementing four-tier training limits system to prevent user overload and
+enable controlled learning process.
+
+- **OpenSpec Change Created**: `add-training-limits`
+    - Proposal for multi-level limit system (global daily, course daily, session, time-based)
+    - Motivation: current implementation returns ALL due cards without limits (potential 100+ cards overload)
+    - Solution: 4-tier limit system with inheritance and progress tracking
+
+- **Proposal Structure** (`openspec/changes/add-training-limits/`)
+    - **proposal.md** (8.1 KB)
+        - Problem: overload risk, no control, multi-course issues, no new/review distinction
+        - Solution: global daily limits (aggregate), course daily limits (per-course), session limits (per session)
+        - User value: controlled load, burnout prevention, multi-course fairness, Anki compatibility
+        - Success criteria: 6 points including trainingStartTime-based reset logic
+    - **design.md** (19.7 KB)
+        - Architecture: Settings Layer + Progress Tracking + Limit Enforcement
+        - Data model: `dailyProgress` table (date, courseId, newCardsStudied, reviewsCompleted)
+        - Business logic: `calculateAvailableCards()` algorithm with multi-tier min() operations
+        - API design: GET `/due-cards?session=true`, POST `/review`, GET `/stats` (new)
+        - Daily reset mechanism: lazy reset based on trainingStartTime (NOT midnight)
+        - New day algorithm: compare `updatedAt` with last `trainingStartTime` occurrence
+    - **tasks.md** (9.2 KB, 60+ tasks in 8 phases)
+        - Phase 1: Database schema & migration (4 tasks)
+        - Phase 2: Backend services & repositories (4 tasks: progressRepo, limitService)
+        - Phase 3: Backend API routes (3 tasks: update `/due-cards`, `/review`, add `/stats`)
+        - Phase 4: Frontend settings UI (4 tasks: global + course limits)
+        - Phase 5: Frontend training page (4 tasks: session progress, limits display)
+        - Phase 6: Frontend course page (2 tasks: stats display, button state)
+        - Phase 7: Testing & validation (3 tasks: unit, integration, E2E)
+        - Phase 8: Documentation & cleanup (4 tasks)
+    - **specs/training-limits/spec.md** (NEW spec, 15.4 KB)
+        - 8 requirements with SHALL/MUST keywords
+        - Global daily limits aggregate across all courses (2 scenarios)
+        - Course daily limits override and constrain global (2 scenarios)
+        - Session limits partition daily limits (2 scenarios)
+        - Daily progress tracked per course and globally (2 scenarios)
+        - **Daily limits reset based on trainingStartTime** (5 scenarios)
+        - API returns limit metadata (2 scenarios)
+        - UI displays remaining limits (2 scenarios)
+        - Settings UI configures all limit types (2 scenarios)
+        - Edge cases handled gracefully (3 scenarios)
+    - **specs/settings-global-management/spec.md** (delta, 2.9 KB)
+        - ADDED: Global Settings SHALL Include Daily Training Limits
+        - 3 scenarios: database storage, API access, validation
+    - **specs/settings-course-management/spec.md** (delta, 4.4 KB)
+        - ADDED: Course Settings SHALL Include Per-Course Training Limits
+        - 7 scenarios: database, null inheritance, API, UI with placeholders, validation
+
+- **Key Features Documented**
+    - **Four Limit Levels**:
+        - Global daily: `globalNewCardsPerDay` (20), `globalMaxReviewsPerDay` (200)
+        - Course daily: `newCardsPerDay` (null=inherit), `maxReviewsPerDay` (null=inherit)
+        - Session: `newCardsPerSession` (10), `maxReviewsPerSession` (50)
+        - Time-based: uses existing `trainingStartTime`/`trainingEndTime` from settings
+    - **Progress Tracking**:
+        - New table `dailyProgress` (date, courseId, newCardsStudied, reviewsCompleted)
+        - Tracks per-course and global progress
+        - Persists across app restarts
+    - **trainingStartTime-Based Reset** (KEY FEATURE):
+        - "New day" starts at `trainingStartTime` (e.g., 08:00), NOT midnight
+        - Algorithm: compare last `updatedAt` with most recent `trainingStartTime`
+        - If user studies at 02:00 (before 08:00) → continues previous day
+        - If app reopened after 08:00 → automatic reset
+        - Advantages: matches real sleep/wake cycle, no background processes needed
+    - **Limit Calculation**:
+        - Formula: `availableCards = min(sessionLimit, courseRemaining, globalRemaining)`
+        - Applied separately for new cards and reviews
+        - First-come first-served between courses
+    - **API Metadata**:
+        - Returns: `newCardsInSession`, `reviewsInSession`, `*Remaining` counts
+        - Frontend knows exact limits and progress
+
+- **Default Values**
+    - Global: 20 new/day, 200 reviews/day (across all courses)
+    - Course: inherit from global (null), or custom override
+    - Session: 10 new, 50 reviews (per single training session)
+
+- **User Adjustments During Design**
+    - ✅ Confirmed pропорциональное распределение between courses (simple approach)
+    - ✅ Confirmed UI подсказки о лимитах (transparency)
+    - ✅ CRITICAL: Changed reset logic from midnight to `trainingStartTime`-based
+        - Reason: better matches user's actual day cycle
+        - Implementation: lazy check on each request, no cron needed
+        - Edge case: 02:00 study session continues previous day until 08:00
+
+### Technical Details
+
+- **OpenSpec Validation**: ✅ Passed `npx @fission-ai/openspec validate add-training-limits --strict`
+- **Change Status**: 0/60+ tasks (proposal stage, ready for user review and approval)
+- **Files Created**: 6
+    - `openspec/changes/add-training-limits/proposal.md`
+    - `openspec/changes/add-training-limits/design.md`
+    - `openspec/changes/add-training-limits/tasks.md`
+    - `openspec/changes/add-training-limits/specs/training-limits/spec.md` (NEW spec)
+    - `openspec/changes/add-training-limits/specs/settings-global-management/spec.md` (delta)
+    - `openspec/changes/add-training-limits/specs/settings-course-management/spec.md` (delta)
+- **No Code Changes**: Pure planning/proposal phase
+- **Complexity**: High (60+ tasks, 8 phases, new table, new service layer)
+- **Estimated Effort**: 8-12 hours full implementation
+
+### Architecture Highlights
+
+```
+Frontend (TrainingPage)
+  ↓ GET /courses/:id/due-cards?session=true
+API Layer (training.ts)
+  ↓ calculateAvailableCards()
+limitService
+  ├→ progressRepo (dailyProgress table)
+  ├→ settingsRepo (effective settings with inheritance)
+  └→ isNewTrainingDay() (trainingStartTime-based)
+```
+
+### Next Steps
+
+- User review and approval of proposal
+- Implementation via `/openspec-apply add-training-limits` after approval
+- New spec `training-limits` will be created upon archiving
+- Extensions to `settings-global-management` and `settings-course-management` specs
+
 ## [0.4.7] - 2026-01-07 23:10
 
 ### Added
 
 #### Feature: Custom Dialogs and Notifications System
 
-Implemented custom UI components to replace native `alert()` and `confirm()` dialogs, providing a consistent design system integration and better user experience.
+Implemented custom UI components to replace native `alert()` and `confirm()` dialogs, providing a consistent design
+system integration and better user experience.
 
 - **Toast Notifications** (`vue3-toastify`)
     - Global configuration in `main.js` with auto-theme support

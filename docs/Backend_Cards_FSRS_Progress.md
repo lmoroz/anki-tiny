@@ -14,7 +14,8 @@
 **Changes:**
 
 - Added 3 new tables: `cards`, `settings`, `courseSettings`
-- `cards` table contains all FSRS fields: `stability`, `difficulty`, `elapsedDays`, `scheduledDays`, `reps`, `lapses`, `state`, `lastReview`, `stepIndex`
+- `cards` table contains all FSRS fields: `stability`, `difficulty`, `elapsedDays`, `scheduledDays`, `reps`, `lapses`,
+  `state`, `lastReview`, `stepIndex`
 - Created indices for query optimization: `courseId`, `due`, `state`
 - Configured foreign keys with cascade deletion
 
@@ -110,19 +111,19 @@
 ### Critical Errors (Require fixing)
 
 1. **FSRS Type Compatibility Issue:**
-   - `Rating` type from ts-fsrs is named `Grade`
-   - Need to change imports in `fsrs/index.ts` and `training.ts`
+    - `Rating` type from ts-fsrs is named `Grade`
+    - Need to change imports in `fsrs/index.ts` and `training.ts`
 
 2. **Zod enum errorMap:**
-   - Incorrect syntax for errorMap is used in `schemas/card.ts`
-   - Need to use `{ invalid_type_error: '...' }` instead of `errorMap`
+    - Incorrect syntax for errorMap is used in `schemas/card.ts`
+    - Need to use `{ invalid_type_error: '...' }` instead of `errorMap`
 
 3. **ZodError.errors:**
-   - Routes files use `error.errors`, but correct property is `error.issues`
+    - Routes files use `error.errors`, but correct property is `error.issues`
 
 4. **Prettier formatting:**
-   - Multiple formatting errors (extra line breaks)
-   - Need to run `npm run format` in backend
+    - Multiple formatting errors (extra line breaks)
+    - Need to run `npm run format` in backend
 
 ### Non-critical (warning)
 
@@ -138,7 +139,7 @@
 
 ```typescript
 // In fsrs/index.ts and training.ts
-import { Grade } from 'ts-fsrs'; // instead of Rating
+import {Grade} from 'ts-fsrs'; // instead of Rating
 
 export function calculateNextReview(card: Card, rating: Grade, ...) {
   // ...
@@ -159,7 +160,7 @@ rating: z.enum(['1', '2', '3', '4'], {
 ```typescript
 // In all routes
 if (error instanceof ZodError) {
-  return res.status(400).json({ error: 'Validation error', details: error.issues });
+  return res.status(400).json({error: 'Validation error', details: error.issues});
 }
 ```
 
@@ -178,9 +179,9 @@ npm run format
 2. **Test DB migrations** — run application and verify table creation
 3. **Test API endpoints via Postman/curl**
 4. **Frontend integration:**
-   - Entity layer (Card types, API, Store)
-   - Widgets (CardList, CardEditor, QuickAddCard)
-   - Pages (CoursePage, TrainingPage, SettingsPage)
+    - Entity layer (Card types, API, Store)
+    - Widgets (CardList, CardEditor, QuickAddCard)
+    - Pages (CoursePage, TrainingPage, SettingsPage)
 
 ---
 

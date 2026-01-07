@@ -148,29 +148,29 @@ Validation for `learningSteps`: checks that it is a valid JSON array of numbers.
 
 #### [routes/cards.ts](file:///e:/Develop/anki-tiny/backend/src/routes/cards.ts)
 
-| Method | Endpoint                       | Description                |
-|--------|--------------------------------|----------------------------|
-| GET    | `/api/courses/:courseId/cards` | Course card list           |
-| POST   | `/api/courses/:courseId/cards` | Create card                |
-| GET    | `/api/cards/:id`               | Get card                   |
-| PUT    | `/api/cards/:id`               | Update card                |
-| DELETE | `/api/cards/:id`               | Delete card                |
-| GET    | `/api/courses/:courseId/stats` | Course statistics          |
+| Method | Endpoint                       | Description       |
+|--------|--------------------------------|-------------------|
+| GET    | `/api/courses/:courseId/cards` | Course card list  |
+| POST   | `/api/courses/:courseId/cards` | Create card       |
+| GET    | `/api/cards/:id`               | Get card          |
+| PUT    | `/api/cards/:id`               | Update card       |
+| DELETE | `/api/cards/:id`               | Delete card       |
+| GET    | `/api/courses/:courseId/stats` | Course statistics |
 
 #### [routes/training.ts](file:///e:/Develop/anki-tiny/backend/src/routes/training.ts)
 
-| Method | Endpoint                         | Description                           |
-|--------|----------------------------------|---------------------------------------|
-| GET    | `/api/courses/:courseId/due-cards` | Cards for review                   |
-| POST   | `/api/training/review`           | Submit result (Rating)                |
+| Method | Endpoint                           | Description            |
+|--------|------------------------------------|------------------------|
+| GET    | `/api/courses/:courseId/due-cards` | Cards for review       |
+| POST   | `/api/training/review`             | Submit result (Rating) |
 
 **Logic `/due-cards`:**
 
 1. Check training time (`trainingStartHour` / `trainingEndHour`)
 2. Calculate time until end of day
 3. If < 4 hours until end:
-   - Exclude NEW cards
-   - Return message: `"Too close to end of day for new cards"`
+    - Exclude NEW cards
+    - Return message: `"Too close to end of day for new cards"`
 4. Otherwise return all due cards
 
 **Request body for `/training/review`:**
@@ -178,26 +178,35 @@ Validation for `learningSteps`: checks that it is a valid JSON array of numbers.
 ```json
 {
   "cardId": 123,
-  "rating": "3"  // 1=Again, 2=Hard, 3=Good, 4=Easy
+  "rating": "3"
+  // 1=Again, 2=Hard, 3=Good, 4=Easy
 }
 ```
 
 #### [routes/settings.ts](file:///e:/Develop/anki-tiny/backend/src/routes/settings.ts)
 
-| Method | Endpoint                           | Description                      |
-|--------|------------------------------------|----------------------------------|
-| GET    | `/api/settings`                    | Global settings                  |
-| PUT    | `/api/settings`                    | Update global                    |
-| GET    | `/api/courses/:courseId/settings`  | Course settings + effective      |
-| PUT    | `/api/courses/:courseId/settings`  | Update course settings           |
-| DELETE | `/api/courses/:courseId/settings`  | Reset to global                  |
+| Method | Endpoint                          | Description                 |
+|--------|-----------------------------------|-----------------------------|
+| GET    | `/api/settings`                   | Global settings             |
+| PUT    | `/api/settings`                   | Update global               |
+| GET    | `/api/courses/:courseId/settings` | Course settings + effective |
+| PUT    | `/api/courses/:courseId/settings` | Update course settings      |
+| DELETE | `/api/courses/:courseId/settings` | Reset to global             |
 
 **Response from GET `/api/courses/:courseId/settings`:**
 
 ```json
 {
-  "courseSettings": { ... } | null,  // Individual (if exists)
-  "effectiveSettings": { ... }       // Merged result
+  "courseSettings": {
+    ...
+  }
+  |
+  null,
+  // Individual (if exists)
+  "effectiveSettings": {
+    ...
+  }
+  // Merged result
 }
 ```
 
@@ -229,7 +238,7 @@ router.use(settingsRouter);
 ```typescript
 // Was:
 rating: z.enum(['1', '2', '3', '4'], {
-  errorMap: () => ({ message: '...' })
+  errorMap: () => ({message: '...'})
 })
 
 // Became:
@@ -299,26 +308,27 @@ npm run format --workspace=backend
 ### Table `cards`
 
 ```sql
-CREATE TABLE cards (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    courseId INTEGER NOT NULL,
-    front TEXT NOT NULL,
-    back TEXT NOT NULL,
+CREATE TABLE cards
+(
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    courseId      INTEGER NOT NULL,
+    front         TEXT    NOT NULL,
+    back          TEXT    NOT NULL,
     -- FSRS fields
-    due TEXT NOT NULL,
-    stability REAL DEFAULT 0.0,
-    difficulty REAL DEFAULT 5.0,
-    elapsedDays INTEGER DEFAULT 0,
+    due           TEXT    NOT NULL,
+    stability     REAL    DEFAULT 0.0,
+    difficulty    REAL    DEFAULT 5.0,
+    elapsedDays   INTEGER DEFAULT 0,
     scheduledDays INTEGER DEFAULT 0,
-    reps INTEGER DEFAULT 0,
-    lapses INTEGER DEFAULT 0,
-    state INTEGER DEFAULT 0,
-    lastReview TEXT,
-    stepIndex INTEGER DEFAULT 0,
+    reps          INTEGER DEFAULT 0,
+    lapses        INTEGER DEFAULT 0,
+    state         INTEGER DEFAULT 0,
+    lastReview    TEXT,
+    stepIndex     INTEGER DEFAULT 0,
     -- Timestamps
-    createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
-    updatedAt TEXT DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (courseId) REFERENCES courses(id) ON DELETE CASCADE
+    createdAt     TEXT    DEFAULT CURRENT_TIMESTAMP,
+    updatedAt     TEXT    DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (courseId) REFERENCES courses (id) ON DELETE CASCADE
 );
 ```
 
@@ -327,34 +337,36 @@ CREATE TABLE cards (
 ### Table `settings`
 
 ```sql
-CREATE TABLE settings (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    trainingStartHour INTEGER DEFAULT 8,
-    trainingEndHour INTEGER DEFAULT 22,
-    minTimeBeforeEnd INTEGER DEFAULT 4,
+CREATE TABLE settings
+(
+    id                   INTEGER PRIMARY KEY AUTOINCREMENT,
+    trainingStartHour    INTEGER DEFAULT 8,
+    trainingEndHour      INTEGER DEFAULT 22,
+    minTimeBeforeEnd     INTEGER DEFAULT 4,
     notificationsEnabled INTEGER DEFAULT 1,
-    learningSteps TEXT DEFAULT '[10, 240]',
-    enableFuzz INTEGER DEFAULT 1,
-    createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
-    updatedAt TEXT DEFAULT CURRENT_TIMESTAMP
+    learningSteps        TEXT    DEFAULT '[10, 240]',
+    enableFuzz           INTEGER DEFAULT 1,
+    createdAt            TEXT    DEFAULT CURRENT_TIMESTAMP,
+    updatedAt            TEXT    DEFAULT CURRENT_TIMESTAMP
 );
 ```
 
 ### Table `courseSettings`
 
 ```sql
-CREATE TABLE courseSettings (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    courseId INTEGER NOT NULL UNIQUE,
-    trainingStartHour INTEGER,
-    trainingEndHour INTEGER,
-    minTimeBeforeEnd INTEGER,
+CREATE TABLE courseSettings
+(
+    id                   INTEGER PRIMARY KEY AUTOINCREMENT,
+    courseId             INTEGER NOT NULL UNIQUE,
+    trainingStartHour    INTEGER,
+    trainingEndHour      INTEGER,
+    minTimeBeforeEnd     INTEGER,
     notificationsEnabled INTEGER,
-    learningSteps TEXT,
-    enableFuzz INTEGER,
-    created TEXT DEFAULT CURRENT_TIMESTAMP,
-    updatedAt TEXT DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (courseId) REFERENCES courses(id) ON DELETE CASCADE
+    learningSteps        TEXT,
+    enableFuzz           INTEGER,
+    created              TEXT DEFAULT CURRENT_TIMESTAMP,
+    updatedAt            TEXT DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (courseId) REFERENCES courses (id) ON DELETE CASCADE
 );
 ```
 
