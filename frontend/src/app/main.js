@@ -2,13 +2,29 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
+import Vue3Toastify from 'vue3-toastify'
 import '@/shared/types/electron.d.ts'
-import '@/app/assets/css/styles.css'
 import 'bootstrap-icons/font/bootstrap-icons.min.css'
+import 'vue3-toastify/dist/index.css'
+import '@/app/assets/css/styles.css'
 
 const pinia = createPinia()
 
-const startApp = () => createApp(App).use(router).use(pinia).mount('#app')
+const startApp = () => {
+  const app = createApp(App)
+  app.use(router)
+  app.use(pinia)
+  app.use(Vue3Toastify, {
+    theme: 'dark',
+    autoClose: 3000,
+    position: 'top-right',
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true
+  })
+  return app.mount('#app')
+}
 
 if (window.electronAPI)
   window.electronAPI.onBackendPort(port => {

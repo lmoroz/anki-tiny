@@ -5,8 +5,10 @@
   import { useFocusTrap } from '@vueuse/integrations/useFocusTrap'
   import MarkdownIt from 'markdown-it'
   import hljs from 'highlight.js'
+  import { useConfirm } from '@/shared/lib/useConfirm'
   import { useCourseStore } from '@/entities/course/model/useCourseStore'
   import { useCardStore } from '@/entities/card/model/useCardStore'
+  import { toast } from 'vue3-toastify'
 
   const route = useRoute()
   const router = useRouter()
@@ -75,6 +77,7 @@
       await Promise.all([cardStore.fetchCardsByCourse(courseId), cardStore.fetchCourseStats(courseId)])
     } catch (err) {
       console.error('Failed to load course data:', err)
+      toast.error('Ошибка загрузки: ' + err.message)
     } finally {
       isLoading.value = false
     }
@@ -102,9 +105,11 @@
   const handleQuickAdd = async cardData => {
     try {
       const newCard = await cardStore.createCard(courseId, cardData)
+      toast.success('Карточка создана!')
       nextTick(() => scrollToCardWithBounce(newCard.id))
     } catch (err) {
       console.error('Failed to create card:', err)
+      toast.error('Ошибка создания: ' + err.message)
     }
   }
 
@@ -114,15 +119,16 @@
   }
 
   const handleDeleteCard = async card => {
-    const confirmed = confirm(`Удалить карточку?
-
-Вопрос: ${card.front.substring(0, 50)}${card.front.length > 50 ? '...' : ''}`)
+    const { confirm } = useConfirm()
+    const confirmed = await confirm('Удалить карточку?')
 
     if (confirmed) {
       try {
         await cardStore.deleteCard(card.id, courseId)
+        toast.success('Карточка удалена!')
       } catch (err) {
         console.error('Failed to delete card:', err)
+        toast.error('Ошибка удаления: ' + err.message)
       }
     }
   }
@@ -138,28 +144,42 @@
   }
 
   const handleBatchDelete = async () => {
+    const { confirm } = useConfirm()
     const count = selectedCardIds.value.size
-    const confirmed = confirm(`Удалить выбранные карточки (${count})?`)
+    const confirmed = await confirm({
+      title: 'Удаление карточек',
+      message: `Удалить выбранные карточки (${count})?`,
+    })
 
     if (confirmed) {
       try {
         await cardStore.deleteBatchCards(Array.from(selectedCardIds.value), courseId)
+        toast.success('Карточки удалены!')
         exitSelectionMode()
       } catch (err) {
         console.error('Failed to batch delete cards:', err)
+        toast.error('Ошибка удаления: ' + err.message)
       }
     }
   }
 
   const handleDeleteAllCards = async () => {
+    const { confirm } = useConfirm()
     const count = cards.value.length
-    const confirmed = confirm(`Вы уверены, что хотите удалить ВСЕ карточки курса (${count})?\n\nЭто действие необратимо!`)
+    const confirmed = await confirm({
+      title: 'Удаление всех карточек',
+      message: `Вы уверены, что хотите удалить ВСЕ карточки курса (${count})?\n\nЭто действие необратимо!`,
+      confirmText: 'Удалить все',
+      cancelText: 'Отмена'
+    })
 
     if (confirmed) {
       try {
         await cardStore.deleteAllCards(courseId)
+        toast.success('Все карточки удалены!')
       } catch (err) {
         console.error('Failed to delete all cards:', err)
+        toast.error('Ошибка удаления: ' + err.message)
       }
     }
   }
@@ -174,6 +194,7 @@
       if (editingCard.value) {
         // Режим редактирования
         await cardStore.updateCard(editingCard.value.id, { ...data, resetProgress: true })
+        toast.success('Карточка обновлена!')
         const editedCardId = editingCard.value.id
 
         // Обновляем список карточек
@@ -187,6 +208,7 @@
       } else {
         // Режим создания
         const newCard = await cardStore.createCard(courseId, data)
+        toast.success('Карточка создана!')
         handleCloseModal()
 
         nextTick(() => {
@@ -195,6 +217,7 @@
       }
     } catch (err) {
       console.error('Failed to save card:', err)
+      toast.error('Ошибка сохранения: ' + err.message)
     }
   }
 

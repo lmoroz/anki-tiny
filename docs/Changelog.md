@@ -5,6 +5,87 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.4.7] - 2026-01-07 23:10
+
+### Added
+
+#### Feature: Custom Dialogs and Notifications System
+
+Implemented custom UI components to replace native `alert()` and `confirm()` dialogs, providing a consistent design system integration and better user experience.
+
+- **Toast Notifications** (`vue3-toastify`)
+    - Global configuration in `main.js` with auto-theme support
+    - Position: top-right, autoClose: 3000ms
+    - Custom CSS variables integration (`--toastify-color-success`, `--toastify-color-error`, etc.)
+    - Usage: `toast.success()`, `toast.error()`
+    - Replaced 4 `alert()` usages across SettingsPage.vue and HomePage.vue
+
+- **Custom ConfirmDialog Component** (`shared/ui/ConfirmDialog.vue`)
+    - Modal dialog with backdrop and animations (fadeIn/slideIn, 300ms ease)
+    - Props: `title`, `message`, `confirmText`, `cancelText`
+    - Styled with project CSS variables (`--color-bg-modal`, `--color-text-primary`, etc.)
+    - Closes on: backdrop click, Escape key, button clicks
+    - Accessibility: `role="dialog"`, `aria-modal="true"`, keyboard navigation
+
+- **useConfirm Composable** (`shared/lib/useConfirm.js`)
+    - Promise-based API: `const {confirm} = useConfirm(); const result = await confirm(message | options)`
+    - Returns: Promise<boolean> (true = confirmed, false = cancelled)
+    - Dynamic mounting/unmounting of dialog instances
+    - Supports simple string messages and advanced options (custom title, button texts)
+    - Replaced 5 `confirm()` usages across 3 components
+
+### Changed
+
+- **Migration from Native Dialogs**
+    - `SettingsPage.vue`: 2 alerts → toasts (success/error)
+    - `HomePage.vue`: 2 alerts → toasts, 1 confirm → custom dialog with options
+    - `CourseSettingsModal.vue`: 1 confirm → custom dialog
+    - `CoursePage.vue`: 3 confirms → custom dialogs (simple + advanced with custom buttons)
+
+- **Styling Integration**
+    - Added toast color variables to `styles.css`
+    - All components auto-adapt to light/dark theme via CSS variables
+    - Consistent button styles (`.btn-primary`, `.btn-secondary`)
+
+### Technical Details
+
+- **Files Created**: 2
+    - `frontend/src/shared/ui/ConfirmDialog.vue` (177 lines)
+    - `frontend/src/shared/lib/useConfirm.js` (41 lines)
+
+- **Files Modified**: 5
+    - `frontend/src/app/main.js` — vue3-toastify initialization
+    - `frontend/src/app/assets/css/styles.css` — toast CSS variables
+    - `frontend/src/pages/settings/SettingsPage.vue` — toast integration
+    - `frontend/src/pages/home/HomePage.vue` — toast + useConfirm integration
+    - `frontend/src/widgets/course-settings-modal/CourseSettingsModal.vue` — useConfirm integration
+    - `frontend/src/pages/course/CoursePage.vue` — useConfirm integration (3 dialogs)
+
+- **Code Quality**:
+    - ✅ Lint passed (0 errors)
+    - ✅ All system dialogs replaced (verified via grep)
+    - ✅ Consistent coding style maintained
+
+- **User Experience**:
+    - ✅ Non-blocking notifications (no UI freeze)
+    - ✅ Smooth animations and transitions
+    - ✅ Theme-aware styling
+    - ✅ Keyboard navigation support
+    - ✅ Accessible dialogs (ARIA attributes, Escape key)
+
+- **OpenSpec Status**:
+    - Change: `replace-dialogs`
+    - Tasks completed: 48/53 (Phases 1-3, 5.1 fully done)
+    - Remaining: 4.2 (Theme testing), 5.2 (Walkthrough update), focus trap implementation
+    - Total implementation time: ~2 hours
+
+### Notes
+
+- All async methods now use `await` for confirm dialogs
+- Custom dialogs support both simple (string) and advanced (options object) usage patterns
+- No breaking changes to existing functionality
+- Legacy `alert()` and `confirm()` fully removed from codebase
+
 ## [0.4.6] - 2026-01-07 22:15
 
 ### Added

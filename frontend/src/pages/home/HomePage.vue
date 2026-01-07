@@ -1,6 +1,8 @@
 <script setup>
   import { ref, onMounted, computed } from 'vue'
   import { useRouter } from 'vue-router'
+  import { toast } from 'vue3-toastify'
+  import { useConfirm } from '@/shared/lib/useConfirm'
   import { useCourseStore } from '@/entities/course/model/useCourseStore'
 
   const router = useRouter()
@@ -17,6 +19,7 @@
       await courseStore.fetchCourses()
     } catch (error) {
       console.error('[HomePage] Failed to load courses:', error)
+      toast.error('Ошибка при загрузке курсов. Попробуйте еще раз.')
     }
   })
 
@@ -31,13 +34,19 @@
   }
 
   const handleDeleteCourse = async course => {
-    const confirmed = confirm(`Вы уверены, что хотите удалить курс "${course.name}"?`)
+    const { confirm } = useConfirm()
+    const confirmed = await confirm({
+      title: 'Удаление курса',
+      message: `Вы уверены, что хотите удалить курс "${course.name}"?`,
+      confirmText: 'Удалить',
+      cancelText: 'Отмена'
+    })
     if (!confirmed) return
 
     try {
       await courseStore.deleteCourse(course.id)
     } catch (error) {
-      alert('Ошибка при удалении курса. Попробуйте еще раз.')
+      toast.error('Ошибка при удалении курса. Попробуйте еще раз.')
     }
   }
 
@@ -49,13 +58,15 @@
     try {
       if (editingCourse.value) {
         await courseStore.updateCourse(editingCourse.value.id, data)
+        toast.success('Курс успешно обновлен!')
       } else {
         await courseStore.createCourse(data)
+        toast.success('Курс успешно создан!')
       }
       showEditorModal.value = false
       editingCourse.value = null
     } catch (error) {
-      alert('Ошибка при сохранении курса. Попробуйте еще раз.')
+      toast.error('Ошибка при сохранении курса. Попробуйте еще раз.')
     }
   }
 

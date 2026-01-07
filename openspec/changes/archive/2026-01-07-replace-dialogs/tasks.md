@@ -4,10 +4,10 @@
 
 ### 1.1 Configure vue3-toastify
 
-- [ ] Добавить импорт `vue3-toastify` в `frontend/src/app/main.ts`
-- [ ] Добавить импорт стилей `'vue3-toastify/dist/index.css'`
-- [ ] Настроить глобальные параметры toast (position, autoClose, theme: 'auto')
-- [ ] Проверить отображение toast в светлой и темной теме
+- [x] Добавить импорт `vue3-toastify` в `frontend/src/app/main.js`
+- [x] Добавить импорт стилей `'vue3-toastify/dist/index.css'`
+- [x] Настроить глобальные параметры toast (position, autoClose, draggable)
+- [x] Добавить кастомизацию CSS переменных toast в `styles.css`
 
 **Verification**: Вызвать `toast.success('Test')` в консоли, увидеть toast уведомление
 
@@ -15,14 +15,14 @@
 
 ### 1.2 Create ConfirmDialog Component
 
-- [ ] Создать файл `frontend/src/shared/ui/ConfirmDialog.vue`
-- [ ] Реализовать template с модальным окном и backdrop
-- [ ] Добавить props: `title`, `message`, `confirmText`, `cancelText`, `resolve`, `close`
-- [ ] Реализовать анимации открытия/закрытия (fadeIn/slideIn)
-- [ ] Добавить обработчики `handleConfirm` и `handleCancel`
-- [ ] Стилизовать компонент с использованием CSS переменных проекта (`--color-background`, `--color-text`, и т.д.)
-- [ ] Добавить классы `.btn-primary` и `.btn-secondary` для кнопок
-- [ ] Добавить поддержку закрытия по клику на backdrop
+- [x] Создать файл `frontend/src/shared/ui/ConfirmDialog.vue`
+- [x] Реализовать template с модальным окном и backdrop
+- [x] Добавить props: `title`, `message`, `confirmText`, `cancelText`, `resolve`, `close`
+- [x] Реализовать анимации открытия/закрытия (fadeIn/slideIn)
+- [x] Добавить обработчики `handleConfirm` и `handleCancel`
+- [x] Стилизовать компонент с использованием CSS переменных проекта (`--color-background`, `--color-text`, и т.д.)
+- [x] Добавить классы `.btn-primary` и `.btn-secondary` для кнопок
+- [x] Добавить поддержку закрытия по клику на backdrop
 
 **Verification**: Ручное тестирование рендера компонента в Vue DevTools
 
@@ -30,12 +30,12 @@
 
 ### 1.3 Create useConfirm Composable
 
-- [ ] Создать файл `frontend/src/shared/lib/useConfirm.js`
-- [ ] Реализовать функцию `confirm()` которая возвращает Promise<boolean>
-- [ ] Поддержать два формата вызова: строка и объект с опциями
-- [ ] Реализовать динамическое создание контейнера для монтирования
-- [ ] Реализовать функцию `close()` для уничтожения компонента после закрытия
-- [ ] Использовать `createVNode` и `render` из Vue для программного рендера
+- [x] Создать файл `frontend/src/shared/lib/useConfirm.js`
+- [x] Реализовать функцию `confirm()` которая возвращает Promise<boolean>
+- [x] Поддержать два формата вызова: строка и объект с опциями
+- [x] Реализовать динамическое создание контейнера для монтирования
+- [x] Реализовать функцию `close()` для уничтожения компонента после закрытия
+- [x] Использовать `createVNode` и `render` из Vue для программного рендера
 
 **Verification**:
 
@@ -51,10 +51,10 @@ console.log(result); // true или false
 
 ### 2.1 Replace in SettingsPage.vue (2 usages)
 
-- [ ] Добавить import `toast` из `'vue3-toastify'`
-- [ ] **Line 48**: заменить `alert('Глобальные настройки сохранены!')` на
+- [x] Добавить import `toast` из `'vue3-toastify'`
+- [x] **Line 48**: заменить `alert('Глобальные настройки сохранены!')` на
   `toast.success('Глобальные настройки сохранены!')`
-- [ ] **Line 50**: заменить `alert('Ошибка сохранения: ' + error.message)` на
+- [x] **Line 50**: заменить `alert('Ошибка сохранения: ' + error.message)` на
   `toast.error('Ошибка сохранения: ' + error.message)`
 
 **Verification**: Открыть SettingsPage, сохранить настройки с успехом и с ошибкой (отключив backend), проверить toast
@@ -63,10 +63,10 @@ console.log(result); // true или false
 
 ### 2.2 Replace in HomePage.vue (2 usages)
 
-- [ ] Добавить import `toast` из `'vue3-toastify'`
-- [ ] **Line 40**: заменить `alert('Ошибка при удалении курса...')` на
+- [x] Добавить import `toast` из `'vue3-toastify'`
+- [x] **Line 40**: заменить `alert('Ошибка при удалении курса...')` на
   `toast.error('Ошибка при удалении курса. Попробуйте еще раз.')`
-- [ ] **Line 58**: заменить `alert('Ошибка при сохранении курса...')` на
+- [x] **Line 58**: заменить `alert('Ошибка при сохранении курса...')` на
   `toast.error('Ошибка при сохранении курса. Попробуйте еще раз.')`
 
 **Verification**: Открыть HomePage, симулировать ошибку (отключив backend), проверить toast
@@ -77,15 +77,15 @@ console.log(result); // true или false
 
 ### 3.1 Replace in CourseSettingsModal.vue (1 usage)
 
-- [ ] Добавить import `useConfirm` из `'@/shared/lib/useConfirm'`
-- [ ] Получить `confirm` из `useConfirm()` composable
-- [ ] **Line 81**: заменить `if (confirm('Сбросить настройки к глобальным?'))` на:
+- [x] Добавить import `useConfirm` из `'@/shared/lib/useConfirm'`
+- [x] Получить `confirm` из `useConfirm()` composable
+- [x] **Line 81**: заменить `if (confirm('Сбросить настройки к глобальным?'))` на:
   ```javascript
   const {confirm} = useConfirm();
   const confirmed = await confirm('Сбросить настройки к глобальным?');
   if (confirmed)
   ```
-- [ ] Сделать метод обработчика `async`
+- [x] Сделать метод обработчика `async`
 
 **Verification**: Открыть CourseSettingsModal, нажать "Сбросить к глобальным", проверить ConfirmDialog
 
@@ -93,9 +93,9 @@ console.log(result); // true или false
 
 ### 3.2 Replace in HomePage.vue (1 usage)
 
-- [ ] Добавить import `useConfirm` из `'@/shared/lib/useConfirm'`
-- [ ] Получить `confirm` из `useConfirm()` composable
-- [ ] **Line 34**: заменить `const confirmed = confirm(\`Вы уверены...\`)` на:
+- [x] Добавить import `useConfirm` из `'@/shared/lib/useConfirm'`
+- [x] Получить `confirm` из `useConfirm()` composable
+- [x] **Line 34**: заменить `const confirmed = confirm(\`Вы уверены...\`)` на:
   ```javascript
   const {confirm} = useConfirm();
   const confirmed = await confirm({
@@ -105,7 +105,7 @@ console.log(result); // true или false
     cancelText: 'Отмена'
   });
   ```
-- [ ] Сделать метод `deleteCourse` async
+- [x] Сделать метод `deleteCourse` async
 
 **Verification**: Открыть HomePage, удалить курс, проверить ConfirmDialog с кастомными текстами кнопок
 
@@ -113,21 +113,21 @@ console.log(result); // true или false
 
 ### 3.3 Replace in CoursePage.vue (3 usages)
 
-- [ ] Добавить import `useConfirm` из `'@/shared/lib/useConfirm'`
-- [ ] Получить `confirm` из `useConfirm()` composable
-- [ ] **Line 117**: заменить `const confirmed = confirm('Удалить карточку?')` на:
+- [x] Добавить import `useConfirm` из `'@/shared/lib/useConfirm'`
+- [x] Получить `confirm` из `useConfirm()` composable
+- [x] **Line 117**: заменить `const confirmed = confirm('Удалить карточку?')` на:
   ```javascript
   const {confirm} = useConfirm();
   const confirmed = await confirm('Удалить карточку?');
   ```
-- [ ] **Line 142**: заменить `const confirmed = confirm(\`Удалить выбранные карточки (\${count})?\`)` на:
+- [x] **Line 142**: заменить `const confirmed = confirm(\`Удалить выбранные карточки (\${count})?\`)` на:
   ```javascript
   const confirmed = await confirm({
     title: 'Удаление карточек',
     message: `Удалить выбранные карточки (${count})?`,
   });
   ```
-- [ ] **Line 156**: заменить `const confirmed = confirm(\`Вы уверены...\`)` на:
+- [x] **Line 156**: заменить `const confirmed = confirm(\`Вы уверены...\`)` на:
   ```javascript
   const confirmed = await confirm({
     title: 'Удаление всех карточек',
@@ -136,7 +136,7 @@ console.log(result); // true или false
     cancelText: 'Отмена'
   });
   ```
-- [ ] Сделать соответствующие методы async (`deleteCard`, `deleteSelectedCards`, `deleteAllCards`)
+- [x] Сделать соответствующие методы async (`deleteCard`, `deleteSelectedCards`, `deleteAllCards`)
 
 **Verification**: Открыть CoursePage:
 
@@ -150,11 +150,11 @@ console.log(result); // true или false
 
 ### 4.1 Add Accessibility to ConfirmDialog
 
-- [ ] Добавить `role="dialog"` на модальное окно
-- [ ] Добавить `aria-modal="true"`
-- [ ] Добавить `aria-labelledby` для title
-- [ ] Добавить `aria-describedby` для message
-- [ ] Реализовать закрытие по клавише Escape
+- [x] Добавить `role="dialog"` на модальное окно
+- [x] Добавить `aria-modal="true"`
+- [x] Добавить `aria-labelledby` для title
+- [x] Добавить `aria-describedby` для message
+- [x] Реализовать закрытие по клавише Escape
 - [ ] Реализовать focus trap (фокус остается внутри диалога)
 
 **Verification**: Открыть диалог, проверить что:
@@ -180,9 +180,9 @@ console.log(result); // true или false
 
 ### 5.1 Remove Legacy Code
 
-- [ ] Убедиться что все 4 `alert()` заменены
-- [ ] Убедиться что все 5 `confirm()` заменены
-- [ ] Проверить что нет случайных eslint warnings
+- [x] Убедиться что все 4 `alert()` заменены
+- [x] Убедиться что все 5 `confirm()` заменены
+- [x] Проверить что нет случайных eslint warnings
 
 **Verification**: Запустить `npm run lint` в frontend
 
@@ -190,7 +190,7 @@ console.log(result); // true или false
 
 ### 5.2 Update Documentation
 
-- [ ] Документировать новый подход в `ui-notifications` spec
+- [x] Документировать новый подход в `ui-notifications` spec
 - [ ] Обновить `docs/Walkthrough.md` с информацией о замене диалогов
 
 **Verification**: Прочитать обновленную документацию

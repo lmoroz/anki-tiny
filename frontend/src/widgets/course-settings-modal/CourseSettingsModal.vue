@@ -2,7 +2,8 @@
 import { ref, computed, onMounted } from 'vue'
 import Modal from '@/shared/ui/Modal.vue'
 import Button from '@/shared/ui/Button.vue'
-import SettingsForm from '@/widgets/settings-form/SettingsForm.vue'
+import { toast } from 'vue3-toastify'
+import { useConfirm } from '@/shared/lib/useConfirm'
 import { useSettingsStore } from '@/entities/settings/model/useSettingsStore.js'
 
 const props = defineProps({
@@ -59,11 +60,13 @@ async function handleSave(formSettings) {
   try {
     if (useCustomSettings.value) {
       await settingsStore.updateCourseSettings(props.courseId, formSettings)
+      toast.success('Настройки сохранены!')
     }
     else {
       // Если юзер переключил на глобальные, сбросить индивидуальные
       if (hasCustom.value) {
         await settingsStore.resetCourseSettings(props.courseId)
+        toast.success('Настройки сброшены!')
       }
     }
     emit('saved')
@@ -71,6 +74,7 @@ async function handleSave(formSettings) {
   }
   catch (error) {
     console.error('Failed to save settings:', error)
+    toast.error('Ошибка сохранения настроек!')
   }
   finally {
     saving.value = false
@@ -78,10 +82,13 @@ async function handleSave(formSettings) {
 }
 
 async function handleReset() {
-  if (confirm('Сбросить настройки к глобальным?')) {
+  const { confirm } = useConfirm()
+  const confirmed = await confirm('Сбросить настройки к глобальным?')
+  if (confirmed) {
     await settingsStore.resetCourseSettings(props.courseId)
     settings.value = { ...settingsStore.globalSettings }
     useCustomSettings.value = false
+    toast.success('Настройки сброшены!')
   }
 }
 

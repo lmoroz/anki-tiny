@@ -1,6 +1,7 @@
 <script setup>
   import { ref, onMounted, computed } from 'vue'
   import { useRouter } from 'vue-router'
+  import { toast } from 'vue3-toastify'
   import { useSettingsStore } from '@/entities/settings/model/useSettingsStore.js'
   import { useCourseStore } from '@/entities/course/model/useCourseStore.js'
 
@@ -45,9 +46,9 @@
   async function handleSaveGlobal(settings) {
     try {
       await settingsStore.updateGlobalSettings(settings)
-      alert('Глобальные настройки сохранены!')
+      toast.success('Глобальные настройки сохранены!')
     } catch (error) {
-      alert('Ошибка сохранения: ' + error.message)
+      toast.error('Ошибка сохранения: ' + error.message)
     }
   }
 
