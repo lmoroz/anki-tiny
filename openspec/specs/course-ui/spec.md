@@ -169,3 +169,45 @@ The system SHALL provide accessibility support for statistics display through to
 
 ---
 
+### Requirement: Progress Reset on Edit
+
+The system SHALL reset card learning progress when card content is edited, treating the edited card as a new
+card for learning purposes.
+
+**Rationale**: Changing card content invalidates existing learning metrics. If a card's question or answer
+changes, the user should re-learn it from scratch to ensure proper retention.
+
+#### Scenario: Backend Progress Reset
+
+- **GIVEN** card exists with state = Review, reps = 10, stability = 5.2
+- **WHEN** `PUT /api/courses/:courseId/cards/:cardId` is called with
+  `{ front: "new question", back: "new answer", resetProgress: true }`
+- **THEN** backend updates card with:
+  - `front` = "new question"
+  - `back` = "new answer"
+  - `state` = `CardState.New`
+  - `stability` = `null`
+  - `difficulty` = `null`
+  - `reps` = 0
+  - `lapses` = 0
+  - `lastReview` = `null`
+  - `due` = current time + 4 hours (first learning interval)
+  - `interval` = `null`
+- **AND** response returns updated card with all fields
+
+#### Scenario: Frontend Progress Reset Display
+
+- **GIVEN** card was edited and progress reset
+- **WHEN** card list is refreshed
+- **THEN**:
+  - Card displays state badge "Новая" (green)
+  - Stability value shows "0.0"
+  - Difficulty value shows "0.0"
+  - Reps value shows "0"
+  - Lapses value shows "0"
+  - Due date shows time relative to current (e.g., "Через 4 часа", "Сегодня")
+  - Last review timestamp is hidden (since `lastReview` is null)
+- **AND** card is now eligible for training as a new card
+
+---
+

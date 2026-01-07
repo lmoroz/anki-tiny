@@ -28,6 +28,7 @@
   })
 
   const isEditMode = ref(false)
+  const frontInput = ref(null)
 
   // Инициализация формы
   const initForm = () => {
@@ -48,6 +49,10 @@
   }
 
   watch(() => props.card, initForm, { immediate: true })
+  watch(
+    () => frontInput.value,
+    () => frontInput.value?.focus()
+  )
 
   const validateForm = () => {
     errors.value = { front: '', back: '' }
@@ -98,6 +103,7 @@
 
     <div class="form-group">
       <Input
+        ref="frontInput"
         v-model="formData.front"
         label="Вопрос"
         type="textarea"

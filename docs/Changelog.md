@@ -5,6 +5,67 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.4.5] - 2026-01-07 19:37
+
+### Added
+
+#### Feature: Visual Feedback for Card Edit/Create
+
+- **Visual feedback after card creation/edit**: automatic scroll to card with bounce animation
+- **Card progress reset on edit**: card becomes "new" with fresh FSRS metrics (state, stability, difficulty, reps, lapses reset)
+- **CardList.vue now exposes `scrollToCardWithBounce()` method**:
+    - Scrolls to card using `scrollIntoView({ behavior: 'smooth', block: 'start' })`
+    - Applies `bounce-in-bck` CSS animation (2s duration)
+    - Handles edge cases (card not found, respects `prefers-reduced-motion`)
+- **CoursePage.vue now triggers scroll and animation** after card save/create
+    - `handleQuickAdd`: scrolls to newly added card with bounce
+    - `handleSaveCard`: scrolls to edited card with bounce and resets progress
+    - Auto-opens mobile panel when creating/editing cards on mobile devices
+
+### Changed
+
+- **Card update endpoint now supports `resetProgress` parameter**:
+    - `PUT /api/cards/:id` accepts `{ front, back, resetProgress?: boolean }`
+    - When `resetProgress=true`, backend resets: state (→ New), stability (→ 0.0), difficulty (→ 5.0), reps (→ 0),
+      lapses (→ 0), due (→ now + first learning step)
+    - Schema updated: `UpdateCardSchema` includes optional `resetProgress` field
+    - Settings-based interval: uses first learning step from course/global settings (default: 10 minutes)
+
+- **Code refactoring (by user)**:
+    - Extracted scroll and highlight logic to `useScrollAndHighlight` composable
+    - Improved animation with opacity changes (0.5 at 55% keyframe)
+    - Enhanced z-index handling for animated cards
+    - Code style improvements: consistent `else` formatting
+
+### Technical Details
+
+- **Files Modified**:
+    - Backend (3 files):
+        - `backend/src/routes/cards.ts` (+28 lines): resetProgress logic
+        - `backend/src/schemas/card.ts` (+1 line): add resetProgress to schema
+    - Frontend (4 files):
+        - `frontend/src/widgets/card-list/CardList.vue` (refactored): useScrollAndHighlight composable integration
+        - `frontend/src/widgets/card-list/composables/useScrollAndHighlight.js` (new): extracted scroll/highlight logic
+        - `frontend/src/pages/course/CoursePage.vue` (+35 lines): refs, scrollToCardWithBounce wrapper, mobile panel
+          auto-open
+        - `frontend/src/pages/course/CoursePage.vue`: conditional course description rendering
+
+- **Code Quality**:
+    - ✅ Backend lint passed (0 errors, 5 pre-existing warnings)
+    - ✅ Frontend lint passed (0 errors, auto-fixed)
+    - ✅ TypeScript: Proper types (Partial&lt;Card&gt;), no any usage in new code
+
+- **Animation Details**:
+    - `bounce-in-bck`: 2s duration, 7 keyframes (scale from 7 to 1 with bounces, opacity fade)
+    - Accessibility: respects `prefers-reduced-motion: reduce`
+    - 500ms delay before animation to allow scroll completion
+    - Enhanced z-index (99) for better visual layering
+
+- **OpenSpec**:
+    - ✅ Change `card-edit-form` archived as `2026-01-07-card-edit-form`
+    - ✅ Spec `course-ui` updated: +2 requirements (Card Management Interface, Progress Reset on Edit)
+    - ✅ All tasks completed (9/9), including manual testing on desktop and mobile
+
 ## [0.4.4] - 2026-01-07 17:28
 
 ### Added

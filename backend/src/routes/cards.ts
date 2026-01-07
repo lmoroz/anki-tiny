@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { cardRepository } from '../services/repositories/cardRepository';
 import { settingsRepository } from '../services/repositories/settingsRepository';
 import { CreateCardSchema, UpdateCardSchema } from '../schemas/card';
+import { Card } from '../services/database/schema';
 import { ZodError } from 'zod';
 
 const router = Router();
@@ -90,21 +91,42 @@ router.put('/cards/:id', async (req: Request, res: Response) => {
   try {
     const id = parseInt(req.params.id, 10);
 
-    if (isNaN(id)) {
-      return res.status(400).json({ error: 'Invalid card ID' });
-    }
+    if (isNaN(id)) return res.status(400).json({ error: 'Invalid card ID' });
 
     // Валидация
     const validatedData = UpdateCardSchema.parse(req.body);
 
     // Проверяем существование карточки
     const existingCard = await cardRepository.getCardById(id);
-    if (!existingCard) {
-      return res.status(404).json({ error: 'Card not found' });
+    if (!existingCard) return res.status(404).json({ error: 'Card not found' });
+
+    // Формируем обновления
+    const updates: Partial<Card> = {};
+    if (validatedData.front !== undefined) updates.front = validatedData.front;
+    if (validatedData.back !== undefined) updates.back = validatedData.back;
+
+    // Если resetProgress = true, сбрасываем прогресс карточки
+    if (validatedData.resetProgress === true) {
+      const settings = await settingsRepository.getEffectiveSettings(existingCard.courseId);
+      const steps = JSON.parse(settings.learningSteps);
+      const firstStepMinutes = Array.isArray(steps) && steps.length > 0 ? steps[0] : 10;
+
+      Object.assign(updates, {
+        state: 0, // CardState.NEW
+        stability: 0.0,
+        difficulty: 5.0,
+        reps: 0,
+        lapses: 0,
+        lastReview: null,
+        due: new Date(Date.now() + firstStepMinutes * 60 * 1000).toISOString(),
+        elapsedDays: 0,
+        scheduledDays: 0,
+        stepIndex: 0,
+      });
     }
 
     // Обновляем
-    const card = await cardRepository.updateCard(id, validatedData);
+    const card = await cardRepository.updateCard(id, updates);
 
     res.json({ card });
   } catch (error) {

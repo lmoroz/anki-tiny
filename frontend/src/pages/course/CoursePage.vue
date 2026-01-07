@@ -20,6 +20,8 @@
   const editingCard = ref(null)
   const showSettingsModal = ref(false)
   const quickAddCardRef = ref(null)
+  const cardListDesktopRef = ref(null)
+  const cardListMobileRef = ref(null)
 
   // Responsive layout state
   const isDesktop = useMediaQuery('(min-width: 1025px)')
@@ -95,7 +97,8 @@
 
   const handleQuickAdd = async cardData => {
     try {
-      await cardStore.createCard(courseId, cardData)
+      const newCard = await cardStore.createCard(courseId, cardData)
+      nextTick(() => scrollToCardWithBounce(newCard.id))
     } catch (err) {
       console.error('Failed to create card:', err)
     }
@@ -123,13 +126,27 @@
   const handleSaveCard = async data => {
     try {
       if (editingCard.value) {
-        //Режим редактирования
-        await cardStore.updateCard(editingCard.value.id, data)
+        // Режим редактирования
+        await cardStore.updateCard(editingCard.value.id, { ...data, resetProgress: true })
+        const editedCardId = editingCard.value.id
+
+        // Обновляем список карточек
+        await cardStore.fetchCardsByCourse(courseId)
+        handleCloseModal()
+
+        // Прокручиваем к отредактированной карточке с анимацией
+        nextTick(() => {
+          scrollToCardWithBounce(editedCardId)
+        })
       } else {
         // Режим создания
-        await cardStore.createCard(courseId, data)
+        const newCard = await cardStore.createCard(courseId, data)
+        handleCloseModal()
+
+        nextTick(() => {
+          scrollToCardWithBounce(newCard.id)
+        })
       }
-      handleCloseModal()
     } catch (err) {
       console.error('Failed to save card:', err)
     }
@@ -166,6 +183,13 @@
   const closeCardsPanel = () => {
     isCardsPanelOpen.value = false
     document.body.style.overflow = ''
+  }
+
+  const scrollToCardWithBounce = async cardId => {
+    if (!isDesktop.value && !isCardsPanelOpen.value) openCardsPanel()
+    await nextTick()
+    const cardListComponent = isDesktop.value ? cardListDesktopRef.value : cardListMobileRef.value
+    if (cardListComponent) cardListComponent.scrollToCardWithBounce(cardId)
   }
 
   // Watchers
@@ -224,6 +248,7 @@
             class="mb-6">
             <h1 class="course-title lg:mb-2 md:mb-1 sm:mb-1 text-3xl font-bold text-white leading-tight tracking-tight drop-shadow-sm">{{ course?.name }}</h1>
             <div
+              v-if="course?.description"
               class="course-description lg:mb-2 md:mb-1 sm:mb-1 rounded-[12px] p-3 text-gray-100 leading-relaxed shadow-xl bg-gray-500/20 border border-white/30 backdrop-blur-md bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.15)_0%,transparent_50%)]"
               v-html="parsedDescription" />
 
@@ -316,6 +341,7 @@
           </div>
 
           <CardList
+            ref="cardListDesktopRef"
             :cards="cards"
             :loading="cardsLoading"
             @edit="handleEditCard"
@@ -366,6 +392,7 @@
             </Button>
           </div>
           <CardList
+            ref="cardListMobileRef"
             class="panel-content flex-1 pl-[10px]"
             :cards="cards"
             :loading="cardsLoading"

@@ -10,6 +10,7 @@ export const CreateCardSchema = z.object({
 export const UpdateCardSchema = z.object({
   front: z.string().min(1).max(10000).optional(),
   back: z.string().min(1).max(10000).optional(),
+  resetProgress: z.boolean().optional(),
 });
 
 // Схема для отправки результата повторения

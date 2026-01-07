@@ -1,6 +1,6 @@
 # Spec Delta: course-ui
 
-## MODIFIED Requirements
+## ADDED Requirements
 
 ### Requirement: Card Management Interface
 

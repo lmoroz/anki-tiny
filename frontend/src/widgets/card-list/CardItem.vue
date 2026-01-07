@@ -12,6 +12,7 @@
 
   const emit = defineEmits(['edit', 'delete'])
   const isMobile = useMediaQuery('(max-width: 768px)')
+  const isTablet = useMediaQuery('(max-width: 1024px)')
 
   const cardPadding = computed(() => {
     return !isMobile.value ? 'md' : 'sm'
@@ -25,7 +26,6 @@
 
   const handleEdit = e => {
     e.stopPropagation()
-    console.log('handleEdit in CatdItem', props.card)
     emit('edit', props.card)
   }
 
@@ -98,7 +98,9 @@
           :class="getStateBadge(card.state).class">
           {{ getStateBadge(card.state).text }}
         </span>
-        <div class="card-actions">
+        <div
+          class="card-actions"
+          :class="{ visible: isTablet || isFlipped }">
           <button
             class="action-btn edit-btn"
             @click="handleEdit"
@@ -300,6 +302,7 @@
     transition: opacity 0.2s ease;
   }
 
+  .card-actions.visible,
   .card-front:hover .card-actions {
     opacity: 1;
   }

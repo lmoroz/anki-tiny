@@ -1,5 +1,5 @@
 <script setup>
-  import { computed } from 'vue'
+  import { computed, useTemplateRef } from 'vue'
 
   const props = defineProps({
     modelValue: {
@@ -39,6 +39,8 @@
 
   const emit = defineEmits(['update:modelValue'])
 
+  const inputElRef = useTemplateRef('inputEl')
+
   const inputClasses = computed(() => {
     return ['input-field', { 'input-error': props.error }]
   })
@@ -46,6 +48,14 @@
   const handleInput = event => {
     emit('update:modelValue', event.target.value)
   }
+
+  const putFocus = () => {
+    if (inputElRef.value) inputElRef.value.focus()
+  }
+
+  defineExpose({
+    focus: putFocus
+  })
 </script>
 
 <template>
@@ -67,6 +77,7 @@
 
       <!-- Top Layer (Actual Textarea) -->
       <textarea
+        ref="inputEl"
         class="relative z-10 w-full rounded-2xl px-6 py-3 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-400/40 focus:border-blue-400/40 resize-none transition-all text-lg leading-relaxed shadow-xl border border-white/10 bg-gray-700 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.15)_0%,transparent_50%)]"
         :value="modelValue"
         :placeholder="placeholder"
@@ -78,6 +89,7 @@
 
     <textarea
       v-else-if="type === 'textarea'"
+      ref="inputEl"
       class="bg-gray-500/20 border border-white/30 backdrop-blur-md"
       :class="inputClasses"
       :value="modelValue"
@@ -88,6 +100,7 @@
 
     <input
       v-else
+      ref="inputEl"
       class="bg-gray-500/20 border border-white/30 backdrop-blur-md"
       :class="inputClasses"
       :type="type"

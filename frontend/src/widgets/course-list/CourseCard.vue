@@ -32,7 +32,7 @@
 
 <template>
   <Card
-    class="course-card"
+    class="course-card flex flex-col cursor-pointer"
     @click="emit('click', course)">
     <div class="course-header">
       <h3 class="course-title">{{ course.name }}</h3>
@@ -52,13 +52,11 @@
       </div>
     </div>
 
-    <p
-      v-if="course.description"
-      class="course-description">
+    <p class="course-description">
       {{ course.description }}
     </p>
 
-    <div class="course-footer">
+    <div class="course-footer mt-auto">
       <div class="course-meta">
         <i class="bi bi-clock" />
         <span>Обновлено {{ formattedDate }}</span>
@@ -69,11 +67,7 @@
 
 <style scoped>
   .course-card {
-    cursor: pointer;
     transition: all 0.25s ease;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
   }
 
   .course-card:hover {

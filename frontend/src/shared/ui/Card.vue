@@ -59,7 +59,7 @@
       v-if="highlight"
       class="absolute -top-[20%] -right-[20%] w-[80%] h-[80%] bg-[radial-gradient(circle,rgba(255,255,255,0.7)_0%,transparent_50%)] blur-2xl pointer-events-none" />
     <!-- Content Container -->
-    <div class="card-content relative z-10 flex flex-col gap-10 md:gap-8 sm:gap-6">
+    <div class="card-content relative z-10 flex flex-col gap-10 md:gap-8 sm:gap-6 h-full">
       <slot />
     </div>
   </div>

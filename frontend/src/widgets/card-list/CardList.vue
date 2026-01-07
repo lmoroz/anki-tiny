@@ -1,24 +1,8 @@
 <script setup>
   import { ref, useTemplateRef, onMounted, onUnmounted } from 'vue'
+  import useScrollAndHighlight from './composables/useScrollAndHighlight.js'
 
-  const checkScroll = () => {
-    const el = scrollContainer.value
-    if (!el) {
-      showTopFade.value = false
-      showBottomFade.value = false
-      return
-    }
-
-    // Порог срабатывания (например, 10px), чтобы не мерцало на границах
-    const threshold = 10
-
-    // Есть ли куда скроллить вверх?
-    showTopFade.value = el.scrollTop > threshold
-
-    // Есть ли куда скроллить вниз?
-    // Проверка: (прокрученное + видимое) < (полная высота - порог)
-    showBottomFade.value = el.scrollTop + el.clientHeight < el.scrollHeight - threshold
-  }
+  const { scrollTo, highlight, useFades, showTopFade, showBottomFade } = useScrollAndHighlight()
 
   const props = defineProps({
     cards: {
@@ -33,31 +17,26 @@
 
   const emit = defineEmits(['edit', 'delete'])
 
-  const scrollContainer = useTemplateRef('cardList')
-  const showTopFade = ref(false)
-  const showBottomFade = ref(true)
+  const scrollContainer = useTemplateRef('cardsGrid')
+  useFades(scrollContainer)
 
-  const handleEdit = card => {
-    console.log('handleEdit in CatdList', card)
-    emit('edit', card)
+  const handleEdit = card => emit('edit', card)
+
+  const handleDelete = card => emit('delete', card)
+
+  const scrollToCardWithBounce = cardId => {
+    const cardElement = scrollContainer.value?.querySelector(`[data-card-id="${cardId}"]`)
+
+    if (!cardElement) {
+      console.warn(`Card with id ${cardId} not found in list`)
+      return
+    }
+    scrollTo(cardElement, scrollContainer.value)
+    highlight(cardElement, 'anim-bounce-in-bck', 500)
   }
 
-  const handleDelete = card => {
-    emit('delete', card)
-  }
-
-  onMounted(() => {
-    const el = scrollContainer.value
-    if (el) {
-      el.addEventListener('scroll', checkScroll)
-      checkScroll()
-    }
-  })
-
-  onUnmounted(() => {
-    if (scrollContainer.value) {
-      scrollContainer.value.removeEventListener('scroll', checkScroll)
-    }
+  defineExpose({
+    scrollToCardWithBounce
   })
 </script>
 
@@ -85,12 +64,13 @@
 
     <div
       v-else
-      ref="cardList"
-      class="cards-grid z-10 flex flex-col flex-1 gap-4 overflow-y-auto snap-y snap-mandatory scroll-pt-3 p-1">
+      ref="cardsGrid"
+      class="cards-grid z-10 flex flex-col flex-1 gap-4 overflow-y-auto overflow-x-hidden snap-y snap-mandatory scroll-pt-3 p-1">
       <CardItem
         class="snap-start flex-[0_0_210px] z-5"
         v-for="card in cards"
         :key="card.id"
+        :data-card-id="card.id"
         :card="card"
         @edit="handleEdit"
         @delete="handleDelete" />
@@ -149,5 +129,50 @@
   .empty-state span {
     font-size: 14px;
     color: var(--color-text-tertiary);
+  }
+
+  .anim-bounce-in-bck {
+    animation-duration: 2s;
+    animation-name: bounce-in-bck;
+    z-index: 99;
+  }
+
+  @keyframes bounce-in-bck {
+    0% {
+      opacity: 0;
+      animation-timing-function: ease-in;
+      transform: scale(7);
+    }
+    38% {
+      opacity: 1;
+      animation-timing-function: ease-out;
+      transform: scale(1);
+    }
+    55% {
+      opacity: 0.5;
+      animation-timing-function: ease-in;
+      transform: scale(1.5);
+    }
+    72%,
+    89%,
+    to {
+      opacity: 1;
+      animation-timing-function: ease-out;
+      transform: scale(1);
+    }
+    81% {
+      animation-timing-function: ease-in;
+      transform: scale(1.24);
+    }
+    95% {
+      animation-timing-function: ease-in;
+      transform: scale(1.04);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .anim-bounce-in-bck {
+      animation: none;
+    }
   }
 </style>
