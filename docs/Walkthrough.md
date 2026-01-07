@@ -19,8 +19,8 @@ Created a universal wrapper component for `vue-scroll-picker` library:
 
 #### TimeRangePicker.vue
 Refactored to use **4 ScrollTimePicker instances**:
-- Start Hours (0-23) + Start Minutes (0, 15, 30, 45)
-- End Hours (0-23) + End Minutes (0, 15, 30, 45)
+- Start Hours (0-23) + Start Minutes (0-59)
+- End Hours (0-23) + End Minutes (0-59)
 - Converted API from hour-based (0-23) to **minute-based (0-1439)**
 - Maintains timeline visualization with minute precision
 - All event handlers convert hours+minutes ↔ total minutes

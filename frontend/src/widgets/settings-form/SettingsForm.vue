@@ -20,6 +20,38 @@
 
   const localSettings = ref({ ...props.modelValue })
 
+  // Helper для конвертации learningSteps из JSON в user-friendly формат
+  function parseLearningStepsForDisplay(jsonString) {
+    if (!jsonString) return ''
+    try {
+      const parsed = JSON.parse(jsonString)
+      if (Array.isArray(parsed)) return parsed.join(', ')
+    }
+    catch {
+      // Если это уже строка с запятыми, оставляем как есть
+      return jsonString
+    }
+    return jsonString
+  }
+
+  // Helper для конвертации learningSteps из user-friendly в JSON
+  function formatLearningStepsForBackend(input) {
+    if (!input) return ''
+    // Если это уже JSON-массив, возвращаем как есть
+    if (input.trim().startsWith('[')) return input
+    // Конвертируем строку с числами через запятую в JSON-массив
+    const numbers = input.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n) && n > 0)
+    return JSON.stringify(numbers)
+  }
+
+  // Computed для отображения learningSteps в удобном формате
+  const displayLearningSteps = computed({
+    get: () => parseLearningStepsForDisplay(localSettings.value.learningSteps),
+    set: (value) => {
+      localSettings.value.learningSteps = formatLearningStepsForBackend(value)
+    }
+  })
+
   // Helper function to format minutes to HH:MM
   function formatTime(minutes) {
     const hours = Math.floor(minutes / 60)
@@ -43,6 +75,19 @@
 
     if (localSettings.value.minTimeBeforeEnd < 1 || localSettings.value.minTimeBeforeEnd > 12) {
       errors.minTimeValue = 'Минимальное время должно быть от 1 до 12 часов'
+    }
+
+    // Validate learningSteps
+    if (localSettings.value.learningSteps) {
+      try {
+        const parsed = JSON.parse(localSettings.value.learningSteps)
+        if (!Array.isArray(parsed) || !parsed.every(n => typeof n === 'number' && n > 0)) {
+          errors.learningSteps = 'Шаги обучения должны быть положительными числами'
+        }
+      }
+      catch {
+        errors.learningSteps = 'Неверный формат (используйте числа через запятую)'
+      }
     }
 
     return {
@@ -127,6 +172,22 @@
         <span>Включить размытие интервалов (fuzz)</span>
       </label>
       <p class="help-text">Добавляет случайную вариацию к интервалам повторения для более естественного распределения карточек</p>
+    </div>
+
+    <!-- Learning Steps -->
+    <div class="form-section">
+      <label>Шаги обучения (минуты)</label>
+      <Input
+        v-model="displayLearningSteps"
+        type="text"
+        placeholder="10, 240"
+        :disabled="readonly" />
+      <p class="help-text">Интервалы для новых карточек в минутах, разделённые запятой (например: 10, 240)</p>
+      <p
+        v-if="validation.errors.learningSteps"
+        class="error-message">
+        {{ validation.errors.learningSteps }}
+      </p>
     </div>
 
     <!-- Preview текущего расписания -->
