@@ -5,6 +5,80 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.4.5] - 2026-01-07 20:30
+
+### Added
+
+#### OpenSpec: Batch Card Delete Proposal
+
+- **OpenSpec Change Created**: `add-batch-card-delete`
+  - Comprehensive proposal for batch card deletion functionality
+  - Motivation: inefficient to delete cards one by one when cleaning up course content
+  
+- **Proposal Structure** (`openspec/changes/add-batch-card-delete/`)
+  - **proposal.md** (2.4 KB)
+    - Overview: batch card deletion with checkboxes + delete all cards feature
+    - Motivation: current one-by-one deletion is inconvenient for bulk operations
+    - Goals: selection mode, visual feedback, batch delete, delete all
+    - Success criteria: 7 points covering selection, deletion, backend support
+  - **design.md** (15.2 KB)
+    - Backend API: two endpoints for batch delete and delete all
+      - `DELETE /api/courses/:courseId/cards/batch` (with cardIds array)
+      - `DELETE /api/courses/:courseId/cards` (delete all cards)
+    - Frontend UI: selection mode with custom checkboxes
+      - `CardCheckbox.vue` component (20x20px, gradient when checked)
+      - `CardItem.vue` changes: selectionMode prop, opacity 0.6 when selected
+      - `CoursePage.vue`: selection state, toggle/batch delete handlers
+    - UX considerations: visual feedback, transitions, accessibility
+    - Error handling: SQL transactions, network errors
+  - **tasks.md** (3.8 KB, 8 phases, 30+ subtasks)
+    - Phase 1: Backend API endpoints (5 tasks)
+    - Phase 2: Frontend UI components for selection mode (6 tasks)
+    - Phase 3: CoursePage selection mode (7 tasks)
+    - Phase 4: Delete all cards feature (4 tasks)
+    - Phase 5: API client integration (4 tasks)
+    - Phase 6: Testing (7 tasks)
+    - Phase 7: UI/UX polish (4 tasks)
+  - **specs/course-ui/spec.md** (delta)
+    - ADDED requirements:
+      - Batch Card Delete (4 scenarios: entering mode, selecting, deleting, exiting)
+      - Delete All Cards (2 scenarios: accessing, deleting)
+      - Custom Checkbox Component (3 scenarios: unchecked, checked, dark theme)
+    - MODIFIED requirements:
+      - Enhanced Card Statistics: added selection mode behavior
+
+- **Key Features Documented**
+  - **Selection Mode**:
+    - Custom checkboxes (not native browser checkboxes)
+    - Selected cards have reduced opacity (0.6)
+    - Cards don't flip in selection mode
+    - "Delete selected (N)" button (disabled when N=0)
+    - "Cancel" button to exit selection mode
+  - **Delete All**:
+    - Separate "Delete all cards" button
+    - Confirmation dialog with warning
+    - Single operation to clear entire course
+  - **Backend**:
+    - Transactional batch delete (all or nothing)
+    - Validation: max 100 cards per batch, cards belong to course
+    - Returns deleted count in response
+
+### Technical Details
+
+- **OpenSpec Validation**: ✅ Passed `npx @fission-ai/openspec validate add-batch-card-delete --strict`
+- **Change Status**: 0/30+ tasks (proposal stage, ready for user review and approval)
+- **Files Created**: 4
+  - `openspec/changes/add-batch-card-delete/proposal.md`
+  - `openspec/changes/add-batch-card-delete/design.md`
+  - `openspec/changes/add-batch-card-delete/tasks.md`
+  - `openspec/changes/add-batch-card-delete/specs/course-ui/spec.md`
+- **No Code Changes Yet**: Pure planning/proposal phase
+
+### Next Steps
+
+- User review and approval of proposal
+- Implementation via `/openspec-apply` workflow after approval
+
 ## [0.4.5] - 2026-01-07 19:37
 
 ### Added
