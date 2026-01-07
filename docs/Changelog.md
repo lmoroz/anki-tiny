@@ -5,9 +5,82 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.4.3] - 2026-01-07 12:08
+
+### Added
+
+#### OpenSpec: Course Layout Redesign Proposal
+
+- **OpenSpec Change Created**: `redesign-course-layout`
+    - Comprehensive proposal for redesigning course page with adaptive layout and enhanced card statistics
+    - Motivation: efficient screen space usage on desktop, better mobile UX, transparency of FSRS algorithm
+
+- **Proposal Structure** (`openspec/changes/redesign-course-layout/`)
+    - **proposal.md** (6 KB)
+        - Overview: two-column layout (desktop) + slide-out panel (mobile)
+        - Motivation: current issues (wasted space, hidden metrics) and expected improvements
+        - Why section: need for transparency and efficient layout
+        - Scope: in/out of scope clearly defined
+        - User Review Required: breakpoint (1024px) and statistics format (inline)
+        - Dependencies, Rollout Plan, Alternatives Considered
+    - **design.md** (14 KB)
+        - Architecture: component structure, responsive layouts (desktop/tablet/mobile)
+        - Desktop: grid-cols-[2fr_1fr], 60%/40% split
+        - Mobile/Tablet: slide-out panel from right (85% tablet width, 100% mobile), FAB button
+        - Card Statistics Display: 8 metrics (state, stability, difficulty, reps, lapses, created, last review, due)
+        - Icons mapping (Bootstrap Icons), tooltips, compact mode for desktop right column
+        - Accessibility, performance, testing strategy
+    - **tasks.md** (7 KB, 6 phases, ~40 subtasks)
+        - Phase 1: Desktop Two-Column Layout (2 tasks)
+        - Phase 2: Mobile Slide-Out Panel (4 tasks with FAB, panel, focus trap)
+        - Phase 3: Enhanced Card Statistics (3 tasks for metrics display)
+        - Phase 4: Accessibility Enhancements (2 tasks)
+        - Phase 5: Testing & Verification (3 tasks for responsive/functional/performance)
+        - Phase 6: Documentation (2 tasks)
+        - Dependencies graph and estimated effort: 11-17 hours
+    - **specs/course-ui/spec.md** (11 KB)
+        - 4 requirements with SHALL/MUST keywords
+        - 8 scenarios: desktop/mobile layouts, panel opening/closing, statistics display, accessibility
+        - GIVEN/WHEN/THEN format with AND clauses
+        - Rationale for each requirement
+
+- **Key Features Documented**
+    - **Responsive Breakpoint**: 1024px (desktop ≥1024px, mobile/tablet \u003c1024px)
+    - **Desktop Layout**: Two columns (course info left, compact cards list right)
+    - **Mobile Layout**: Single column + FAB + slide-out panel (hardware-accelerated transitions)
+    - **Enhanced Statistics**: 8 metrics per card
+        - FSRS: stability, difficulty, reps, lapses
+        - Timestamps: created, last review, due
+        - Icons: Bootstrap Icons with tooltips
+        - Compact mode: smaller font, 2-line text clamp in right column
+    - **Accessibility**: ARIA labels, tooltips (300ms hover), screen reader support, focus trap in panel
+
+- **User Adjustments** (post-proposal)
+    - Panel width clarified: 85% on tablet (max 400px), 100% on mobile
+    - Tooltips decision: for all metrics (resolved in design.md)
+    - Partial English translation of documents (proposal, spec, tasks, design)
+
+### Technical Details
+
+- **OpenSpec Validation**: ✅ Passed `npx @fission-ai/openspec validate redesign-course-layout --strict`
+- **Change Status**: 0/40 tasks (proposal stage, ready for user review and approval)
+- **Files Created**: 4
+    - `openspec/changes/redesign-course-layout/proposal.md`
+    - `openspec/changes/redesign-course-layout/design.md`
+    - `openspec/changes/redesign-course-layout/tasks.md`
+    - `openspec/changes/redesign-course-layout/specs/course-ui/spec.md`
+- **No Code Changes Yet**: Pure planning/proposal phase
+
+### Next Steps
+
+- User review and approval of proposal
+- Verify breakpoint (1024px) and statistics format preferences
+- Implementation via `/openspec-apply` workflow after approval
+
 ## [0.4.3] - 2026-01-07 11:31
 
 ### Added
+
 
 #### Settings: Learning Steps Parameter in UI
 
