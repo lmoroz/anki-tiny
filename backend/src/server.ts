@@ -44,7 +44,7 @@ let server: http.Server;
 async function startServer(port: number = 0): Promise<number> {
   // Инициализировать БД перед запуском сервера
   await initializeDatabase();
-  logger.info('✅ Database initialized');
+  logger.info('✅  Database initialized');
 
   return new Promise((resolve, reject) => {
     server = app.listen(port, () => {

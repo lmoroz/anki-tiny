@@ -118,16 +118,30 @@ function handleLearningSteps(card: Card, rating: Rating, settings: FSRSSettings,
 
     if (nextStepIndex >= steps.length) {
       // Завершили все шаги обучения - переводим в REVIEW
-      // Используем FSRS для расчета первого интервала в REVIEW
+      // Передаём карточку FSRS как NEW, чтобы он рассчитал первый интервал REVIEW
       const fsrs = initializeFSRS(settings);
+
+      // Создаём карточку в состоянии NEW для корректного расчёта первого интервала
       const fsrsCard = toFSRSCard({
         ...card,
-        state: CardState.REVIEW,
+        state: CardState.NEW,
+        reps: 0, // Делаем вид, что это первое повторение
         stepIndex: 0,
+        stability: 0,
+        difficulty: card.difficulty || 5.0,
+        elapsedDays: 0,
+        scheduledDays: 0,
+        due: now.toISOString(),
+        lastReview: null,
       });
 
       const scheduledCard = fsrs.next(fsrsCard, now, Rating.Good as Grade);
-      return fromFSRSCard(scheduledCard.card, card);
+
+      // Сохраняем реальное количество повторений из исходной карточки
+      return {
+        ...fromFSRSCard(scheduledCard.card, card),
+        reps: card.reps + 1, // Увеличиваем счётчик
+      };
     }
 
     // Переход к следующему шагу

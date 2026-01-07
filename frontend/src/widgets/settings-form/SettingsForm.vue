@@ -13,6 +13,10 @@
     showSaveButton: {
       type: Boolean,
       default: true
+    },
+    isCourseSettings: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -26,8 +30,7 @@
     try {
       const parsed = JSON.parse(jsonString)
       if (Array.isArray(parsed)) return parsed.join(', ')
-    }
-    catch {
+    } catch {
       // Если это уже строка с запятыми, оставляем как есть
       return jsonString
     }
@@ -40,14 +43,17 @@
     // Если это уже JSON-массив, возвращаем как есть
     if (input.trim().startsWith('[')) return input
     // Конвертируем строку с числами через запятую в JSON-массив
-    const numbers = input.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n) && n > 0)
+    const numbers = input
+      .split(',')
+      .map(s => parseFloat(s.trim()))
+      .filter(n => !isNaN(n) && n > 0)
     return JSON.stringify(numbers)
   }
 
   // Computed для отображения learningSteps в удобном формате
   const displayLearningSteps = computed({
     get: () => parseLearningStepsForDisplay(localSettings.value.learningSteps),
-    set: (value) => {
+    set: value => {
       localSettings.value.learningSteps = formatLearningStepsForBackend(value)
     }
   })
@@ -84,8 +90,7 @@
         if (!Array.isArray(parsed) || !parsed.every(n => typeof n === 'number' && n > 0)) {
           errors.learningSteps = 'Шаги обучения должны быть положительными числами'
         }
-      }
-      catch {
+      } catch {
         errors.learningSteps = 'Неверный формат (используйте числа через запятую)'
       }
     }
@@ -114,14 +119,15 @@
   )
 
   function handleSave() {
+    console.log('SettingsForm handleSave', localSettings.value)
     if (validation.value.isValid) emit('save', localSettings.value)
   }
 </script>
 
 <template>
-  <div class="settings-form">
+  <div class="settings-form flex flex-col gap-[24px]">
     <!-- Временной диапазон -->
-    <div class="form-section">
+    <div class="form-section flex flex-col gap-[8px]">
       <h3>Временные рамки тренировок</h3>
       <TimeRangePicker
         v-model:start="localSettings.trainingStartTime"
@@ -135,7 +141,7 @@
     </div>
 
     <!-- Минимальное время до конца дня -->
-    <div class="form-section">
+    <div class="form-section flex flex-col gap-[8px]">
       <label>Минимальное время до конца дня (часов)</label>
       <Input
         v-model.number="localSettings.minTimeBeforeEnd"
@@ -152,7 +158,7 @@
     </div>
 
     <!-- Уведомления -->
-    <div class="form-section">
+    <div class="form-section flex flex-col gap-[8px]">
       <label class="checkbox-label">
         <input
           v-model="localSettings.notificationsEnabled"
@@ -163,7 +169,7 @@
     </div>
 
     <!-- Enable Fuzz -->
-    <div class="form-section">
+    <div class="form-section flex flex-col gap-[8px]">
       <label class="checkbox-label">
         <input
           v-model="localSettings.enableFuzz"
@@ -175,7 +181,7 @@
     </div>
 
     <!-- Learning Steps -->
-    <div class="form-section">
+    <div class="form-section flex flex-col gap-[8px]">
       <label>Шаги обучения (минуты)</label>
       <Input
         v-model="displayLearningSteps"
@@ -190,9 +196,118 @@
       </p>
     </div>
 
+    <!-- Дневные лимиты (по всем курсам) - только для глобальных настроек -->
+    <div
+      v-if="!isCourseSettings"
+      class="form-section flex flex-col gap-[8px]">
+      <h3>Дневные лимиты (по всем курсам)</h3>
+
+      <label>Новых карточек в день</label>
+      <Input
+        v-model.number="localSettings.globalNewCardsPerDay"
+        type="number"
+        min="0"
+        :disabled="readonly" />
+      <p class="help-text">Максимальное количество новых карточек для изучения в день по всем курсам суммарно</p>
+
+      <label>Повторений в день</label>
+      <Input
+        v-model.number="localSettings.globalMaxReviewsPerDay"
+        type="number"
+        min="0"
+        :disabled="readonly" />
+      <p class="help-text">Максимальное количество повторений в день по всем курсам суммарно</p>
+    </div>
+
+    <!-- Дефолтные лимиты курсов (для новых курсов и тех, у которых нет индивидуальных настроек) -->
+    <div
+      v-if="!isCourseSettings"
+      class="form-section flex flex-col gap-[8px]">
+      <h3>Лимиты курсов по умолчанию</h3>
+      <p class="section-desc text-sm text-gray-400 mb-2">Эти настройки применяются ко всем курсам, у которых нет индивидуальных лимитов</p>
+
+      <label>Новых карточек в день (на курс)</label>
+      <Input
+        v-model.number="localSettings.defaultNewCardsPerDay"
+        type="number"
+        min="0"
+        :disabled="readonly" />
+
+      <label>Повторений в день (на курс)</label>
+      <Input
+        v-model.number="localSettings.defaultMaxReviewsPerDay"
+        type="number"
+        min="0"
+        :disabled="readonly" />
+
+      <label>Новых карточек за сессию (на курс)</label>
+      <Input
+        v-model.number="localSettings.defaultNewCardsPerSession"
+        type="number"
+        min="0"
+        :disabled="readonly" />
+
+      <label>Повторений за сессию (на курс)</label>
+      <Input
+        v-model.number="localSettings.defaultMaxReviewsPerSession"
+        type="number"
+        min="0"
+        :disabled="readonly" />
+    </div>
+
+    <!-- Курсовые дневные лимиты - только для настроек курса -->
+    <div
+      v-if="isCourseSettings"
+      class="form-section flex flex-col gap-[8px]">
+      <h3>Дневные лимиты курса</h3>
+
+      <label>Новых карточек в день</label>
+      <Input
+        v-model.number="localSettings.newCardsPerDay"
+        type="number"
+        min="0"
+        :disabled="readonly"
+        placeholder="Наследуется от глобальных" />
+      <p class="help-text">Максимальное количество новых карточек для изучения в день в этом курсе (оставьте пустым для наследования)</p>
+
+      <label>Повторений в день</label>
+      <Input
+        v-model.number="localSettings.maxReviewsPerDay"
+        type="number"
+        min="0"
+        :disabled="readonly"
+        placeholder="Наследуется от глобальных" />
+      <p class="help-text">Максимальное количество повторений в день в этом курсе (оставьте пустым для наследования)</p>
+    </div>
+
+    <!-- Сессионные лимиты - только для настроек курса -->
+    <div
+      v-if="isCourseSettings"
+      class="form-section flex flex-col gap-[8px]">
+      <h3>Сессионные лимиты</h3>
+
+      <label>Новых карточек за сессию</label>
+      <Input
+        v-model.number="localSettings.newCardsPerSession"
+        type="number"
+        min="0"
+        :disabled="readonly"
+        placeholder="Наследуется от глобальных" />
+      <p class="help-text">Максимальное количество новых карточек за одну тренировку</p>
+
+      <label>Повторений за сессию</label>
+      <Input
+        v-model.number="localSettings.maxReviewsPerSession"
+        type="number"
+        min="0"
+        :disabled="readonly"
+        placeholder="Наследуется от глобальных" />
+      <p class="help-text">Максимальное количество повторений за одну тренировку</p>
+    </div>
+
     <!-- Preview текущего расписания -->
     <div
-      class="form-section preview bg-gray-500/20 border border-white/30 backdrop-blur-md bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.15)_0%,transparent_50%)] p-4 rounded-xl shadow-lg">
+      class="form-section flex flex-col gap-[8px] preview bg-gray-500/20 border border-white/30 backdrop-blur-md bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.15)_0%,transparent_50%)] p-4 rounded-xl shadow-lg">
       <h4>Текущее расписание</h4>
       <p>
         Тренировки доступны с
@@ -220,27 +335,13 @@
 </template>
 
 <style scoped>
-  .settings-form {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-  }
-
-  .form-section {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
   .form-section h3 {
-    margin: 0;
     font-size: var(--text-section-title-size);
     font-weight: 600;
     color: var(--color-text-primary);
   }
 
   .form-section h4 {
-    margin: 0;
     font-size: var(--text-body-lg-size);
     font-weight: 600;
     color: var(--color-text-primary);
@@ -255,13 +356,11 @@
   .error-message {
     color: var(--color-danger);
     font-size: var(--text-body-md-size);
-    margin: 0;
   }
 
   .help-text {
     color: var(--color-text-tertiary);
     font-size: var(--text-body-md-size);
-    margin: 0;
   }
 
   .preview {
@@ -298,27 +397,5 @@
     display: flex;
     justify-content: flex-end;
     margin-top: 16px;
-  }
-
-  .btn-primary {
-    padding: 10px 24px;
-    background: var(--color-primary);
-    color: #ffffff;
-    border: none;
-    border-radius: 8px;
-    font-size: var(--text-body-md-size);
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .btn-primary:hover:not(:disabled) {
-    background: var(--color-primary-hover);
-    box-shadow: 0 2px 8px var(--input-focus-shadow);
-  }
-
-  .btn-primary:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
   }
 </style>

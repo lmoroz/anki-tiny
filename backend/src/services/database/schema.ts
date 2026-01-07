@@ -55,6 +55,12 @@ export interface SettingsTable {
   notificationsEnabled: number; // SQLite boolean (0/1)
   learningSteps: string; // JSON массив, например "[10, 240]" (минуты)
   enableFuzz: number; // SQLite boolean (0/1)
+  globalNewCardsPerDay: number; // default: 20
+  globalMaxReviewsPerDay: number; // default: 200
+  defaultNewCardsPerDay: number; // default: 20
+  defaultMaxReviewsPerDay: number; // default: 200
+  defaultNewCardsPerSession: number; // default: 10
+  defaultMaxReviewsPerSession: number; // default: 50
   createdAt: Generated<string>;
   updatedAt: Generated<string>;
 }
@@ -76,6 +82,10 @@ export interface CourseSettingsTable {
   notificationsEnabled: number | null;
   learningSteps: string | null;
   enableFuzz: number | null;
+  newCardsPerDay: number | null; // default: 20
+  maxReviewsPerDay: number | null; // default: 200
+  newCardsPerSession: number | null; // default: 10
+  maxReviewsPerSession: number | null; // default: 50
   createdAt: Generated<string>;
   updatedAt: Generated<string>;
 }
@@ -85,10 +95,27 @@ export type CourseSettings = Selectable<CourseSettingsTable>;
 export type NewCourseSettings = Insertable<CourseSettingsTable>;
 export type CourseSettingsUpdate = Updateable<CourseSettingsTable>;
 
+// Таблица dailyProgress (отслеживание прогресса за день)
+export interface DailyProgressTable {
+  id: Generated<number>;
+  date: string; // YYYY-MM-DD format
+  courseId: number;
+  newCardsStudied: number;
+  reviewsCompleted: number;
+  createdAt: Generated<string>;
+  updatedAt: Generated<string>;
+}
+
+// Типы для работы с прогрессом
+export type DailyProgress = Selectable<DailyProgressTable>;
+export type NewDailyProgress = Insertable<DailyProgressTable>;
+export type DailyProgressUpdate = Updateable<DailyProgressTable>;
+
 // Интерфейс всей базы данных
 export interface Database {
   courses: CoursesTable;
   cards: CardsTable;
   settings: SettingsTable;
   courseSettings: CourseSettingsTable;
+  dailyProgress: DailyProgressTable;
 }

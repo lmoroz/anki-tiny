@@ -26,6 +26,12 @@ export class SettingsRepository {
           notificationsEnabled: 1,
           learningSteps: '[10, 240]',
           enableFuzz: 1,
+          globalNewCardsPerDay: 20,
+          globalMaxReviewsPerDay: 200,
+          defaultNewCardsPerDay: 20,
+          defaultMaxReviewsPerDay: 200,
+          defaultNewCardsPerSession: 10,
+          defaultMaxReviewsPerSession: 50,
         })
         .returningAll()
         .executeTakeFirstOrThrow();
@@ -120,6 +126,8 @@ export class SettingsRepository {
         notificationsEnabled: globalSettings.notificationsEnabled === 1,
         learningSteps: globalSettings.learningSteps,
         enableFuzz: globalSettings.enableFuzz === 1,
+        // newCardsPerDay: globalSettings.defaultNewCardsPerDay,
+        // maxReviewsPerDay: globalSettings.defaultMaxReviewsPerDay,
       };
     }
 

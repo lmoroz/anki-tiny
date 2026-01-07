@@ -11,32 +11,31 @@ export const useSettingsStore = defineStore('settings', {
 
   getters: {
     // Получить эффективные настройки для курса (с fallback на глобальные)
-    getEffectiveSettings: (state) => (courseId) => {
+    getEffectiveSettings: state => courseId => {
       if (!courseId) return state.globalSettings
       const customSettings = state.courseSettings.get(courseId)
       return customSettings || state.globalSettings
     },
 
     // Проверить, использует ли курс индивидуальные настройки
-    hasCustomSettings: (state) => (courseId) => {
+    hasCustomSettings: state => courseId => {
       return state.courseSettings.has(courseId)
     }
   },
 
   actions: {
     // Загрузить глобальные настройки
-    async fetchGlobalSettings() {
+    async fetchGlobalSettings(from = 'unknown') {
+      console.log('fetchGlobalSettings from ', from)
       this.loading = true
       this.error = null
       try {
         const response = await settingsAPI.getGlobalSettings()
         this.globalSettings = response
-      }
-      catch (error) {
+      } catch (error) {
         this.error = error.message
         throw error
-      }
-      finally {
+      } finally {
         this.loading = false
       }
     },
@@ -46,15 +45,12 @@ export const useSettingsStore = defineStore('settings', {
       this.loading = true
       this.error = null
       try {
-        const response = await settingsAPI.updateGlobalSettings(settings)
         // Бэк возвращает данные напрямую
-        this.globalSettings = response
-      }
-      catch (error) {
+        this.globalSettings = await settingsAPI.updateGlobalSettings(settings)
+      } catch (error) {
         this.error = error.message
         throw error
-      }
-      finally {
+      } finally {
         this.loading = false
       }
     },
@@ -69,23 +65,19 @@ export const useSettingsStore = defineStore('settings', {
         // Если courseSettings !== null, то у курса есть индивидуальные настройки
         if (response.courseSettings) {
           this.courseSettings.set(courseId, response.courseSettings)
-        }
-        else {
+        } else {
           // Если courseSettings === null, то курс использует глобальные
           this.courseSettings.delete(courseId)
         }
-      }
-      catch (error) {
+      } catch (error) {
         // 404 означает что курс использует глобальные настройки
         if (error.response?.status === 404) {
           this.courseSettings.delete(courseId)
-        }
-        else {
+        } else {
           this.error = error.message
           throw error
         }
-      }
-      finally {
+      } finally {
         this.loading = false
       }
     },
@@ -96,13 +88,11 @@ export const useSettingsStore = defineStore('settings', {
       this.error = null
       try {
         const response = await settingsAPI.updateCourseSettings(courseId, settings)
-        this.courseSettings.set(courseId, response)
-      }
-      catch (error) {
+        this.courseSettings.set(courseId, response.settings)
+      } catch (error) {
         this.error = error.message
         throw error
-      }
-      finally {
+      } finally {
         this.loading = false
       }
     },
@@ -114,12 +104,10 @@ export const useSettingsStore = defineStore('settings', {
       try {
         await settingsAPI.resetCourseSettings(courseId)
         this.courseSettings.delete(courseId)
-      }
-      catch (error) {
+      } catch (error) {
         this.error = error.message
         throw error
-      }
-      finally {
+      } finally {
         this.loading = false
       }
     }

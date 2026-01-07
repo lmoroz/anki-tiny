@@ -23,6 +23,13 @@ export const GlobalSettingsSchema = z.object({
     )
     .optional(),
   enableFuzz: z.boolean().optional(),
+  globalNewCardsPerDay: z.number().int().min(0).optional(),
+  globalMaxReviewsPerDay: z.number().int().min(0).optional(),
+  // New fields for default course limits (will be added in migration 007)
+  defaultNewCardsPerDay: z.number().int().min(0).optional(),
+  defaultMaxReviewsPerDay: z.number().int().min(0).optional(),
+  defaultNewCardsPerSession: z.number().int().min(0).optional(),
+  defaultMaxReviewsPerSession: z.number().int().min(0).optional(),
 });
 
 // Схема для настроек курса (все поля optional, т.к. наследуются из глобальных)
@@ -49,6 +56,10 @@ export const CourseSettingsSchema = z.object({
     .nullable()
     .optional(),
   enableFuzz: z.boolean().nullable().optional(),
+  newCardsPerDay: z.number().int().min(0).nullable().optional(),
+  maxReviewsPerDay: z.number().int().min(0).nullable().optional(),
+  newCardsPerSession: z.number().int().min(0).nullable().optional(),
+  maxReviewsPerSession: z.number().int().min(0).nullable().optional(),
 });
 
 // Типы для TypeScript

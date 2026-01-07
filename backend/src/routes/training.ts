@@ -2,15 +2,17 @@ import { Router, Request, Response } from 'express';
 import { cardRepository } from '../services/repositories/cardRepository';
 import { settingsRepository } from '../services/repositories/settingsRepository';
 import { calculateNextReview, canShowNewCards } from '../services/fsrs';
+import { calculateAvailableCards, updateProgressAfterReview, getDailyStats, isNewCard } from '../services/limitService';
 import { ReviewCardSchema } from '../schemas/card';
 import { Rating } from 'ts-fsrs';
 import { ZodError } from 'zod';
+import { Card } from '../services/database/schema';
 
 const router = Router();
 
 /**
  * GET /api/courses/:courseId/due-cards
- * Получить карточки для повторения
+ * Получить карточки для повторения с учётом лимитов
  */
 router.get('/courses/:courseId/due-cards', async (req: Request, res: Response) => {
   try {
@@ -32,20 +34,27 @@ router.get('/courses/:courseId/due-cards', async (req: Request, res: Response) =
       });
     }
 
-    // Проверяем, можно ли предлагать новые карточки
+    // Проверяем, можно ли предлагать новые карточки (по времени)
     const showNew = canShowNewCards(settings, now);
-    const cards = await cardRepository.getDueCards(courseId, now, !showNew);
 
-    if (!showNew && cards.length > 0 && cards.some((c) => c.state === 0)) {
+    // Получаем карточки с учётом лимитов
+    const sessionMode = req.query.session === 'true';
+    const result = await calculateAvailableCards(courseId, sessionMode);
+
+    // Если слишком близко к концу дня, фильтруем новые карточки
+    if (!showNew && result.cards.length > 0 && result.cards.some((c) => isNewCard(c.state))) {
       return res.json({
-        cards: cards.filter((c) => c.state !== 0),
+        cards: result.cards.filter((c) => !isNewCard(c.state)),
+        limits: result.limits,
+        canShowNewCards: false,
         message: 'Too close to end of day for new cards',
       });
     }
 
     res.json({
-      cards,
-      canShowNewCards: showNew,
+      cards: result.cards,
+      limits: result.limits,
+      canShowNewCards: result.canShowNewCards && showNew,
     });
   } catch (error) {
     console.error('Error fetching due cards:', error);
@@ -58,18 +67,22 @@ router.get('/courses/:courseId/due-cards', async (req: Request, res: Response) =
  * Отправить результат повторения
  */
 router.post('/training/review', async (req: Request, res: Response) => {
+  let card: Card | null = null;
   try {
     // Валидация
     const validatedData = ReviewCardSchema.parse(req.body);
 
     const cardId = validatedData.cardId;
-    const rating = parseInt(validatedData.rating, 10) as Rating;
+    const rating = validatedData.rating as Rating;
 
     // Получаем карточку
-    const card = await cardRepository.getCardById(cardId);
+    card = await cardRepository.getCardById(cardId);
     if (!card) {
       return res.status(404).json({ error: 'Card not found' });
     }
+
+    // Запоминаем, была ли карточка новой (до обновления)
+    const wasNew = isNewCard(card.state);
 
     // Получаем настройки
     const settings = await settingsRepository.getEffectiveSettings(card.courseId);
@@ -81,6 +94,9 @@ router.post('/training/review', async (req: Request, res: Response) => {
     // Обновляем карточку
     const updatedCard = await cardRepository.updateCard(cardId, updates);
 
+    // Обновляем прогресс за день
+    await updateProgressAfterReview(cardId, wasNew);
+
     res.json({
       card: updatedCard,
       message: 'Review submitted successfully',
@@ -90,7 +106,21 @@ router.post('/training/review', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Validation error', details: error.issues });
     }
     console.error('Error submitting review:', error);
-    res.status(500).json({ error: 'Failed to submit review' });
+    res.status(500).json({ error: 'Failed to submit review', card });
+  }
+});
+
+/**
+ * GET /api/training/stats
+ * Получить статистику за день (глобальную и по курсам)
+ */
+router.get('/training/stats', async (_req: Request, res: Response) => {
+  try {
+    const stats = await getDailyStats();
+    res.json(stats);
+  } catch (error) {
+    console.error('Error fetching daily stats:', error);
+    res.status(500).json({ error: 'Failed to fetch daily stats' });
   }
 });
 

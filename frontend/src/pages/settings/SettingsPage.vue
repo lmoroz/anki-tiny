@@ -34,6 +34,7 @@
       console.error('Failed to load settings:', error)
       // При ошибке используем дефолтные значения
       globalSettings.value = { ...DEFAULT_SETTINGS }
+      toast.error('Failed to load settings:' + error.message)
     } finally {
       loading.value = false
     }

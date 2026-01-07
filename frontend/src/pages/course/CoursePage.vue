@@ -5,18 +5,25 @@
   import { useFocusTrap } from '@vueuse/integrations/useFocusTrap'
   import MarkdownIt from 'markdown-it'
   import hljs from 'highlight.js'
+  import 'highlight.js/styles/github-dark.css' // Стиль подсветки (можно выбрать другой)
   import { useConfirm } from '@/shared/lib/useConfirm'
   import { useCourseStore } from '@/entities/course/model/useCourseStore'
   import { useCardStore } from '@/entities/card/model/useCardStore'
+  import { useSettingsStore } from '@/entities/settings/model/useSettingsStore'
+  import { useTrainingStore } from '@/entities/training/model/useTrainingStore'
   import { toast } from 'vue3-toastify'
 
   const route = useRoute()
   const router = useRouter()
   const courseId = parseInt(route.params.id, 10)
 
+  // Stores
   const courseStore = useCourseStore()
   const cardStore = useCardStore()
+  const settingsStore = useSettingsStore()
+  const trainingStore = useTrainingStore()
 
+  // State
   const isLoading = ref(true)
   const showEditorModal = ref(false)
   const editingCard = ref(null)
@@ -24,6 +31,7 @@
   const quickAddCardRef = ref(null)
   const cardListDesktopRef = ref(null)
   const cardListMobileRef = ref(null)
+  const trainingStats = ref(null)
 
   // Responsive layout state
   const isDesktop = useMediaQuery('(min-width: 1025px)')
@@ -69,19 +77,26 @@
   }
 
   onMounted(async () => {
+    isLoading.value = true
     try {
-      // Загружаем данные курса если его нет в store
-      if (!course.value) await courseStore.fetchCourses()
+      await Promise.all([
+        courseStore.fetchCourses(),
+        cardStore.fetchCourseStats(courseId),
+        cardStore.fetchCardsByCourse(courseId),
+        settingsStore.fetchGlobalSettings('CoursePage onMounted')
+      ])
 
-      // Загружаем карточки курса
-      await Promise.all([cardStore.fetchCardsByCourse(courseId), cardStore.fetchCourseStats(courseId)])
-    } catch (err) {
-      console.error('Failed to load course data:', err)
-      toast.error('Ошибка загрузки: ' + err.message)
+      // Fetch stats
+      const dailyStats = await trainingStore.fetchDailyStats()
+      if (dailyStats) {
+        trainingStats.value = dailyStats.courses.find(c => c.courseId === courseId)
+      }
+    } catch (error) {
+      console.error('Failed to load course data:', error)
+      toast.error('Ошибка загрузки данных курса')
     } finally {
       isLoading.value = false
     }
-
     // Add keyboard listener for panel
     window.addEventListener('keydown', handleKeydown)
   })
@@ -148,7 +163,7 @@
     const count = selectedCardIds.value.size
     const confirmed = await confirm({
       title: 'Удаление карточек',
-      message: `Удалить выбранные карточки (${count})?`,
+      message: `Удалить выбранные карточки (${count})?`
     })
 
     if (confirmed) {
@@ -561,7 +576,7 @@
       @save="handleSaveCard" />
 
     <CourseSettingsModal
-      v-if="course"
+      v-if="course && showSettingsModal"
       :course-id="courseId"
       :course-name="course.name"
       :show="showSettingsModal"

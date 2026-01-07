@@ -5,6 +5,81 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.4.8] - 2026-01-08 03:57
+
+### Added
+
+#### Feature: Training Limits System (4-Level Limits)
+
+Implemented comprehensive training limits system with global, course-level, and session-based constraints to prevent user overload and enable controlled learning.
+
+- **Backend Implementation**:
+  - **Database Migration 006**: Added `dailyProgress` table and limit fields to `settings`/`courseSettings`
+  - **Database Migration 007**: Added default course limit fields to `settings` table
+  - **New Repositories**: `progressRepository.ts` for daily progress tracking
+  - **New Services**: `limitService.ts` with limit calculation and enforcement logic
+  - **API Enhancements**:
+    - `GET /api/courses/:courseId/due-cards?session=true` — returns cards with limit metadata
+    - `POST /api/training/review` — updates daily progress
+    - `GET /api/training/stats` — retrieves daily statistics per course and globally
+  - **Validation Schemas**: Added Zod schemas for all limit fields in `settings.ts`
+
+- **Frontend Implementation**:
+  - **API Layer**: Created `src/shared/api/training.js` with centralized training endpoints
+  - **Pinia Store**: Created `src/entities/training/model/useTrainingStore.js` for session state management
+  - **TrainingPage.vue**: Integrated session limits, progress display, and completion handling
+  - **CoursePage.vue**: Added daily stats widget showing remaining limits
+  - **SettingsForm.vue**: Added UI for configuring:
+    - Global daily limits (shared across all courses)
+    - Default course limits (fallbacks for courses without custom settings)
+    - Course-specific daily limits (per-course overrides)
+    - Session limits (per-training-session caps)
+
+- **Limit Hierarchy** (from highest to lowest priority):
+  1. **Global Daily Limits**: `globalNewCardsPerDay`, `globalMaxReviewsPerDay` (aggregate across all courses)
+  2. **Course Daily Limits**: `newCardsPerDay`, `maxReviewsPerDay` (per-course, inherits from defaults if null)
+  3. **Session Limits**: `newCardsPerSession`, `maxReviewsPerSession` (per-training-session)
+  4. **Daily Progress Tracking**: Persisted in `dailyProgress` table, resets based on `trainingStartTime`
+
+- **Default Values**:
+  - Global daily: 20 new cards, 200 reviews (total across all courses)
+  - Default course daily: 20 new cards, 200 reviews (per course)
+  - Default session: 10 new cards, 50 reviews (per session)
+
+### Changed
+
+- **Settings Architecture**: Refactored to support 4-level limit system
+- **Training Flow**: Cards are now fetched with session awareness and limit enforcement
+- **Progress Tracking**: Daily progress persists across app restarts and resets at `trainingStartTime`
+
+### Fixed
+
+- **Schema Validation**: Fixed missing Zod schemas causing limit fields to be lost on save
+- **Default Fallbacks**: Updated `limitService.ts` to use global defaults when course settings are null
+- **Migration 007**: Split column additions into separate statements for SQLite compatibility
+
+### Technical Details
+
+- **Files Created**: 4
+  - `backend/src/services/limitService.ts`
+  - `backend/src/services/repositories/progressRepository.ts`
+  - `frontend/src/shared/api/training.js`
+  - `frontend/src/entities/training/model/useTrainingStore.js`
+
+- **Files Modified**: 19 (schemas, migrations, repositories, API routes, UI components)
+
+- **OpenSpec Status**:
+  - ✅ Change `add-training-limits` archived as `2026-01-07-add-training-limits`
+  - ✅ Spec `training-limits` created (9 requirements)
+  - ✅ Specs `settings-global-management` and `settings-course-management` updated
+  - ✅ All specs validated with `--strict` mode
+
+- **Architecture Improvements**:
+  - Proper separation of concerns: API layer → Store → Components
+  - No direct axios calls in Vue components
+  - Centralized business logic in `limitService.ts`
+  - Efficient progress tracking with compound indexes
+
 ## [0.4.7] - 2026-01-07 23:49
 
 ### Added

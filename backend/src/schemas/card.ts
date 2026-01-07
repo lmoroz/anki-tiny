@@ -16,9 +16,12 @@ export const UpdateCardSchema = z.object({
 // Схема для отправки результата повторения
 export const ReviewCardSchema = z.object({
   cardId: z.number().int().positive('Card ID must be positive'),
-  rating: z.enum(['1', '2', '3', '4'], {
-    message: 'Rating must be 1 (Again), 2 (Hard), 3 (Good), or 4 (Easy)',
-  }),
+  rating: z
+    .number()
+    .int()
+    .positive()
+    .min(1, 'Rating must be 1 (Again), 2 (Hard), 3 (Good), or 4 (Easy)')
+    .max(4, 'Rating must be 1 (Again), 2 (Hard), 3 (Good), or 4 (Easy)'),
 });
 
 // Схема для массового удаления карточек

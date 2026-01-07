@@ -1,39 +1,82 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { onMounted, computed, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import Card from '@/shared/ui/Card.vue';
-import Button from '@/shared/ui/Button.vue';
+import { storeToRefs } from 'pinia';
+import { useTrainingStore } from '@/entities/training/model/useTrainingStore';
+import { toast } from 'vue3-toastify';
 
 const route = useRoute();
 const router = useRouter();
-const courseId = route.params.id;
-const currentCard = ref(null);
-const isFlipped = ref(false);
-const isLoading = ref(true);
+const courseId = parseInt(route.params.id);
 
-onMounted(() => {
-  // TODO: Загрузка карточки для повторения
-  setTimeout(() => {
-    currentCard.value = {
-      front: 'Пример лицевой стороны',
-      back: 'Пример обратной стороны'
-    };
-    isLoading.value = false;
-  }, 300);
+const trainingStore = useTrainingStore();
+const { 
+  currentCard, 
+  isSessionComplete, 
+  loading, 
+  sessionLimits, 
+  progress 
+} = storeToRefs(trainingStore);
+
+// Состояние переворота карточки (локальное для UI)
+import { ref } from 'vue';
+const isFlipped = ref(false);
+
+onMounted(async () => {
+  try {
+    await trainingStore.startSession(courseId);
+  } catch (error) {
+    toast.error('Не удалось запустить тренировку');
+    router.push(`/course/${courseId}`);
+  }
+});
+
+onUnmounted(() => {
+  trainingStore.resetSession();
 });
 
 const handleFlip = () => {
   isFlipped.value = !isFlipped.value;
 };
 
-const handleAnswer = (difficulty) => {
-  console.log('Answer:', difficulty);
-  // TODO: Отправка результата, загрузка следующей карточки
-  isFlipped.value = false;
+const handleAnswer = async (ratingCode) => {
+  const ratingMap = {
+    'again': 1,
+    'hard': 2,
+    'good': 3,
+    'easy': 4
+  };
+  
+  const rating = ratingMap[ratingCode];
+  if (!rating) return;
+
+  try {
+    await trainingStore.submitReview(rating);
+    isFlipped.value = false;
+    
+    if (isSessionComplete.value) {
+      toast.success('Сессия завершена!');
+    }
+  } catch (error) {
+    toast.error('Ошибка сохранения ответа');
+  }
 };
 
 const handleBack = () => {
   router.push(`/course/${courseId}`);
+};
+
+const handleContinue = async () => {
+  // Попробовать получить еще карточки (новая сессия)
+  try {
+    await trainingStore.startSession(courseId);
+    if (trainingStore.sessionCards.length === 0) {
+      toast.info('На сегодня карточек больше нет');
+      router.push(`/course/${courseId}`);
+    }
+  } catch (error) {
+    toast.error('Ошибка продолжения тренировки');
+  }
 };
 </script>
 
@@ -42,15 +85,48 @@ const handleBack = () => {
     <div class="page-header">
       <Button @click="handleBack" variant="ghost" size="sm">
         <i class="bi bi-arrow-left"/>
-        Завершить
+        {{ isSessionComplete ? 'Выйти' : 'Завершить' }}
       </Button>
+      
+      <!-- Информация о сессии -->
+      <div v-if="!loading && sessionLimits && !isSessionComplete" class="session-info">
+        <div class="progress-text">
+          Карточка {{ progress.current }} / {{ progress.total }}
+        </div>
+        <div class="limits-text">
+          Осталось: 
+          <span class="badge new" v-if="sessionLimits.newCardsRemaining > 0">
+            {{ sessionLimits.newCardsRemaining }} новых
+          </span>
+          <span class="badge review" v-if="sessionLimits.reviewsRemaining > 0">
+            {{ sessionLimits.reviewsRemaining }} повтор.
+          </span>
+        </div>
+      </div>
     </div>
 
-    <div v-if="isLoading" class="loading-state">
+    <div v-if="loading" class="loading-state">
       <div class="spinner"/>
     </div>
 
-    <div v-else class="training-container">
+    <div v-else-if="isSessionComplete" class="complete-state">
+      <div class="complete-content">
+        <i class="bi bi-check-circle-fill success-icon"/>
+        <h2>Сессия завершена!</h2>
+        <p>Вы отлично поработали.</p>
+        
+        <div class="action-buttons">
+          <Button @click="handleContinue" variant="primary">
+            Продолжить тренировку
+          </Button>
+          <Button @click="handleBack" variant="secondary">
+            Вернуться к курсу
+          </Button>
+        </div>
+      </div>
+    </div>
+
+    <div v-else-if="currentCard" class="training-container">
       <Card padding="lg" class="training-card" @click="handleFlip">
         <div class="card-content">
           <div v-if="!isFlipped" class="card-front">
@@ -83,6 +159,11 @@ const handleBack = () => {
         </Button>
       </div>
     </div>
+    
+    <div v-else class="empty-state">
+      <p>Нет карточек для повторения.</p>
+      <Button @click="handleBack">Вернуться назад</Button>
+    </div>
   </div>
 </template>
 
@@ -95,6 +176,38 @@ const handleBack = () => {
 
 .page-header {
   margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.session-info {
+  text-align: right;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.limits-text {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.badge {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge.new {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.badge.review {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
 }
 
 .loading-state {
@@ -114,6 +227,31 @@ const handleBack = () => {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+.complete-state {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+  text-align: center;
+}
+
+.complete-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.success-icon {
+  font-size: 48px;
+  color: #10b981;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
 }
 
 .training-container {

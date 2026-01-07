@@ -119,20 +119,97 @@ const migrations: Migration[] = [
       await db.schema.alterTable('courseSettings').addColumn('trainingEndTime', 'integer').execute();
 
       // Migrate existing data: convert hours to minutes (hour * 60)
-      await sql`UPDATE settings SET trainingStartTime = trainingStartHour * 60, trainingEndTime = trainingEndHour * 60`.execute(db);
+      await sql`UPDATE settings
+                SET trainingStartTime = trainingStartHour * 60,
+                    trainingEndTime   = trainingEndHour * 60`.execute(db);
 
-      await sql`UPDATE courseSettings SET trainingStartTime = trainingStartHour * 60 WHERE trainingStartHour IS NOT NULL`.execute(db);
+      await sql`UPDATE courseSettings
+                SET trainingStartTime = trainingStartHour * 60
+                WHERE trainingStartHour IS NOT NULL`.execute(db);
 
-      await sql`UPDATE courseSettings SET trainingEndTime = trainingEndHour * 60 WHERE trainingEndHour IS NOT NULL`.execute(db);
+      await sql`UPDATE courseSettings
+                SET trainingEndTime = trainingEndHour * 60
+                WHERE trainingEndHour IS NOT NULL`.execute(db);
 
       // Set defaults for new columns in settings table
-      await sql`UPDATE settings SET trainingStartTime = 480 WHERE trainingStartTime IS NULL`.execute(db);
-      await sql`UPDATE settings SET trainingEndTime = 1320 WHERE trainingEndTime IS NULL`.execute(db);
+      await sql`UPDATE settings
+                SET trainingStartTime = 480
+                WHERE trainingStartTime IS NULL`.execute(db);
+      await sql`UPDATE settings
+                SET trainingEndTime = 1320
+                WHERE trainingEndTime IS NULL`.execute(db);
 
       // Drop old hour-based columns from settings
       // SQLite doesn't support DROP COLUMN directly, so we need to recreate the table
       // For simplicity, we'll keep the old columns for backward compatibility
       // They can be removed in a future migration if needed
+    },
+  },
+  {
+    id: '006',
+    name: 'add_training_limits',
+    up: async (db: Kysely<Database>) => {
+      // 1. Add global limit fields to settings table
+      await db.schema
+        .alterTable('settings')
+        .addColumn('globalNewCardsPerDay', 'integer', (col) => col.notNull().defaultTo(20))
+        .execute();
+
+      await db.schema
+        .alterTable('settings')
+        .addColumn('globalMaxReviewsPerDay', 'integer', (col) => col.notNull().defaultTo(200))
+        .execute();
+
+      // 2. Add course-specific limit fields to courseSettings table
+      await db.schema.alterTable('courseSettings').addColumn('newCardsPerDay', 'integer').execute();
+
+      await db.schema.alterTable('courseSettings').addColumn('maxReviewsPerDay', 'integer').execute();
+
+      await db.schema.alterTable('courseSettings').addColumn('newCardsPerSession', 'integer').execute();
+
+      await db.schema.alterTable('courseSettings').addColumn('maxReviewsPerSession', 'integer').execute();
+
+      // 3. Create dailyProgress table
+      await db.schema
+        .createTable('dailyProgress')
+        .addColumn('id', 'integer', (col) => col.primaryKey().autoIncrement())
+        .addColumn('date', 'text', (col) => col.notNull())
+        .addColumn('courseId', 'integer', (col) => col.notNull().references('courses.id').onDelete('cascade'))
+        .addColumn('newCardsStudied', 'integer', (col) => col.notNull().defaultTo(0))
+        .addColumn('reviewsCompleted', 'integer', (col) => col.notNull().defaultTo(0))
+        .addColumn('createdAt', 'text', (col) => col.notNull().defaultTo(sql`CURRENT_TIMESTAMP`))
+        .addColumn('updatedAt', 'text', (col) => col.notNull().defaultTo(sql`CURRENT_TIMESTAMP`))
+        .execute();
+
+      // 4. Create indexes for dailyProgress
+      await db.schema.createIndex('idx_dailyProgress_date').on('dailyProgress').column('date').execute();
+
+      await db.schema.createIndex('idx_dailyProgress_courseId').on('dailyProgress').column('courseId').execute();
+
+      // 5. Create unique composite index for (date, courseId)
+      await db.schema.createIndex('idx_dailyProgress_date_course').on('dailyProgress').columns(['date', 'courseId']).unique().execute();
+    },
+  },
+  {
+    id: '007',
+    name: 'add_default_course_limits',
+    up: async (db: Kysely<Database>) => {
+      await db.schema
+        .alterTable('settings')
+        .addColumn('defaultNewCardsPerDay', 'integer', (col) => col.notNull().defaultTo(20))
+        .execute();
+      await db.schema
+        .alterTable('settings')
+        .addColumn('defaultMaxReviewsPerDay', 'integer', (col) => col.notNull().defaultTo(200))
+        .execute();
+      await db.schema
+        .alterTable('settings')
+        .addColumn('defaultNewCardsPerSession', 'integer', (col) => col.notNull().defaultTo(10))
+        .execute();
+      await db.schema
+        .alterTable('settings')
+        .addColumn('defaultMaxReviewsPerSession', 'integer', (col) => col.notNull().defaultTo(50))
+        .execute();
     },
   },
 ];

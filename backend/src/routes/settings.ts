@@ -76,7 +76,13 @@ router.get('/courses/:courseId/settings', async (req: Request, res: Response) =>
     const effectiveSettings = await settingsRepository.getEffectiveSettings(courseId);
 
     res.json({
-      courseSettings, // null если используются глобальные
+      courseSettings: courseSettings
+        ? {
+            ...courseSettings,
+            notificationsEnabled: courseSettings.notificationsEnabled === 1,
+            enableFuzz: courseSettings.enableFuzz === 1,
+          }
+        : null,
       effectiveSettings,
     });
   } catch (error) {
@@ -90,6 +96,8 @@ router.get('/courses/:courseId/settings', async (req: Request, res: Response) =>
  * Обновить настройки курса
  */
 router.put('/courses/:courseId/settings', async (req: Request, res: Response) => {
+  let validatedData: Record<string, unknown> = {};
+  let updateData: Record<string, unknown> = {};
   try {
     const courseId = parseInt(req.params.courseId, 10);
 
@@ -98,20 +106,22 @@ router.put('/courses/:courseId/settings', async (req: Request, res: Response) =>
     }
 
     // Валидация
-    const validatedData = CourseSettingsSchema.parse(req.body);
+    validatedData = CourseSettingsSchema.parse(req.body);
 
     // Преобразуем boolean в SQLite boolean (0/1)
-    const updateData: Record<string, unknown> = { ...validatedData };
+    // const updateData: Record<string, unknown> = { ...validatedData };
+    // Преобразуем boolean в SQLite boolean (0/1)
+    updateData = { ...validatedData, enableFuzz: validatedData.enableFuzz ? 1 : 0, notificationsEnabled: validatedData.notificationsEnabled ? 1 : 0 };
 
     const settings = await settingsRepository.updateCourseSettings(courseId, updateData);
 
     res.json({ settings });
   } catch (error) {
     if (error instanceof ZodError) {
-      return res.status(400).json({ error: 'Validation error', details: error.issues });
+      return res.status(400).json({ error: 'Validation error', details: error.issues, validatedData, updateData });
     }
     console.error('Error updating course settings:', error);
-    res.status(500).json({ error: 'Failed to update course settings' });
+    res.status(500).json({ error: 'Failed to update course settings', validatedData, updateData });
   }
 });
 

@@ -59,10 +59,6 @@
 </template>
 
 <style scoped>
-  .vue-scroll-picker {
-    height: 7rem;
-  }
-
   .vue-scroll-picker.disabled {
     opacity: 0.5;
     pointer-events: none;
