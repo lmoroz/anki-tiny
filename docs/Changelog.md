@@ -5,6 +5,19 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.6.2] - 2026-01-09 02:49
+
+### Changed
+
+#### OpenSpec: Archived Retention Settings Change
+
+- Archived OpenSpec change `add-retention-settings` as `2026-01-08-add-retention-settings`
+- Created two new specification documents:
+  - `openspec/specs/settings-retention/spec.md` — Request retention parameter specification
+  - `openspec/specs/settings-ui-sections/spec.md` — Collapsible settings UI sections specification
+- All specs validated successfully with strict mode
+- Change status: 30/32 tasks completed before archiving
+
 ## [0.6.2] - 2026-01-09 02:42
 
 ### Added
