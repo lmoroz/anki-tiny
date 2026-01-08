@@ -294,26 +294,90 @@ interface Settings {
 
 ## Project Status
 
+### Текущая версия: 0.5.0 (MVP Feature Complete)
+
 ### Реализовано ✅
 
+**Архитектура & Инфраструктура**
 - Полная структура проекта (FSD для frontend, Layered для backend)
-- Кастомный Title Bar с управлением окном
 - Database Layer (SQLite + Kysely) с системой миграций
-- Courses API (CRUD endpoints)
-- Frontend интеграция курсов (Pinia stores, UI components)
-- QuickAddCard компонент для быстрого добавления карточек
+- Кастомный Title Bar с управлением окном (acrylic blur)
 - Light/Dark темы с Tailwind CSS v4
-- Система настроек (глобальные + индивидуальные для курсов)
+- Кастомный протокол `lmorozanki://` для загрузки ресурсов
+
+**Управление Курсами и Карточками**
+- Courses API (полный CRUD) с статистикой
+- Cards API (полный CRUD) с FSRS интеграцией
+- QuickAddCard компонент для быстрого добавления
+- Batch Add (массовое добавление через текстовый формат)
+- Batch Delete (выбор нескольких карточек + удаление)
+- Delete All Cards (очистка всего курса)
+- Card Editor с визуальным фидбеком (scroll + bounce animation)
+- Progress Reset при редактировании карточки
+- Course Statistics на главной странице (total, new, last training)
+
+**Система Тренировок**
+- Training Page с FSRS-алгоритмом (ts-fsrs v5)
+- Card-based UI с flip-анимациями
+- Кнопки оценки ответа (Again/Hard/Good/Easy)
+- **4-уровневая система лимитов**:
+  - Global Daily Limits (aggregate across all courses)
+  - Course Daily Limits (per-course with inheritance)
+  - Session Limits (per training session)
+  - Daily Progress Tracking (с reset на основе trainingStartTime)
+- Session Management (счетчики, badges, completion states)
+- Due cards с учетом времени дня и лимитов
+
+**Система Настроек**
+- Global Settings (глобальные настройки приложения)
+- Course Settings (индивидуальные для каждого курса с наследованием)
+- Settings UI с полной формой конфигурации:
+  - Custom Time Pickers (scroll-based hour/minute selection)
+  - FSRS Parameters (learningSteps, requestRetention, maximumInterval, enableFuzz)
+  - Training Limits (global daily, course daily, session)
+  - Time Range (trainingStartTime, trainingEndTime)
+- Inheritance Pattern (null = inherit from global)
+
+**UI/UX Система**
+- Системный дизайн с CSS-переменными
+- **Custom Dialogs & Notifications**:
+  - vue3-toastify для alerts (success/error)
+  - Custom ConfirmDialog компонент для confirmations
+  - useConfirm composable (Promise-based API)
+  - Полная замена нативных `alert()` и `confirm()`
+- Анимации (transitions, flip, bounce, hover states)
+- Responsive дизайн (desktop + mobile с slide-out panels)
+- Accessibility (ARIA, keyboard navigation, focus management)
+
+**Backend Services**
+- FSRS Service (интеграция ts-fsrs, custom parameters)
+- Limit Service (расчет доступных карточек с учетом лимитов)
+- Progress Repository (отслеживание дневного прогресса)
+- Card Repository (CRUD, batch operations, statistics)
+- Course Repository (CRUD, settings management)
+- Settings Repository (global + course with inheritance)
+
+**OpenSpec Specs (Актуальные)**
+- `course-ui` — UI управления курсами и карточками
+- `settings-global-management` — глобальные настройки
+- `settings-course-management` — настройки курсов
+- `settings-ui` — UI настроек
+- `styling-system` — система стилей
+- `training-limits` — 4-уровневая система лимитов
+- `ui-notifications` — кастомные диалоги и уведомления
 
 ### В работе 🔄
 
-- Cards API и интеграция с FSRS
-- Training Page с алгоритмом повторения
+**Desktop Integration (Priority 1 для v1.0)**
+- System Tray Integration — сворачивание в трей вместо закрытия
+- System Notifications — нативные уведомления ОС о готовых карточках
+- Deep Linking — открытие приложения в режиме тренировки из уведомления
 
 ### Запланировано 📅
 
-- Системные уведомления
-- Tray Integration
-- Статистика прогресса обучения
-- Импорт/Экспорт курсов
-- Поддержка медиа в карточках (изображения, аудио)
+**Priority 2 (Post v1.0)**
+- Statistics Dashboard — графики и визуализация прогресса обучения
+- Import/Export — поддержка JSON и Anki форматов
+- Media Support — изображения и аудио в карточках
+- Search & Filtering — поиск и фильтрация карточек
+- Tags System — теги и категории для организации контента

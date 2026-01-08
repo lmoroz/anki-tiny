@@ -147,11 +147,15 @@
         <div class="training-card__content flex-1">
           <div class="card-front">
             <div class="card-label">ВОПРОС</div>
-            <div class="card-text">{{ currentCard.front }}</div>
+            <div
+              class="card-text"
+              v-html="currentCard.front" />
           </div>
           <div class="card-back">
             <div class="card-label">ОТВЕТ</div>
-            <div class="card-text">{{ currentCard.back }}</div>
+            <div
+              class="card-text"
+              v-html="currentCard.back" />
           </div>
         </div>
         <div class="flip-hint mt-auto">

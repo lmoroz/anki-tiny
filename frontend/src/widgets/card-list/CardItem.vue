@@ -31,8 +31,7 @@
   const toggleFlip = () => {
     if (props.selectionMode) {
       emit('toggle-select')
-    }
-    else {
+    } else {
       isFlipped.value = !isFlipped.value
     }
   }
@@ -115,8 +114,7 @@
         <CardCheckbox
           v-if="selectionMode"
           :checked="selected"
-          @click.stop="emit('toggle-select')"
-        />
+          @click.stop="emit('toggle-select')" />
         <!-- Normal Mode: Show Edit/Delete -->
         <div
           v-else
@@ -176,11 +174,16 @@
               aria-label="Ошибок" />
             {{ card.lapses || 0 }}
           </span>
+
+          <span class="flip-hint ml-auto">
+            <i class="bi bi-arrow-repeat" />
+            Показать ответ
+          </span>
         </div>
 
         <div class="flex items-start justify-between">
           <!-- Timestamps -->
-          <div class="card-timestamps flex flex-col gap-[4px]">
+          <div class="card-timestamps flex flex gap-4">
             <span
               class="timestamp-item flex gap-[6px] items-center"
               title="Следующее повторение">
@@ -207,11 +210,6 @@
               Создано: {{ formatCreatedDate(card.createdAt) }}
             </span>
           </div>
-
-          <span class="flip-hint">
-            <i class="bi bi-arrow-repeat" />
-            Показать ответ
-          </span>
         </div>
       </div>
     </div>
@@ -222,7 +220,9 @@
       </div>
 
       <div class="card-body">
-        <p class="card-text">{{ card.back }}</p>
+        <div
+          class="card-text"
+          v-html="card.back" />
       </div>
 
       <div class="card-footer">
@@ -240,7 +240,9 @@
     perspective: 1000px;
     cursor: pointer;
     min-height: 180px;
-    transition: transform 0.6s, opacity 0.2s ease;
+    transition:
+      transform 0.6s,
+      opacity 0.2s ease;
     transform-style: preserve-3d;
   }
 

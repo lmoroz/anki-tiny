@@ -1,180 +1,484 @@
-# Walkthrough: UI Enhancements & Data Model Simplification
+# Walkthrough: Repetitio Project Development
 
-## Session Date: 2026-01-08
+## Project Overview
 
-## Objective
+**Repetitio** — desktop-приложение для изучения материала с помощью карточек и интервального повторения (spaced repetition), построенное на базе FSRS v5 алгоритма.
 
-Manual improvements to Training UI, Button component, and data model simplification (removed `elapsedDays` field).
+**Версия**: 0.5.0 (MVP Feature Complete)
 
-## Implementation Summary
+**Разработка**: AI-assisted development с human-in-the-loop подходом
 
-### Frontend UI Enhancements ✅
+---
 
-#### 1. Training Page Complete Redesign (`frontend/src/pages/training/TrainingPage.vue`)
+## Development Timeline
 
-**Major Refactoring**:
-- Complete rewrite of training interface
-- New card-based design with flip animations
-- Answer buttons with visual feedback
-- Session state management (loading, complete, empty)
-- Limit counters display with badges
+### Phase 1: Architecture & Foundation ✅
 
-**Key Features**:
-- **Card Display**:
-  - Click-to-flip interaction
-  - Front side: "ВОПРОС" label + question text
-  - Back side: "ОТВЕТ" label + answer text
-  - Flip hint with icon and dynamic text
-  
-- **Answer Buttons** (visible when card is flipped):
-  - "Снова" (danger variant, red)
-  - "Сложно" (secondary variant, gray)
-  - "Хорошо" (primary variant, default blue)
-  - "Легко" (success variant, green)
-  - All buttons: size `lg`, centered flex layout
+**Stack выбран**:
+- Frontend: Vue 3 + Vite + TailwindCSS v4 + Pinia
+- Backend: Node.js + TypeScript + Express + Electron
+- Database: SQLite + Kysely (query builder)
+- Algorithm: ts-fsrs v5.2+
 
-- **Session States**:
-  - **Loading**: Spinner animation with CSS keyframes
-  - **Complete**: Success icon, congratulations message, action buttons (back/continue)
-  - **Empty**: No cards message, back button
-  - **Training**: Card + buttons
+**Реализовано**:
+- Feature-Sliced Design для frontend
+- Layered Architecture для backend
+- Custom protocol `lmorozanki://` для Electron
+- Database с системой миграций
+- Custom Title Bar с acrylic blur (Windows 11)
 
-- **Session Info Display**:
-  - Course name in header
-  - Limits badges: new cards and reviews with color-coded styles
-  - Real-time session counter
+### Phase 2: Styling System ✅
 
-**Styling**:
-- `.page-container` - max-width 800px, centered
-- `.training-card` - min-height 400px, cursor pointer
-- `.card-content` - flexbox centered content
-- `.card-label` - uppercase, small, secondary color
-- `.card-text` - large (24px), primary color
-- `.flip-hint` - icon + text, top border
-- `.answer-buttons` - gap-5, centered
-- `.badge` - rounded, colored backgrounds (blue for new, green for review)
+**OpenSpec Change**: `2026-01-06-systemize-styling`
 
-#### 2. Button Component Extensions (`frontend/src/shared/ui/Button.vue`)
+**Реализовано**:
+- Централизованная система CSS-переменных
+- Dark/Light theme support
+- Design tokens (colors, typography, shadows, borders)
+- Premium UI aesthetics с современными градиентами
+- Responsive design система
 
-**New Features**:
-- **Size `xs`**: 4px/8px padding, uses `--text-body-xs-size` variable
-- **Variant `success`**: Green theme (`--color-success`, `--btn-success-bg-hover`)
-  - Shadow: `0 10px 20px -5px var(--btn-success-shadow)`
-  - Hover color: `--color-text-hilight`
-- **Variant `ghost` for secondary**: Transparent background, border
-  - Background: `transparent`
-  - Border: `0.5px solid var(--action-btn-bg)`
-  - Hover: `var(--action-btn-bg-hover)` background
+**Файлы**:
+- `frontend/src/app/assets/css/styles.css` — centralized CSS variables
 
-**Improvements**:
-- All sizes now use CSS variables for font-size
-- Enhanced shadows: `box-shadow: 0 10px 20px -5px` (deeper, more modern)
-- Better hover states for danger variant
+### Phase 3: Settings System ✅
 
-#### 3. Global Styles (`frontend/src/app/assets/css/styles.css`)
+**OpenSpec Changes**:
+- `2026-01-06-add-settings-page`
+- `2026-01-06-replace-time-selects`
 
-**Added Components**:
-- `.badge` - inline badge with padding, border-radius
-  - `.badge.new` - blue background (rgba(59, 130, 246, 0.1))
-  - `.badge.review` - green background (rgba(16, 185, 129, 0.1))
-- `.empty-state` - centered, padding
-- `.loading-state` - centered spinner container
-- `.spinner` - 40px circle, rotating animation
-- `.complete-state` - success message container
-- `.answer-buttons` - flexbox layout for training buttons
-- `.flip-hint` - icon + text hint
-- `.card-label`, `.card-text` - card typography
+**Реализовано**:
 
-**Animations**:
-```css
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+#### Global Settings
+- Training time range (trainingStartTime, trainingEndTime)
+- FSRS parameters:
+  - `learningSteps` — массив интервалов в минутах (e.g., [10, 1440, 4320])
+  - `requestRetention` — целевая точность запоминания (0.0-1.0)
+  - `maximumInterval` — максимальный интервал в днях
+  - `enableFuzz` — добавление рандомизации к интервалам
+- Daily limits:
+  - `globalNewCardsPerDay` — глобальный лимит новых карточек (aggregate)
+  - `globalMaxReviewsPerDay` — глобальный лимит повторений
+- Default course limits (fallbacks для курсов без индивидуальных настроек)
+- Session limits (per training session)
+- Notifications toggle
+
+#### Course Settings
+- Полное наследование от global settings
+- Возможность override любого параметра
+- `null` = inherit from global
+- Individual time ranges, FSRS params, limits per course
+
+#### UI Components
+- **ScrollTimePicker.vue** — generic scroll picker для hour/minute selection
+- **TimeRangePicker.vue** — диапазон времени с двумя парами пикеров
+- **SettingsForm.vue** — unified form для global и course settings
+- **CourseSettingsModal.vue** — modal для редактирования настроек курса
+
+**Specs**:
+- `settings-global-management`
+- `settings-course-management`
+- `settings-ui`
+
+### Phase 4: Course & Card Management ✅
+
+**OpenSpec Changes**:
+- `2026-01-07-redesign-course-layout`
+- `2026-01-07-card-edit-form`
+- `2026-01-07-add-batch-card-delete`
+
+**Реализовано**:
+
+#### Course Management
+- Full CRUD operations
+- Course statistics на главной странице:
+  - Total cards count
+  - New cards count
+  - Last training date (formatted)
+- Responsive layout с slide-out panels на mobile
+- Settings inheritance visualization
+
+#### Card Management
+- Full CRUD с модальными окнами
+- **QuickAdd режим** — inline добавление карточек
+- **Batch Add** — массовое добавление через текст (`question | answer` format)
+- **Batch Delete** — выбор нескольких карточек с custom checkboxes
+- **Delete All** — очистка всего курса с подтверждением
+- **Card Editor** — modal для редактирования с автоматическим:
+  - Progress reset (card становится New)
+  - Visual feedback (scroll to card + bounce animation)
+
+#### Visual Feedback
+- `useScrollAndHighlight` composable для прокрутки к карточке
+- Bounce animation (`bounce-in-bck`) при создании/редактировании
+- Opacity transitions в selection mode
+- Custom checkbox component с gradient styling
+
+**Specs**:
+- `course-ui`
+
+### Phase 5: Training System ✅
+
+**OpenSpec Change**: `2026-01-07-add-training-limits`
+
+**Реализовано**:
+
+#### FSRS Integration
+- Full ts-fsrs v5 integration
+- Custom parameters support
+- Card states: New, Learning, Review, Relearning
+- FSRS metrics: stability, difficulty, scheduled days, reps, lapses
+
+#### Training Page
+- Card-based review interface
+- Flip animation (click to reveal answer)
+- Answer buttons:
+  - **Снова** (Again) — danger variant, red
+  - **Сложно** (Hard) — secondary variant, gray
+  - **Хорошо** (Good) — primary variant, blue
+  - **Легко** (Easy) — success variant, green
+- Session states:
+  - Loading (spinner animation)
+  - Training (card + buttons)
+  - Complete (success message + navigation)
+  - Empty (no cards available)
+
+#### 4-Tier Limits System
+
+**Иерархия лимитов** (от высшего к низшему):
+
+1. **Global Daily Limits** (aggregate across all courses)
+   - `globalNewCardsPerDay` (default: 20)
+   - `globalMaxReviewsPerDay` (default: 200)
+
+2. **Course Daily Limits** (per-course)
+   - `newCardsPerDay` (null = inherit from default)
+   - `maxReviewsPerDay` (null = inherit from default)
+   - Constrains global limits
+
+3. **Session Limits** (per training session)
+   - `newCardsPerSession` (default: 10)
+   - `maxReviewsPerSession` (default: 50)
+   - Partitions daily limits
+
+4. **Daily Progress Tracking**
+   - Table: `dailyProgress` (date, courseId, newCardsStudied, reviewsCompleted)
+   - Reset mechanism: based on `trainingStartTime` (NOT midnight)
+   - Lazy reset: check on each request, no cron needed
+
+**Формула расчета**:
+```
+availableCards = min(
+  sessionLimit,
+  courseRemainingDaily,
+  globalRemainingDaily
+)
 ```
 
-### Backend Data Model Simplification ✅
+**API**:
+- `GET /api/courses/:courseId/due-cards?session=true` — returns cards with limit metadata
+- `POST /api/training/review` — updates daily progress
+- `GET /api/training/stats` — retrieves daily statistics
 
-#### Removed `elapsedDays` Field
+**Services**:
+- `limitService.ts` — business logic для расчета лимитов
+- `progressRepository.ts` — отслеживание дневного прогресса
 
-**Rationale**: FSRS algorithm doesn't use `elapsedDays` for scheduling - it's calculated internally when needed.
+**Specs**:
+- `training-limits`
 
-**Files Modified**:
+### Phase 6: UI Enhancements ✅
 
-1. **backend/src/services/database/schema.ts**
-   - Removed `elapsedDays INTEGER NOT NULL DEFAULT 0` from `cards` table schema
-   
-2. **backend/src/services/fsrs/index.ts**
-   - Removed `elapsedDays` from FSRS card calculations
-   - Simplified data structure
-   
-3. **backend/src/services/repositories/cardRepository.ts**
-   - Removed field from SELECT queries
-   - Removed from INSERT/UPDATE operations
-   
-4. **backend/src/routes/cards.ts**
-   - Removed from API response mapping
-   
-5. **backend/src/routes/training.ts**
-   - Removed from training card responses
+**OpenSpec Change**: `2026-01-07-replace-dialogs`
 
-6. **frontend/src/shared/types/card.ts**
-   - Removed `elapsedDays: number` from `Card` interface
-   - Simplified TypeScript type definition
+**Реализовано**:
 
-**Impact**:
-- Cleaner data model
-- Less redundant data storage
-- No breaking changes (FSRS calculates elapsed days internally when needed)
+#### Custom Dialogs & Notifications
 
-## Files Modified
+**Toast Notifications** (vue3-toastify):
+- Position: top-right
+- AutoClose: 3000ms
+- Theme: auto (light/dark)
+- Usage: `toast.success()`, `toast.error()`
+- CSS variables integration
 
-### Backend (5 files)
-1. `backend/src/routes/cards.ts` - removed elapsedDays
-2. `backend/src/routes/training.ts` - removed elapsedDays
-3. `backend/src/services/database/schema.ts` - removed field
-4. `backend/src/services/fsrs/index.ts` - simplified FSRS logic
-5. `backend/src/services/repositories/cardRepository.ts` - removed from queries
+**Custom ConfirmDialog**:
+- Modal dialog с backdrop
+- Props: title, message, confirmText, cancelText
+- Animations: fadeIn (backdrop), slideIn (content), 300ms ease
+- Closes on: backdrop click, Escape key, button clicks
+- Accessibility: `role="dialog"`, `aria-modal="true"`, keyboard nav
 
-### Frontend (5 files)
-1. `frontend/src/app/assets/css/styles.css` - added training UI styles
-2. `frontend/src/pages/settings/SettingsPage.vue` - minor changes
-3. `frontend/src/pages/training/TrainingPage.vue` - **COMPLETE REDESIGN**
-4. `frontend/src/shared/types/card.ts` - removed elapsedDays field
-5. `frontend/src/shared/ui/Button.vue` - added xs, success, ghost variants
+**useConfirm Composable**:
+- Promise-based API: `const {confirm} = useConfirm()`
+- Usage: `const result = await confirm(message | options)`
+- Returns: Promise<boolean>
+- Dynamic mounting/unmounting
+
+**Migration**:
+- Replaced 4× `alert()` calls → toasts
+- Replaced 5× `confirm()` calls → custom dialog
+- Полная замена нативных диалогов
+
+**Specs**:
+- `ui-notifications`
+
+#### Button Component Extensions
+
+**New sizes**:
+- `xs` — 4px/8px padding, extra small text
+
+**New variants**:
+- `success` — green theme для положительных действий
+- `ghost` — transparent background, border only
+
+**Improvements**:
+- Enhanced shadows: `0 10px 20px -5px` (deeper, modern)
+- All sizes use CSS variables
+- Better hover states
+
+### Phase 7: Statistics & Polish ✅
+
+**Latest Changes** (2026-01-08):
+
+#### Course Statistics on Home Page
+- Backend: `cardRepository.getAllCoursesStats()` — one query for all courses
+- API: `GET /api/courses` теперь возвращает `stats` для каждого курса
+- Frontend: `CourseCard.vue` footer displays:
+  - Total cards with Russian declension
+  - New cards count (if any) с иконкой
+  - Last training date (human-readable: "сегодня", "вчера", "3 дня назад")
+
+#### Training UI Redesign
+- Complete rewrite of `TrainingPage.vue`
+- Card flip animations
+- Answer buttons with visual feedback
+- Session state management
+- Limit counters with badges
+
+**Files Modified** (last session):
+- Backend: `cardRepository.ts`, `courses.ts`
+- Frontend: `CourseCard.vue`, `TrainingPage.vue`, `Button.vue`, `styles.css`
+
+#### Data Model Simplification
+- **Removed `elapsedDays` field**:
+  - Не используется FSRS (рассчитывается внутренне)
+  - Упрощена модель данных
+  - Updated: schema, repositories, API routes, frontend types
+
+---
+
+## Current Architecture
+
+### Frontend Structure (FSD)
+
+```
+frontend/src/
+├── app/              # Application initialization
+│   ├── main.js       # Entry point (Vue app, router, pinia, toasts)
+│   ├── App.vue
+│   └── router/       # Vue Router config
+├── pages/           # Pages
+│   ├── home/        # HomePage (course list + stats)
+│   ├── course/      # CoursePage (card management)
+│   ├── training/    # TrainingPage (FSRS review)
+│   └── settings/    # SettingsPage (global settings)
+├── widgets/         # Composite UI blocks
+│   ├── title-bar/   # Custom window title bar
+│   ├── course-list/ # Course grid/list
+│   ├── card-list/   # Card list с batch operations
+│   ├── card-editor/ # Card edit modal
+│   ├── course-settings-modal/
+│   └── settings-form/
+├── features/        # Business features
+│   ├── create-course/
+│   ├── add-card/
+│   └── spaced-repetition/
+├── entities/        # Business entities
+│   ├── course/
+│   │   └── model/useCoursesStore.js
+│   ├── card/
+│   │   └── model/useCardStore.js
+│   ├── settings/
+│   │   └── model/useSettingsStore.js
+│   └── training/
+│       └── model/useTrainingStore.js
+└── shared/          # Reusable code
+    ├── ui/          # UI components (Button, Input, Modal, etc.)
+    ├── api/         # HTTP client & API methods
+    ├── lib/         # Utilities (composables)
+    └── types/       # TypeScript types
+```
+
+### Backend Structure
+
+```
+backend/src/
+├── electron/        # Electron main process
+│   ├── main.ts      # Entry point, lmorozanki:// protocol
+│   └── preload.ts   # IPC bridge
+├── routes/          # API endpoints
+│   ├── courses.ts   # Course CRUD + stats
+│   ├── cards.ts     # Card CRUD + batch operations
+│   ├── training.ts  # Training API with limits
+│   └── settings.ts  # Settings CRUD
+├── services/        # Business logic
+│   ├── database/    # Kysely schema & migrations
+│   ├── fsrs/        # FSRS integration
+│   ├── limitService.ts # Training limits calculation
+│   └── repositories/
+│       ├── courseRepository.ts
+│       ├── cardRepository.ts
+│       ├── settingsRepository.ts
+│       └── progressRepository.ts
+├── schemas/         # Zod validation schemas
+│   ├── course.ts
+│   ├── card.ts
+│   └── settings.ts
+├── config/          # Configuration
+├── utils/           # Utilities (logger)
+└── server.ts        # Express server
+```
+
+---
+
+## OpenSpec Specs (Current)
+
+1. **course-ui** — UI управления курсами и карточками
+   - Course CRUD, statistics
+   - Card CRUD, batch operations
+   - Visual feedback, animations
+
+2. **settings-global-management** — глобальные настройки
+   - FSRS parameters
+   - Global daily limits
+   - Default course limits
+   - Time range
+
+3. **settings-course-management** — настройки курсов
+   - Inheritance pattern
+   - Per-course overrides
+   - Settings reset
+
+4. **settings-ui** — UI настроек
+   - Settings form
+   - Time pickers
+   - Course settings modal
+
+5. **styling-system** — система стилей
+   - CSS variables
+   - Dark/light themes
+   - Design tokens
+
+6. **training-limits** — 4-уровневая система лимитов
+   - Global daily limits
+   - Course daily limits
+   - Session limits
+   - Daily progress tracking
+
+7. **ui-notifications** — кастомные диалоги и уведомления
+   - Toast notifications
+   - Confirm dialog
+   - useConfirm composable
+
+---
 
 ## Key Technical Decisions
 
-1. **Card Flip Interaction**: Click anywhere on card to flip (no separate button)
-2. **State Management**: `isFlipped` ref controls front/back display
-3. **Button Variants**: Used semantic variants (danger, secondary, primary, success)
-4. **CSS Variables**: All colors and sizes use design system tokens
-5. **Responsive Design**: Mobile-first with flexbox
-6. **Animation**: Smooth transitions (200-300ms) for all interactions
-7. **Accessibility**: ARIA labels, semantic HTML, keyboard navigation
-8. **Data Simplification**: Removed unused `elapsedDays` field for cleaner architecture
+### 1. FSRS Integration
+- Используем `ts-fsrs` v5.2+ (latest stable)
+- Custom parameters: learningSteps, requestRetention, maximumInterval, enableFuzz
+- Card states: New, Learning, Review, Relearning
+- Progress reset при редактировании карточки (card becomes New)
 
-## User Experience Improvements
+### 2. Limits System
+- 4-tier hierarchy для гибкого контроля
+- Daily reset based on `trainingStartTime` (NOT midnight) — matches user's actual day cycle
+- Lazy reset (no cron jobs) — check on each request
+- First-come first-served между курсами для global limits
 
-- ✅ Modern card-based training interface
-- ✅ Visual feedback on all interactions
-- ✅ Clear state indicators (loading, complete, empty)
-- ✅ Color-coded answer buttons (easy to distinguish difficulty)
-- ✅ Session progress display with badges
-- ✅ Smooth animations and transitions
-- ✅ Consistent design system integration
-- ✅ Extended button component for various use cases
+### 3. Settings Architecture
+- Inheritance pattern: null = inherit from global/default
+- Partial<Settings> для course settings
+- Unified SettingsForm component для global и course
+- Time stored as "HH:MM" strings (easy to display/validate)
 
-## Code Quality
+### 4. UI/UX Patterns
+- Custom dialogs вместо нативных (consistent design, theme support)
+- Visual feedback для всех user actions (animations, toasts)
+- Responsive design с slide-out panels на mobile
+- Accessibility: ARIA, keyboard navigation, focus management
 
-- ✅ Consistent code style (proper `else` formatting)
-- ✅ CSS variables for all theming
-- ✅ No hardcoded colors or sizes
-- ✅ Semantic HTML structure
-- ✅ TypeScript types updated to match backend
-- ✅ Clean separation of concerns (template/script/style)
+### 5. Database Design
+- SQLite с migration system (table `_migrations`)
+- Kysely для type-safe queries
+- Transaction support для batch operations
+- Compound indexes для performance (e.g., `date + courseId` в dailyProgress)
 
-## Next Steps
+---
 
-- Run linting to verify code quality
-- Update version numbers (0.4.9)
-- Commit all changes with semantic message
+## Code Quality Standards
+
+### Formatting
+- Indentation: 2 spaces
+- Line endings: LF (Unix)
+- Encoding: UTF-8
+- Max line length: 160 (code), 120 (markdown)
+
+### Code Style
+- If/else: opening brace on same line, `else` on new line
+- Single statement: no braces (one-line)
+- Multiple statements: braces required
+
+### Imports (Frontend)
+- Always use `@` alias for src imports
+- Never use relative paths (`../`, `./`)
+- No manual Vue component imports (unplugin-vue-components)
+
+### Vue Files
+- `<script setup>` block always ABOVE `<template>`
+
+---
+
+## Next Steps (v0.6-0.9 → v1.0)
+
+### Priority 1: Desktop Integration
+
+1. **System Tray Integration**
+   - Minimize to tray instead of closing
+   - Tray icon with context menu
+   - Restore from tray
+
+2. **System Notifications**
+   - Native OS notifications for due cards
+   - Scheduled checks (every N minutes)
+   - Notification settings (enable/disable)
+
+3. **Deep Linking**
+   - Open app in training mode from notification
+   - URL scheme: `lmorozanki://train/:courseId`
+
+### Priority 2: Enhancements (Post v1.0)
+
+- Statistics Dashboard с charts
+- Import/Export (JSON, Anki)
+- Media support (images, audio)
+- Search & filtering
+- Tags system
+
+---
+
+## Conclusion
+
+**v0.5.0** — полнофункциональное SRS-приложение с:
+- ✅ FSRS v5 algorithm
+- ✅ Гибкой системой настроек
+- ✅ 4-уровневыми лимитами
+- ✅ Batch operations
+- ✅ Premium UI/UX
+- ✅ Dark/Light themes
+- ✅ Responsive design
+
+**v1.0** потребует только desktop integration (tray, notifications, deep linking).
+
+Все основные функции для обучения с карточками **уже реализованы**.

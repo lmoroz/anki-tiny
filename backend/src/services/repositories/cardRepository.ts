@@ -139,6 +139,7 @@ export class CardRepository {
         total: number;
         newCards: number;
         lastTraining: string | null;
+        lastCardAdded: string | null;
       }
     >
   > {
@@ -150,6 +151,7 @@ export class CardRepository {
         total: number;
         newCards: number;
         lastTraining: string | null;
+        lastCardAdded: string | null;
       }
     >();
 
@@ -160,6 +162,7 @@ export class CardRepository {
           total: 0,
           newCards: 0,
           lastTraining: null,
+          lastCardAdded: null,
         });
       }
 
@@ -173,6 +176,11 @@ export class CardRepository {
         if (!stats.lastTraining || card.lastReview > stats.lastTraining) {
           stats.lastTraining = card.lastReview;
         }
+      }
+
+      // Обновляем lastCardAdded, если createdAt позже текущего
+      if (!stats.lastCardAdded || card.createdAt > stats.lastCardAdded) {
+        stats.lastCardAdded = card.createdAt;
       }
     }
 

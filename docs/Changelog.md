@@ -5,6 +5,104 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.5.0] - 2026-01-08 21:40
+
+### Changed
+
+#### Feature Improvement: Course Card "Updated" Date Logic
+
+Улучшена логика отображения даты "Обновлено" в карточках курсов на главной странице.
+
+**Проблема**: Ранее дата "Обновлено" показывала только `course.updatedAt`, что отражало лишь редактирование названия/описания курса, но не добавление контента (карточек).
+
+**Решение**: Теперь отображается **максимальная дата** из двух источников:
+- `course.updatedAt` — дата последнего редактирования метаданных курса (название, описание)
+- `stats.lastCardAdded` — дата последнего добавления карточки в курс
+
+**Результат**: Пользователь видит реальную активность в курсе — будь то добавление контента или редактирование метаданных.
+
+**Технические детали**:
+- Backend: Добавлено поле `lastCardAdded` в `cardRepository.getAllCoursesStats()`
+  - Вычисляется как `max(card.createdAt)` для каждого курса
+- Frontend: Обновлён `CourseCard.vue` для сравнения двух дат и показа более поздней
+
+#### Documentation: Project Documentation Update
+
+Актуализирована документация проекта для отражения текущего состояния разработки.
+
+- **readme.md**:
+    - Обновлен раздел "Data Structure":
+        - Удалено устаревшее поле `elapsedDays` из `Card` interface
+        - Добавлена полная структура `Settings` с FSRS параметрами и лимитами
+        - Добавлен `CourseSettings` с паттерном наследования
+    - Обновлен раздел "Application Features / Implemented":
+        - **Course & Card Management**: отражены batch operations, card editing, course statistics
+        - **Training System**: добавлена информация о FSRS v5, 4-tier limits, visual training UI
+        - **Settings System**: custom time pickers, FSRS configuration, limits configuration
+        - **UI & UX**: custom dialogs, toast notifications, animations, responsive design
+        - **Backend Core**: repositories, services, business logic separation
+    - Обновлен раздел "Current Status":
+        - Версия: **0.5.0 (MVP Feature Complete)**
+        - Список реализованных core features
+        - Roadmap к v1.0 (tray, notifications, deep linking)
+
+- **openspec/project.md**:
+    - Обновлен раздел "Project Status":
+        - Текущая версия: **0.5.0 (MVP Feature Complete)**
+        - Подробный список реализованных фич по категориям:
+            - Архитектура & Инфраструктура
+            - Управление Курсами и Карточками
+            - Система Тренировок
+            - Система Настроек
+            - UI/UX Система
+            - Backend Services
+        - Список всех актуальных OpenSpec specs (7 specs)
+    - Обновлен раздел "В работе":
+        - Desktop Integration (Priority 1 для v1.0): tray, notifications, deep linking
+    - Обновлен раздел "Запланировано":
+        - Priority 2 (Post v1.0): statistics dashboard, import/export, media, search, tags
+
+- **docs/Walkthrough.md**:
+    - Создан comprehensive walkthrough всего проекта
+    - Структура по фазам разработки (Phases 1-7):
+        - Phase 1: Architecture & Foundation
+        - Phase 2: Styling System
+        - Phase 3: Settings System
+        - Phase 4: Course & Card Management
+        - Phase 5: Training System
+        - Phase 6: UI Enhancements
+        - Phase 7: Statistics & Polish
+    - Добавлены разделы:
+        - Current Architecture (frontend FSD, backend structure)
+        - OpenSpec Specs (7 specs с описаниями)
+        - Key Technical Decisions
+        - Code Quality Standards
+        - Next Steps (v0.6-0.9 → v1.0)
+
+### Technical Details
+
+- **Version Update**: Обновлена версия во всех `package.json`:
+    - `package.json`: **0.5.0**
+    - `backend/package.json`: **0.5.0**
+    - `frontend/package.json`: **0.5.0**
+
+- **Files Modified**: 6
+    - `readme.md` — актуализация статуса и features
+    - `openspec/project.md` — обновление статуса проекта
+    - `docs/Walkthrough.md` — comprehensive overview (полная переработка)
+    - `package.json`, `backend/package.json`, `frontend/package.json` — версия 0.5.0
+
+- **Next Milestone**: v1.0.0
+    - **Priority 1 Requirements**:
+        - System Tray Integration
+        - System Notifications
+        - Deep Linking (open app in training mode)
+    - После реализации Priority 1 → готов к релизу v1.0
+
+### Notes
+
+**v0.5.0 = MVP Feature Complete** — все основные функции SRS-приложения реализованы. До полноценного v1.0 остаются только функции desktop integration (tray, notifications, deep linking).
+
 ## [0.4.10] - 2026-01-08 21:22
 
 ### Added

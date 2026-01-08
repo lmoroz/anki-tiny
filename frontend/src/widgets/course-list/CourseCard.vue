@@ -11,7 +11,19 @@
   const emit = defineEmits(['click', 'edit', 'delete'])
 
   const formattedDate = computed(() => {
-    const date = new Date(props.course.updatedAt)
+    // Показываем максимальную дату из:
+    // - course.updatedAt (редактирование метаданных курса)
+    // - stats.lastCardAdded (последняя добавленная карточка)
+    let dateToShow = props.course.updatedAt
+
+    if (props.course.stats?.lastCardAdded) {
+      const updatedAt = new Date(props.course.updatedAt)
+      const lastCardAdded = new Date(props.course.stats.lastCardAdded)
+
+      if (lastCardAdded > updatedAt) dateToShow = props.course.stats.lastCardAdded
+    }
+
+    const date = new Date(dateToShow)
     return new Intl.DateTimeFormat('ru-RU', {
       day: 'numeric',
       month: 'long',
@@ -102,7 +114,8 @@
         </div>
         <div
           v-if="formattedLastTraining"
-          class="stat-item">
+          class="stat-item"
+          title="Последняя тренировка">
           <i class="bi bi-clock-history" />
           <span>{{ formattedLastTraining }}</span>
         </div>

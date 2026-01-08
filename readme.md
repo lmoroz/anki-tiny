@@ -109,7 +109,6 @@ interface Card {
   due: string;          // ISO Date
   stability: number;    // FSRS
   difficulty: number;   // FSRS
-  elapsedDays: number;
   scheduledDays: number;
   reps: number;
   lapses: number;
@@ -122,14 +121,35 @@ interface Card {
 
 ```typescript
 interface Settings {
-  trainingStartHour: number;   // Training day start (default 8)
-  trainingEndHour: number;     // Training day end (default 22)
-  minTimeBeforeEnd: number;    // Minimum time before end of day (4 hours)
+  // Time Range
+  trainingStartTime: string;   // "HH:MM" format (e.g., "08:00")
+  trainingEndTime: string;     // "HH:MM" format (e.g., "22:00")
+  
+  // FSRS Parameters
+  learningSteps: number[];     // Minutes (e.g., [10, 1440, 4320])
+  requestRetention: number;    // 0.0-1.0 (default 0.9)
+  maximumInterval: number;     // Days (default 36500)
+  enableFuzz: boolean;         // Add randomness to intervals
+  
+  // Global Daily Limits (aggregate across all courses)
+  globalNewCardsPerDay: number;    // Default 20
+  globalMaxReviewsPerDay: number;  // Default 200
+  
+  // Default Course Limits (fallbacks for courses without custom settings)
+  newCardsPerDay: number;      // Default 20
+  maxReviewsPerDay: number;    // Default 200
+  
+  // Session Limits
+  newCardsPerSession: number;  // Default 10
+  maxReviewsPerSession: number; // Default 50
+  
+  // Notifications
   notificationsEnabled: boolean;
 }
 
-interface CourseSettings extends Settings {
+interface CourseSettings extends Partial<Settings> {
   courseId: number;
+  // null values inherit from global settings
 }
 ```
 
@@ -223,71 +243,103 @@ backend/src/
 
 ## ✨ Application Features
 
-### Implemented
+### Implemented ✅
 
 #### 🗂️ Course & Card Management
 
-- **Course Management**: Create, Read, Update, Delete courses.
-- **Card Management**: Full CRUD for flashcards.
-- **Batch Import**: Add multiple cards at once via "Batch Add" mode (text based `question | answer`).
+- **Course Management**: Full CRUD operations with statistics.
+- **Card Management**: Full CRUD with visual feedback and progress tracking.
+- **Batch Operations**: 
+  - Batch Add mode (text-based `question | answer` format)
+  - Batch Delete with selection mode and custom checkboxes
+  - Delete All Cards with confirmation
 - **Quick Add**: Inline mode for rapid card creation.
+- **Card Editing**: Edit cards with automatic progress reset and visual feedback (scroll + bounce animation).
+- **Course Statistics**: Home page displays total cards, new cards count, and last training date.
+
+#### 🧠 Training System
+
+- **FSRS v5 Algorithm**: Full integration of `ts-fsrs` with customizable parameters.
+- **Training Mode**: Card-based review interface with flip animations.
+- **4-Tier Limits System**:
+  - Global daily limits (aggregate across all courses)
+  - Course daily limits (per-course with inheritance)
+  - Session limits (per training session)
+  - Daily progress tracking with `trainingStartTime`-based reset
+- **Visual Training UI**: Answer buttons (Again/Hard/Good/Easy) with color coding.
+- **Session Management**: Real-time counter, limit badges, completion states.
 
 #### ⚙️ Settings System
 
-- **Global Settings**: Configure training hours (start/end) and notification preferences.
-- **Course Settings**: Override global settings per course (Inheritance pattern).
-- **Time Range Picker**: Visual UI for selecting active hours.
-
-#### 🧠 Backend Core
-
-- **FSRS v5 Algorithm**: Integration of `ts-fsrs` for advanced spaced repetition.
-- **Database**: SQLite with robust migration system.
-- **REST API**: Full API coverage for frontend integration.
-- **Validation**: Strict Zod schemas for all inputs.
+- **Global Settings**: Training hours, FSRS parameters, daily/session limits.
+- **Course Settings**: Full override capability with inheritance from global settings.
+- **Custom Time Pickers**: Scroll-based hour/minute selection (generic, reusable component).
+- **Learning Steps**: Configurable intervals (e.g., 10min, 1day, 3days).
+- **FSRS Configuration**: Request retention, maximum interval, learning steps, fuzz.
 
 #### 🎨 UI & UX
 
+- **Design System**: Systemized CSS variables, dark/light theme support.
 - **Custom Title Bar**: Frameless acrylic design with window controls.
-- **UI Theme**: Clean, premium aesthetic with systemized CSS variables.
-- **Animations**: Smooth transitions, flip effects, and hover states.
+- **Custom Dialogs**: Replaced native `alert()`/`confirm()` with:
+  - Toast notifications (vue3-toastify) for alerts
+  - Custom `ConfirmDialog` component with theme support
+- **Animations**: Smooth transitions, flip effects, bounce animations, hover states.
+- **Responsive Design**: Mobile-optimized with slide-out panels.
 
-### In Progress
+#### 🔧 Backend Core
 
-- 🔄 **Training Mode**: Frontend implementation of review interface.
-- 🔄 **System Notifications**: Native OS notifications for due cards.
-- 🔄 **Tray Integration**: Minimize to tray functionality.
+- **Database**: SQLite with migration system, transaction support.
+- **REST API**: Full API coverage for all features.
+- **Validation**: Strict Zod v4 schemas for all inputs.
+- **Repositories**: Clean data access layer (courses, cards, settings, progress).
+- **Services**: Business logic separation (FSRS, limits, daily progress).
 
-### Planned
+### In Progress 🔄
 
-- 📅 Learning progress statistics dashboard.
-- 📅 Course import/export (JSON/Anki).
-- 📅 Media support in cards (images, audio).
-- 📅 Card search and filtering.
-- 📅 Tags and categories system.
+- **System Tray Integration**: Minimize to tray instead of closing.
+- **System Notifications**: Native OS notifications for due cards.
+- **Deep Linking**: Open app directly in training mode from notification.
+
+### Planned 📅
+
+- Learning progress statistics dashboard.
+- Course import/export (JSON/Anki format).
+- Media support in cards (images, audio).
+- Card search and filtering.
+- Tags and categories system.
 
 ---
 
 ## 🎬 Current Status
 
-✅ **Phases 1-4 Complete** (Architecture, UI, Backend, Settings)
+**Version**: 0.5.0 (MVP Feature Complete)
 
-**What works:**
+✅ **Core Features Complete**
 
-- **Core**: Electron + Vue 3 + Express integration via IPC/HTTP.
-- **Database**: Fully functional SQLite storage with migrations.
-- **Algorithm**: FSRS logic implemented and exposed via API.
-- **Frontend**:
-    - Full Course management.
-    - Full Card management (including Batch Add).
-    - Settings management (Global & Individual).
-    - Premium UI Theme
+- **Architecture**: Electron + Vue 3 + Express, Feature-Sliced Design
+- **Database**: SQLite with migrations, transaction support, repositories
+- **FSRS Algorithm**: Full ts-fsrs v5 integration with custom parameters
+- **Course Management**: CRUD, statistics, settings inheritance
+- **Card Management**: CRUD, batch operations, visual feedback, progress reset
+- **Training System**: Review interface, 4-tier limits, session management, FSRS scheduling
+- **Settings**: Global + Course-specific, time pickers, FSRS config, limits config
+- **UI/UX**: Custom dialogs, toast notifications, animations, responsive design, dark/light themes
 
-**Next steps:**
+🔄 **Next Phase (v0.6-0.9 → v1.0)**
 
-- Implement **Training Page** logic (connect Frontend to FSRS API).
-- Complete **System Notifications** integration.
-- Implement **Tray** minimization logic.
-- Add **Statistics** visualizations.
+**Priority 1** (Desktop Integration):
+- System Tray: Minimize to tray, restore from tray
+- System Notifications: Native OS notifications for due cards
+- Deep Linking: Open app in training mode from notification
+
+**Priority 2** (Enhancements):
+- Statistics dashboard with charts
+- Import/Export (JSON, Anki)
+- Media support (images, audio)
+- Search and filtering
+
+**v1.0 Release Criteria**: All Priority 1 features + stable production build
 
 ---
 
