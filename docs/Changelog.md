@@ -5,6 +5,26 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.6.2] - 2026-01-09 03:44
+
+### Changed
+
+#### OpenSpec: Global Training Tasks Format Fix
+
+- Reformatted `openspec/changes/add-global-training/tasks.md` to comply with OpenSpec task tracking format
+- Changed from nested checklist format to structured task format with `### Task X.Y` headings
+- OpenSpec now correctly recognizes **82 tasks** (previously showed "No tasks")
+- Change status updated from `no-tasks` to `in-progress` (0/82 tasks completed)
+- Organized into 5 phases:
+  - **Phase 1**: Backend Implementation (4 tasks, 21 subtasks)
+  - **Phase 2**: Frontend State Management (2 tasks, 7 subtasks)
+  - **Phase 3**: UI Components (4 tasks, 20 subtasks)
+  - **Phase 4**: Verification & Testing (7 tasks, 25 subtasks)
+  - **Phase 5**: Documentation & Cleanup (3 tasks, 9 subtasks)
+- Each task now includes metadata: Duration, Dependencies, and Validation criteria
+- Total estimated duration: 7-8 hours
+- Ready for implementation tracking via OpenSpec
+
 ## [0.6.2] - 2026-01-09 03:30
 
 ### Changed
