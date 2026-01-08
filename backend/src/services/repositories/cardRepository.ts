@@ -130,6 +130,19 @@ export class CardRepository {
   }
 
   /**
+   * Получить общее количество новых карточек по всем курсам
+   */
+  async getGlobalNewCardsCount(): Promise<number> {
+    const result = await db
+      .selectFrom('cards')
+      .select(({ fn }) => [fn.count<number>('id').as('count')])
+      .where('state', '=', 0)
+      .executeTakeFirst();
+
+    return Number(result?.count ?? 0);
+  }
+
+  /**
    * Получить статистику по всем курсам
    */
   async getAllCoursesStats(): Promise<

@@ -119,13 +119,25 @@
       </Card>
     </div>
 
-    <CourseList
+    <!-- Two-column layout for courses and stats -->
+    <div
       v-else
-      :courses="courses"
-      :loading="isLoading"
-      @select="handleSelectCourse"
-      @edit="handleEditCourse"
-      @delete="handleDeleteCourse" />
+      class="home-grid">
+      <!-- Left column: Courses -->
+      <div class="courses-column">
+        <CourseList
+          :courses="courses"
+          :loading="isLoading"
+          @select="handleSelectCourse"
+          @edit="handleEditCourse"
+          @delete="handleDeleteCourse" />
+      </div>
+
+      <!-- Right column: Statistics -->
+      <div class="stats-column">
+        <GlobalStats />
+      </div>
+    </div>
 
     <CourseEditorModal
       :show="showEditorModal"
@@ -137,10 +149,26 @@
 
 <style scoped>
   .page-container {
-    max-width: 1200px;
+    max-width: 1600px;
     width: 90%;
     margin: 0 auto;
     padding: 40px 32px;
+  }
+
+  .home-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  @media (max-width: 1024px) {
+    .home-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .stats-column {
+      order: -1;
+    }
   }
 
   .page-header {

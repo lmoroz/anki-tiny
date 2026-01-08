@@ -5,6 +5,120 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.6.0] - 2026-01-08 23:43
+
+### Added
+
+#### Feature: Aggregated Training Statistics on Home Page
+
+Implemented comprehensive statistics display on the home page showing global training progress, daily limits, and remaining cards across all courses.
+
+- **Frontend Implementation**:
+    - **GlobalStats.vue** (новый компонент, `frontend/src/widgets/global-stats/`)
+        - Displays 5 key metrics with icons:
+            - Новых карточек (всего) — total new cards across all courses
+            - Изучено/повторено сегодня — daily training completion (newCardsStudied + reviewsCompleted)
+            - Осталось на сегодня — remaining cards today (considering global limits)
+            - Дневной лимит новых карточек — global new cards per day limit
+            - Тренировок сегодня — total training sessions completed today
+        - Loading state: spinner + "Загрузка статистики..."
+        - Error state: error message + retry button
+        - Placeholder for future chart: "График статистики (скоро)"
+    - **StatItem.vue** (новый компонент, `frontend/src/shared/ui/`)
+        - Reusable component for displaying individual statistics
+        - Icon + label + value layout
+        - Bootstrap Icons integration (24px)
+        - Bold value display (24px font)
+    - **HomePage.vue** — Two-column responsive layout
+        - Desktop (≥1024px): 50%/50% grid layout (courses | stats)
+        - Mobile (<1024px): single column, stats displayed above courses
+        - Max width increased to 1600px for better space utilization
+    - **useStatsStore.js** (новый Pinia store, `frontend/src/entities/stats/model/`)
+        - State management for global statistics
+        - Action `fetchGlobalStats()` combines data from two sources:
+            - `GET /api/training/stats` — daily training statistics
+            - `GET /api/stats/global` — total new cards count
+        - Calculates derived metrics (remainingToday, trainingsToday)
+    - **TrainingPage.vue** — Auto-refresh integration
+        - Calls `statsStore.fetchGlobalStats()` after each review submission
+        - Ensures home page stats stay up-to-date during training sessions
+
+- **Backend Implementation**:
+    - **stats.ts** (новый роут, `backend/src/routes/`)
+        - `GET /api/stats/global` endpoint
+        - Returns `{ totalNewCards: number }`
+    - **cardRepository.ts** — Extended repository
+        - New method: `getGlobalNewCardsCount()`
+        - SQL query: `SELECT COUNT(id) FROM cards WHERE state = 0`
+        - Returns total count of new cards across all courses
+    - **routes/index.ts** — Router registration
+        - Added stats router to main routes
+
+- **Data Flow**:
+    ```text
+    HomePage.vue (onMounted)
+      ↓
+    useStatsStore.fetchGlobalStats()
+      ├→ GET /api/training/stats (daily progress)
+      ├→ GET /api/stats/global (new cards count)
+      └→ calculate metrics
+    GlobalStats.vue ← displays results
+    ```
+
+
+### Changed
+
+- **HomePage.vue Layout**:
+    - Changed from single-column to responsive two-column grid
+    - Desktop: courses and stats side-by-side
+    - Mobile: stats above courses list
+    - Increased max-width from 1200px to 1600px
+
+- **Training Integration**:
+    - Training page now updates global stats after each review
+    - Enables real-time statistics tracking across the application
+
+### Technical Details
+
+- **Files Created**: 5
+    - `backend/src/routes/stats.ts` — global stats API
+    - `frontend/src/shared/api/stats.js` — stats API client
+    - `frontend/src/entities/stats/model/useStatsStore.js` — Pinia store
+    - `frontend/src/shared/ui/StatItem.vue` — stat display component
+    - `frontend/src/widgets/global-stats/GlobalStats.vue` — main stats widget
+
+- **Files Modified**: 4
+    - `backend/src/routes/index.ts` — stats router registration
+    - `backend/src/services/repositories/cardRepository.ts` — getGlobalNewCardsCount()
+    - `frontend/src/pages/home/HomePage.vue` — responsive layout
+    - `frontend/src/pages/training/TrainingPage.vue` — stats refresh
+
+- **OpenSpec Status**:
+    - ✅ Change `add-home-stats` implementation completed
+    - ✅ All phases executed (Backend API, State Management, UI, Responsive, Integration)
+    - Ready for archiving and spec generation
+
+- **Architecture Decisions**:
+    - Separate endpoint `/api/stats/global` for semantic clarity (global vs daily metrics)
+    - 50%/50% grid layout to balance courses list with statistics display
+    - Stats entity in FSD structure (`entities/stats`) for clear domain separation
+    - Mobile-first approach: stats shown first on mobile for immediate progress visibility
+
+- **User Experience**:
+    - ✅ Immediate visibility of training progress on home page
+    - ✅ Clear understanding of daily limits and remaining cards
+    - ✅ Motivation through visible daily achievements
+    - ✅ Responsive design works on all screen sizes
+    - ✅ Auto-updates after training sessions
+    - ✅ Theme-aware (CSS variables for light/dark modes)
+    - ✅ Loading and error states for better UX
+
+### Next Steps
+
+- Archive OpenSpec change with `/openspec-archive add-home-stats`
+- Future enhancement: Add statistics chart (tracked in placeholder)
+- Consider adding per-course breakdown option
+
 ## [0.5.0] - 2026-01-08 22:55
 
 ### Added

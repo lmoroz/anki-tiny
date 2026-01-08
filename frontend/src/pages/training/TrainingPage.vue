@@ -3,6 +3,7 @@
   import { useRoute, useRouter } from 'vue-router'
   import { storeToRefs } from 'pinia'
   import { useTrainingStore } from '@/entities/training/model/useTrainingStore'
+  import { useStatsStore } from '@/entities/stats/model/useStatsStore'
   import { toast } from 'vue3-toastify'
 
   const route = useRoute()
@@ -10,6 +11,7 @@
   const courseId = parseInt(route.params.id)
 
   const trainingStore = useTrainingStore()
+  const statsStore = useStatsStore()
   const { currentCard, isSessionComplete, loading, sessionLimits, progress } = storeToRefs(trainingStore)
 
   // Состояние переворота карточки (локальное для UI)
@@ -48,6 +50,9 @@
     try {
       await trainingStore.submitReview(rating)
       isFlipped.value = false
+
+      // Обновляем глобальную статистику
+      statsStore.fetchGlobalStats()
 
       if (isSessionComplete.value) {
         toast.success('Сессия завершена!')
