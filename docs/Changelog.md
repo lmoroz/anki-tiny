@@ -5,6 +5,101 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.6.2] - 2026-01-09 03:24
+
+### Added
+
+#### OpenSpec: Global Interleaved Practice Proposal
+
+Created comprehensive OpenSpec proposal for implementing "Global Training" mode — an interleaved practice system that mixes cards from all courses in a single unified session.
+
+- **OpenSpec Change Created**: `add-global-training`
+  - Proposal for global queue with interleaving strategy and hierarchical limit enforcement
+  - Motivation: Users currently study one course at a time; research shows interleaved practice (mixing subjects) improves retention and cognitive flexibility
+  - Solution: Global training mode that respects both global and course-specific limits while mixing cards for optimal learning
+
+- **Proposal Structure** (`openspec/changes/add-global-training/`)
+  - **proposal.md** (1.6 KB)
+    - Why: Modern learning science (Interleaved Practice) shows mixing subjects improves retention
+    - Goals: 4 key objectives including intelligent mixing algorithm, global entry point, and course indicators
+    - User Story: One-button "Train All" to review everything due today, mixed together
+  - **design.md** (2.1 KB)
+    - Backend: `getAllDueCards()`, `calculateGlobalAvailableCards()`, `/api/training/global/due-cards`
+    - Frontend: `useTrainingStore.startGlobalSession()`, course badge on cards, due cards counter
+    - Data Flow: Budget calculation → Candidate fetching → Filtering with dual limits → Shuffling for interleaving
+    - Performance: SQL limit of 1000 cards to prevent memory overload
+  - **tasks.md** (1.1 KB, 3 phases)
+    - Phase 1: Backend (4 tasks: repository, service, API endpoint)
+    - Phase 2: Frontend (5 tasks: store, page, router, home button, course badge)
+    - Phase 3: Verification (6 scenarios: session start, mixing, limits, indicators, counters)
+  - **specs/global-training/spec.md** (NEW spec, 1.9 KB)
+    - 4 requirements with SHALL/MUST keywords
+    - **Global Interleaved Queue**: Mix cards from all courses in one session
+    - **Limit Hierarchy Enforcement**: Respect both global AND course limits simultaneously
+    - **Interleaving Strategy**: Random card order after filtering for urgency
+    - **Due Cards Visibility**: Display total due count on HomePage, disable button when zero
+
+- **Key Features Documented**
+  - **Intelligent Mixing Algorithm**:
+    - Fetches due cards sorted by urgency (`due ASC`)
+    - Filters using dual-level budgets (global + per-course)
+    - Separates counters for New vs Review cards
+    - Shuffles final result for interleaving (no subject blocking)
+  - **Limit Hierarchy**:
+    - Global limits (e.g., 300 reviews/day total)
+    - Course limits (e.g., 20 new cards for "English")
+    - Card accepted ONLY if: `CourseLimit > 0` AND `GlobalLimit > 0`
+    - Example: Course limit reached → no more cards from that course, even if global limit allows
+  - **UI Requirements**:
+    - HomePage: "Train All" button with due cards counter (e.g., "15 cards ready")
+    - HomePage: Button disabled/hidden when no due cards
+    - TrainingPage: Course name badge on each card during global session
+    - TrainingPage: "Back to Home" button instead of "Back to Course"
+  - **Backend API**:
+    - `GET /api/training/global/due-cards` → `{ cards: Card[], limits: {...} }`
+    - Cards array contains mixed cards from all courses
+    - Limits object shows remaining global budgets
+  - **Frontend Architecture**:
+    - Router: `/training/global` route
+    - Store: `isGlobalSession` flag, `startGlobalSession()` method
+    - TrainingPage: Adapts UI based on session type (global vs course-specific)
+
+### Technical Details
+
+- **OpenSpec Validation**: ✅ Passed `npx @fission-ai/openspec validate add-global-training --strict`
+- **Markdown Linting**: ✅ All files pass markdownlint-cli2 with 0 errors
+- **Change Status**: 0/15 tasks (proposal stage, ready for implementation)
+- **Files Created**: 4
+  - `openspec/changes/add-global-training/proposal.md`
+  - `openspec/changes/add-global-training/design.md`
+  - `openspec/changes/add-global-training/tasks.md`
+  - `openspec/changes/add-global-training/specs/global-training/spec.md` (NEW spec)
+- **No Code Changes**: Pure planning/proposal phase
+
+### Architecture Highlights
+
+```text
+Global Training Data Flow:
+  Frontend: HomePage "Train All" button
+    ↓
+  useTrainingStore.startGlobalSession()
+    ↓
+  Backend: LimitService.calculateGlobalAvailableCards()
+    ├→ Calculate budgets (Global, per-Course)
+    ├→ Fetch candidates (sorted by due ASC)
+    ├→ Filter with dual limits
+    │   • New card: take if GlobalNew > 0 AND CourseNew[id] > 0
+    │   • Review card: take if GlobalReview > 0 AND CourseReview[id] > 0
+    └→ Shuffle result (interleaving)
+  Frontend: TrainingPage shows mixed cards with course badges
+```
+
+### Next Steps
+
+- Implementation via `/openspec-apply add-global-training` after user approval
+- New spec `global-training` will be formalized upon archiving
+- After implementation: Users will benefit from scientifically-backed interleaved practice
+
 ## [0.6.2] - 2026-01-09 02:49
 
 ### Changed
