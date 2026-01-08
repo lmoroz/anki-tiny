@@ -96,8 +96,9 @@ router.post('/training/review', async (req: Request, res: Response) => {
     // Обновляем карточку
     const updatedCard = await cardRepository.updateCard(cardId, updates);
 
-    // Обновляем прогресс за день
-    await updateProgressAfterReview(cardId, wasNew);
+    // Обновляем прогресс за день (с учетом timezone)
+    const timezone = validatedData.timezone || 'UTC';
+    await updateProgressAfterReview(cardId, wasNew, timezone);
 
     res.json({
       card: updatedCard,
