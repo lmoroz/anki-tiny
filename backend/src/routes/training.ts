@@ -115,11 +115,24 @@ router.post('/training/review', async (req: Request, res: Response) => {
 /**
  * GET /api/training/stats
  * Получить статистику за день (глобальную и по курсам)
+ * Параметры: ?timezone=Asia/Shanghai
  */
-router.get('/training/stats', async (_req: Request, res: Response) => {
+router.get('/training/stats', async (req: Request, res: Response) => {
   try {
-    const stats = await getDailyStats();
-    res.json(stats);
+    // Получаем timezone из query параметра
+    const timezone = (req.query.timezone as string) || 'UTC';
+
+    // Получаем статистику за день
+    const stats = await getDailyStats(timezone);
+
+    // Получаем общее количество новых карточек
+    const totalNewCards = await cardRepository.getGlobalNewCardsCount();
+
+    // Объединяем результат
+    res.json({
+      ...stats,
+      totalNewCards,
+    });
   } catch (error) {
     console.error('Error fetching daily stats:', error);
     res.status(500).json({ error: 'Failed to fetch daily stats' });

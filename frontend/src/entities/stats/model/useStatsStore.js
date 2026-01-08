@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { statsApi } from '@/shared/api/stats';
 import { trainingApi } from '@/shared/api/training';
 
 export const useStatsStore = defineStore('stats', () => {
@@ -19,26 +18,24 @@ export const useStatsStore = defineStore('stats', () => {
     error.value = null;
 
     try {
-      // 1. Получить статистику за день
-      const dailyStats = await trainingApi.getStats();
+      // Определяем часовой пояс пользователя
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-      // 2. Получить общее количество новых карточек
-      const globalStats = await statsApi.getGlobalStats();
+      // Получаем единую статистику, передавая timezone
+      const stats = await trainingApi.getStats(timezone);
 
-      // 3. Рассчитать метрики
-      totalNewCards.value = globalStats.totalNewCards;
-
-      studiedToday.value = dailyStats.global.newCardsStudied + dailyStats.global.reviewsCompleted;
-
+      // Устанавливаем метрики
+      totalNewCards.value = stats.totalNewCards;
+      studiedToday.value = stats.global.newCardsStudied + stats.global.reviewsCompleted;
       trainingsToday.value = studiedToday.value;
 
       // Remaining = globalNewRemaining + globalReviewsRemaining
       remainingToday.value =
-        dailyStats.global.limits.globalNewCardsPerDay -
-        dailyStats.global.newCardsStudied +
-        (dailyStats.global.limits.globalMaxReviewsPerDay - dailyStats.global.reviewsCompleted);
+        stats.global.limits.globalNewCardsPerDay -
+        stats.global.newCardsStudied +
+        (stats.global.limits.globalMaxReviewsPerDay - stats.global.reviewsCompleted);
 
-      dailyNewLimit.value = dailyStats.global.limits.globalNewCardsPerDay;
+      dailyNewLimit.value = stats.global.limits.globalNewCardsPerDay;
     } catch (err) {
       error.value = 'Failed to load statistics';
       console.error('[Stats Store] Failed to fetch global stats:', err);

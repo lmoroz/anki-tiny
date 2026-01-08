@@ -5,13 +5,29 @@ import { settingsRepository } from './repositories/settingsRepository';
 import { progressRepository } from './repositories/progressRepository';
 
 /**
- * Форматировать дату в YYYY-MM-DD
+ * Форматировать дату в YYYY-MM-DD для конкретного часового пояса
+ * @param date - Date объект
+ * @param timezone - IANA timezone (например, 'Asia/Shanghai', 'UTC')
+ * @returns строка в формате YYYY-MM-DD
  */
-export function formatDate(date: Date): string {
-  return date.toISOString().split('T')[0];
+export function formatDate(date: Date, timezone = 'UTC'): string {
+  const formatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone: timezone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+
+  const parts = formatter.formatToParts(date);
+  const year = parts.find((p) => p.type === 'year')!.value;
+  const month = parts.find((p) => p.type === 'month')!.value;
+  const day = parts.find((p) => p.type === 'day')!.value;
+
+  return `${year}-${month}-${day}`;
 }
 
 /**
+
  * Проверить, является ли карточка новой
  */
 export function isNewCard(state: number): boolean {
@@ -158,9 +174,10 @@ export async function updateProgressAfterReview(cardId: number, wasNew: boolean)
 
 /**
  * Получить статистику за день
+ * @param timezone - IANA timezone (например, 'Asia/Shanghai')
  */
-export async function getDailyStats(): Promise<DailyStats> {
-  const today = formatDate(new Date());
+export async function getDailyStats(timezone = 'UTC'): Promise<DailyStats> {
+  const today = formatDate(new Date(), timezone);
   const globalSettings = await settingsRepository.getGlobalSettings();
   const globalProgress = await progressRepository.getGlobalProgress(today);
 

@@ -5,6 +5,93 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.6.0] - 2026-01-09 00:58
+
+### Changed
+
+#### Database: Date Format Unification
+
+Unified all database dates to ISO 8601 UTC format and fixed statistics timezone handling for UTC+8.
+
+- **Migration Script**: Created one-time migration to convert SQLite `CURRENT_TIMESTAMP` dates from UTC+8 to ISO 8601 UTC
+  - **File**: `backend/src/scripts/migrate-dates.ts`
+  - Migrated 3 courses, 105 cards, 2 settings (110 records total)
+  - Dates converted from `"YYYY-MM-DD HH:MM:SS"` (UTC+8 local time) to `"YYYY-MM-DDTHH:MM:SS.sssZ"` (ISO 8601 UTC)
+- **Date Utilities**: Created timezone-aware date utilities
+  - **File**: `backend/src/utils/dateUtils.ts`
+  - `getCurrentISOString()` — get current date in ISO 8601 UTC
+  - `formatDateInTimezone()` — format date in YYYY-MM-DD with timezone support
+  - `getLocalToday()` — get "today" date for specific timezone
+  - `convertSQLiteDateToISO()` — convert SQLite dates to ISO 8601 UTC
+
+- **Statistics Service**: Updated `limitService.ts` to support user timezone
+  - Function `formatDate()` now accepts `timezone` parameter
+  - Uses `Intl.DateTimeFormat` for timezone-aware date formatting
+  - Function `getDailyStats()` now accepts `timezone` parameter
+
+- **API Endpoint Consolidation**: Merged statistics endpoints
+  - **Modified**: `GET /api/training/stats` now accepts `?timezone` parameter
+  - **Added**: Returns `totalNewCards` field (previously in `/api/stats/global`)
+  - **Deleted**: `backend/src/routes/stats.ts` (functionality merged into training endpoint)
+  - Backend endpoint now returns unified statistics response
+
+- **Frontend Integration**: Updated stats store and API client
+  - **Modified**: `frontend/src/entities/stats/model/useStatsStore.js`
+    - Detects user timezone via `Intl.DateTimeFormat().resolvedOptions().timeZone`
+    - Passes timezone to API when fetching stats
+    - Uses single unified endpoint instead of two separate ones
+  - **Modified**: `frontend/src/shared/api/training.js`
+    - Method `getStats()` now accepts and passes `timezone` parameter
+  - **Deleted**: `frontend/src/shared/api/stats.js` (no longer needed)
+
+### Fixed
+
+- **Statistics Timezone Bug**: Daily stats now correctly account for user's local timezone (UTC+8)
+  - Before: Statistics showed UTC day, not user's local day
+  - After: Statistics reset at midnight in user's timezone
+  - Impact: Home page statistics now display correct "today" data
+
+### Technical Details
+
+- **Migration Results**:
+  - ✅ Courses: 3/3 updated
+  - ✅ Cards: 105/105 updated
+  - ✅ Settings: 1/1 updated
+  - ✅ Course Settings: 1/1 updated
+  - ✅ Daily Progress: 0/2 (already in correct format)
+
+- **Date Format Examples**:
+  - Before: `"2026-01-08 05:39:57"` (SQLite CURRENT_TIMESTAMP, ambiguous timezone)
+  - After: `"2026-01-07T21:39:57.000Z"` (ISO 8601 UTC, explicit timezone)
+
+- **Files Created**: 2
+  - `backend/src/scripts/migrate-dates.ts` — one-time migration script
+  - `backend/src/utils/dateUtils.ts` — timezone utilities
+
+- **Files Modified**: 6
+  - `backend/src/services/limitService.ts` — timezone support
+  - `backend/src/routes/training.ts` — unified stats endpoint
+  - `backend/src/routes/index.ts` — removed stats router
+  - `backend/package.json` — added migrate-dates script
+  - `frontend/src/entities/stats/model/useStatsStore.js` — timezone detection
+  - `frontend/src/shared/api/training.js` — timezone parameter
+
+- **Files Deleted**: 2
+  - `backend/src/routes/stats.ts`
+  - `frontend/src/shared/api/stats.js`
+
+### Architecture Improvements
+
+```text
+Before:
+  Frontend → GET /api/training/stats (daily stats)
+  Frontend → GET /api/stats/global (new cards count)
+
+After:
+  Frontend (detects timezone) → GET /api/training/stats?timezone=Asia/Shanghai
+    └→ Returns: { ...dailyStats, totalNewCards }
+```
+
 ## [0.6.0] - 2026-01-08 23:43
 
 ### Added

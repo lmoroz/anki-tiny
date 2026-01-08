@@ -29,8 +29,11 @@ export const trainingApi = {
   /**
    * Получить статистику за день
    */
-  async getStats() {
-    const response = await api.get('/training/stats');
+  async getStats(timezone = 'UTC') {
+    const response = await api.get('/training/stats', {
+      params: { timezone },
+    });
     return response.data;
   },
+
 };
