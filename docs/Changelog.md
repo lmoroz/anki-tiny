@@ -5,6 +5,108 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.5.0] - 2026-01-08 22:55
+
+### Added
+
+#### OpenSpec: Home Page Statistics Proposal
+
+Создан комплексный OpenSpec proposal для добавления агрегированной статистики тренировок на главную страницу приложения.
+
+- **OpenSpec Change Created**: `add-home-stats`
+    - Предложение по добавлению глобальной статистики на главную страницу
+    - Мотивация: пользователь не видит общий прогресс обучения, лимиты и ежедневную активность
+    - Решение: двухколоночный layout (список курсов + статистика) на desktop, single column на mobile
+
+- **Proposal Structure** (`openspec/changes/add-home-stats/`)
+    - **proposal.md** (5.4 KB)
+        - Problem: 4 ключевых проблемы (нет обзора прогресса, лимитов, мотивации, неэффективное пространство)
+        - Why: 5 обоснований важности (прогресс, лимиты, мотивация, эффективность, расширяемость)
+        - Solution: двухколоночный layout (50%/50%) на desktop, статистика выше курсов на mobile
+        - Benefits: мотивация, прозрачность, эффективное использование пространства, готовая основа для графиков
+        - Scope: новый endpoint, компонент GlobalStats, layout изменения, адаптивный дизайн, Pinia store
+    - **design.md** (19.7 KB)
+        - Architecture: Frontend (HomePage + GlobalStats + useStatsStore) + Backend (endpoint + repository)
+        - Component design: GlobalStats с 5 метриками + placeholder для графика
+        - Data flow: HomePage → useStatsStore → GET /api/training/stats + GET /api/stats/global
+        - API design: новый endpoint `/api/stats/global` для получения общего количества новых карточек
+        - Layout: CSS grid (1fr 1fr) для desktop, single column для mobile
+        - Key decisions: почему отдельный endpoint, почему 50%/50%, где хранить store
+    - **tasks.md** (9.2 KB, 6 фаз, ~6-7 часов)
+        - Phase 1: Backend API (3 tasks: endpoint, repository, testing)
+        - Phase 2: Frontend State Management (2 tasks: create store, test in DevTools)
+        - Phase 3: UI Components (3 tasks: StatItem, GlobalStats, HomePage layout)
+        - Phase 4: Responsive Design (2 tasks: mobile layout, testing)
+        - Phase 5: Integration and Polish (3 tasks: refresh after training, theme support, accessibility)
+        - Phase 6: Documentation and Cleanup (3 tasks: Walkthrough, Changelog, linting)
+    - **specs/home-stats/spec.md** (NEW spec, 9.1 KB)
+        - 7 requirements with SHALL keywords
+        - Two-Column Layout on Desktop (2 scenarios: desktop, mobile)
+        - Aggregated Statistics Display (3 scenarios: metrics, loading, error)
+        - Remaining Cards Calculation (3 scenarios: new, review, total)
+        - Global Statistics API Endpoint (2 scenarios: fetching, error handling)
+        - Statistics Store with Pinia (1 scenario: fetching via store)
+        - Visual Consistency with Design System (2 scenarios: Card component, icons/typography)
+        - Placeholder for Future Chart (1 scenario: chart placeholder)
+
+- **Key Features Documented**
+    - **Статистика включает 5 метрик**:
+        - Новых карточек (всего) — общее количество новых карточек по всем курсам
+        - Изучено/повторено сегодня — сумма newCardsStudied + reviewsCompleted
+        - Осталось на сегодня — с учётом глобальных лимитов (new + review)
+        - Дневной лимит новых карточек — globalNewCardsPerDay из настроек
+        - Тренировок сегодня — общее количество завершённых повторений
+    - **Layout**:
+        - Desktop (≥1024px): две колонки 50%/50% с gap 24px
+        - Mobile (<1024px): single column, статистика выше списка курсов
+        - Адаптивный перенос через CSS grid + media query
+    - **Backend API**:
+        - Новый endpoint: `GET /api/stats/global` → `{ totalNewCards: number }`
+        - Использование существующего: `GET /api/training/stats` для дневной статистики
+        - Новый метод: `cardRepository.getGlobalNewCardsCount()` (SQL count с фильтром state = NEW)
+    - **Frontend Architecture**:
+        - Новый компонент: `GlobalStats.vue` (использует useStatsStore)
+        - Новый компонент: `StatItem.vue` (icon + label + value)
+        - Новый Pinia store: `useStatsStore` (state, actions, fetchGlobalStats)
+        - Обновлён: `HomePage.vue` (двухколоночный layout через CSS grid)
+    - **User Experience**:
+        - Placeholder для графика: "График статистики (скоро)" (dashed border, 200px height)
+        - Loading state: spinner + "Загрузка статистики..."
+        - Error state: сообщение + кнопка "Попробовать снова"
+        - Поддержка светлой и тёмной темы (CSS variables)
+        - Accessibility: ARIA labels, tooltips, keyboard navigation
+
+### Technical Details
+
+- **OpenSpec Validation**: ✅ Passed `npx @fission-ai/openspec validate add-home-stats --strict`
+- **Change Status**: 0/~15 tasks (proposal stage, ready for user review and approval)
+- **Files Created**: 4
+    - `openspec/changes/add-home-stats/proposal.md`
+    - `openspec/changes/add-home-stats/design.md`
+    - `openspec/changes/add-home-stats/tasks.md`
+    - `openspec/changes/add-home-stats/specs/home-stats/spec.md` (NEW spec)
+- **No Code Changes**: Pure planning/proposal phase
+- **Total Estimated Effort**: 6-7 hours full implementation
+
+### Architecture Highlights
+
+```
+Frontend (HomePage)
+  ↓ onMounted → fetchGlobalStats()
+useStatsStore
+  ├→ GET /api/training/stats (дневная статистика)
+  ├→ GET /api/stats/global (общее кол-во новых карточек)
+  └→ calculate metrics (studiedToday, remainingToday, trainingsToday)
+GlobalStats.vue → StatItem.vue (x5) + Placeholder (график)
+```
+
+### Next Steps
+
+- User review and approval of proposal
+- Implementation via `/openspec-apply add-home-stats` after approval
+- New spec `home-stats` will be created upon archiving
+- После реализации: v0.6.0 с полноценной статистикой на главной странице
+
 ## [0.5.0] - 2026-01-08 21:40
 
 ### Changed
