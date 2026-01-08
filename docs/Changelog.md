@@ -5,6 +5,92 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.6.1] - 2026-01-09 01:59
+
+### Added
+
+#### OpenSpec: Retention Settings and Collapsible UI Proposal
+
+Created OpenSpec proposal for adding configurable `request_retention` (learning intensity) parameter and reorganizing settings UI into collapsible sections.
+
+- **OpenSpec Change Created**: `add-retention-settings`
+  - Proposal for configurable retention parameter with 3 preset levels
+  - UI reorganization into collapsible sections for better navigation
+  - Motivation: hardcoded `request_retention = 0.9` in FSRS service limits user flexibility
+  - Solution: user-selectable intensity levels (Low/Medium/High) for global and course settings
+
+- **Proposal Structure** (`openspec/changes/add-retention-settings/`)
+  - **proposal.md** — Problem statement, solution (3 levels: Low 0.80, Medium 0.90, High 0.95)
+  - **tasks.md** — 8 implementation phases (56+ tasks: DB → Backend → Frontend → UI)
+  - **specs/settings-retention/spec.md** (NEW spec delta)
+    - Global and course `requestRetention` parameter (0.70-1.00 range)
+    - Inheritance pattern (course null → inherit from global)
+    - FSRS service integration
+    - UI RetentionLevelPicker component with tooltips
+    - 3 levels: Low/Medium/High with explanations
+  - **specs/settings-ui-sections/spec.md** (NEW spec delta)
+    - CollapsibleSection component (expand/collapse, localStorage persistence)
+    - SettingsForm reorganization (5 sections: Time, FSRS, Notifications, Limits)
+    - CourseSettingsModal reorganization (4 sections)
+    - Keyboard navigation support (Tab, Enter/Space)
+
+- **Key Features**
+  - **Retention Levels**:
+    - **Low (Relaxed)** — 0.80: fewer reviews, suitable for long-term learning
+    - **Medium (Standard)** — 0.90: balanced mode (default, current behavior)
+    - **High (Cramming)** — 0.95: many reviews, minimal forgetting, exam preparation
+  - **Inheritance**: Course settings can inherit from global (nullable field)
+  - **UI Improvements**:
+    - Collapsible sections with smooth animations
+    - Section state persistence in localStorage
+    - Tooltips explaining each retention level
+    - Keyboard accessibility (Tab navigation, Enter/Space toggle)
+
+- **Migration Strategy**
+  - All existing courses will default to `requestRetention = 0.90` (current behavior)
+  - No breaking changes — intervals remain unchanged for existing data
+  - Database fields: `settings.requestRetention`, `courseSettings.requestRetention`
+
+### Technical Details
+
+- **OpenSpec Validation**: ✅ Passed `npx @fission-ai/openspec validate add-retention-settings --strict`
+- **Change Status**: 0/56+ tasks (proposal stage, approved by user)
+- **Files Created**: 4
+  - `openspec/changes/add-retention-settings/proposal.md`
+  - `openspec/changes/add-retention-settings/tasks.md`
+  - `openspec/changes/add-retention-settings/specs/settings-retention/spec.md`
+  - `openspec/changes/add-retention-settings/specs/settings-ui-sections/spec.md`
+- **No Code Changes**: Pure planning/proposal phase
+- **Estimated Effort**: 8-10 hours full implementation
+
+### Architecture Highlights
+
+```text
+Retention Parameter Flow:
+  Frontend (SettingsForm/CourseSettingsModal)
+    → RetentionLevelPicker (Low/Medium/High)
+    → useSettingsStore
+    → PUT /api/settings or PUT /api/courses/:id/settings
+    → settingsRepository / courseSettingsRepository
+    → fsrs/index.ts (initializeFSRS with configurable retention)
+    → FSRS algorithm uses custom retention value
+
+UI Organization:
+  SettingsForm
+    ├─ TimeRangePicker (collapsible)
+    ├─ FSRS Parameters (collapsible, includes RetentionLevelPicker)
+    ├─ Notifications (collapsible)
+    ├─ Daily Limits (collapsible)
+    └─ Default Limits (collapsible)
+```
+
+### Next Steps
+
+- Implementation via `/openspec-apply add-retention-settings`
+- New components: `RetentionLevelPicker.vue`, `CollapsibleSection.vue`
+- Database migrations for `requestRetention` fields
+- FSRS service update to use configurable retention
+
 ## [0.6.1] - 2026-01-09 01:25
 
 ### Fixed
