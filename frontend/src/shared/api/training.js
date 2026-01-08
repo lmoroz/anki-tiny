@@ -37,5 +37,4 @@ export const trainingApi = {
     });
     return response.data;
   },
-
 };

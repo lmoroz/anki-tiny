@@ -26,6 +26,7 @@ export class SettingsRepository {
           notificationsEnabled: 1,
           learningSteps: '[10, 240]',
           enableFuzz: 1,
+          requestRetention: 0.9,
           globalNewCardsPerDay: 20,
           globalMaxReviewsPerDay: 200,
           defaultNewCardsPerDay: 20,
@@ -130,6 +131,7 @@ export class SettingsRepository {
         notificationsEnabled: globalSettings.notificationsEnabled === 1,
         learningSteps: globalSettings.learningSteps,
         enableFuzz: globalSettings.enableFuzz === 1,
+        requestRetention: globalSettings.requestRetention,
         // newCardsPerDay: globalSettings.defaultNewCardsPerDay,
         // maxReviewsPerDay: globalSettings.defaultMaxReviewsPerDay,
       };
@@ -143,6 +145,7 @@ export class SettingsRepository {
       notificationsEnabled: (courseSettings.notificationsEnabled ?? globalSettings.notificationsEnabled) === 1,
       learningSteps: courseSettings.learningSteps ?? globalSettings.learningSteps,
       enableFuzz: (courseSettings.enableFuzz ?? globalSettings.enableFuzz) === 1,
+      requestRetention: courseSettings.requestRetention ?? globalSettings.requestRetention,
     };
   }
 }

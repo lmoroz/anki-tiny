@@ -23,6 +23,7 @@ export const GlobalSettingsSchema = z.object({
     )
     .optional(),
   enableFuzz: z.boolean().optional(),
+  requestRetention: z.number().min(0.7).max(1.0).optional(),
   globalNewCardsPerDay: z.number().int().min(0).optional(),
   globalMaxReviewsPerDay: z.number().int().min(0).optional(),
   // New fields for default course limits (will be added in migration 007)
@@ -56,6 +57,7 @@ export const CourseSettingsSchema = z.object({
     .nullable()
     .optional(),
   enableFuzz: z.boolean().nullable().optional(),
+  requestRetention: z.number().min(0.7).max(1.0).nullable().optional(),
   newCardsPerDay: z.number().int().min(0).nullable().optional(),
   maxReviewsPerDay: z.number().int().min(0).nullable().optional(),
   newCardsPerSession: z.number().int().min(0).nullable().optional(),

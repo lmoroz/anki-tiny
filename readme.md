@@ -313,7 +313,7 @@ backend/src/
 
 ## 🎬 Current Status
 
-**Version**: 0.5.0 (MVP Feature Complete)
+**Version**: 0.6.2 (MVP Feature Complete + Retention Settings)
 
 ✅ **Core Features Complete**
 

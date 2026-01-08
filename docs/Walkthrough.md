@@ -59,8 +59,10 @@
 - Training time range (trainingStartTime, trainingEndTime)
 - FSRS parameters:
   - `learningSteps` — массив интервалов в минутах (e.g., [10, 1440, 4320])
-  - `requestRetention` — целевая точность запоминания (0.0-1.0)
-  - `maximumInterval` — максимальный интервал в днях
+  - `requestRetention` — интенсивность обучения (0.70-1.00), три уровня:
+    - **Low (0.80)** — Расслабленный режим, меньше повторений
+    - **Medium (0.90)** — Стандартный режим (по умолчанию)
+    - **High (0.95)** — Cramming, много повторений для экзаменов
   - `enableFuzz` — добавление рандомизации к интервалам
 - Daily limits:
   - `globalNewCardsPerDay` — глобальный лимит новых карточек (aggregate)
@@ -75,19 +77,29 @@
 - Возможность override любого параметра
 - `null` = inherit from global
 - Individual time ranges, FSRS params, limits per course
+- **Retention inheritance**: курсы могут наследовать глобальное значение или установить своё
 
 #### UI Components
 
 - **ScrollTimePicker.vue** — generic scroll picker для hour/minute selection
 - **TimeRangePicker.vue** — диапазон времени с двумя парами пикеров
-- **SettingsForm.vue** — unified form для global и course settings
+- **SettingsForm.vue** — unified form для global и course settings, организованная в сворачиваемые секции:
+  - Временные рамки тренировок
+  - Параметры FSRS (learningSteps, enableFuzz, requestRetention)
+  - Уведомления
+  - Дневные лимиты (глобальные)
+  - Лимиты курсов по умолчанию
 - **CourseSettingsModal.vue** — modal для редактирования настроек курса
+- **CollapsibleSection.vue** — сворачиваемые секции с сохранением состояния в localStorage
+- **RetentionLevelPicker.vue** — компонент выбора интенсивности обучения с radio buttons
 
 **Specs**:
 
 - `settings-global-management`
 - `settings-course-management`
 - `settings-ui`
+- `settings-ui-sections` (NEW)
+- `settings-retention` (NEW)
 
 ### Phase 4: Course & Card Management ✅
 

@@ -54,6 +54,7 @@ export interface SettingsTable {
   notificationsEnabled: number; // SQLite boolean (0/1)
   learningSteps: string; // JSON массив, например "[10, 240]" (минуты)
   enableFuzz: number; // SQLite boolean (0/1)
+  requestRetention: number; // 0.70-1.00, default: 0.9
   globalNewCardsPerDay: number; // default: 20
   globalMaxReviewsPerDay: number; // default: 200
   defaultNewCardsPerDay: number; // default: 20
@@ -81,6 +82,7 @@ export interface CourseSettingsTable {
   notificationsEnabled: number | null;
   learningSteps: string | null;
   enableFuzz: number | null;
+  requestRetention: number | null; // 0.70-1.00, nullable for inheritance
   newCardsPerDay: number | null; // default: 20
   maxReviewsPerDay: number | null; // default: 200
   newCardsPerSession: number | null; // default: 10

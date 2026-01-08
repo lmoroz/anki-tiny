@@ -222,6 +222,23 @@ const migrations: Migration[] = [
         .execute();
     },
   },
+  {
+    id: '008',
+    name: 'add_request_retention',
+    up: async (db: Kysely<Database>) => {
+      // Add requestRetention to settings table
+      await db.schema
+        .alterTable('settings')
+        .addColumn('requestRetention', 'real', (col) => col.notNull().defaultTo(0.9))
+        .execute();
+
+      // Add requestRetention to courseSettings table (nullable for inheritance)
+      await db.schema.alterTable('courseSettings').addColumn('requestRetention', 'real').execute();
+
+      // Ensure all existing settings have the default value
+      await sql`UPDATE settings SET requestRetention = 0.9 WHERE requestRetention IS NULL`.execute(db);
+    },
+  },
 ];
 
 /**

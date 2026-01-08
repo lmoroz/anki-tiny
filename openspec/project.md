@@ -293,7 +293,7 @@ interface Settings {
 
 ## Project Status
 
-### Текущая версия: 0.5.0 (MVP Feature Complete)
+### Текущая версия: 0.6.2 (MVP Feature Complete + Retention Settings)
 
 ### Реализовано ✅
 

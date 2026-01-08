@@ -21,6 +21,7 @@ export interface FSRSSettings {
   notificationsEnabled: boolean;
   learningSteps: string; // JSON массив, например "[10, 240]" (минуты)
   enableFuzz: boolean;
+  requestRetention: number; // 0.70-1.00, default: 0.9
 }
 
 /**
@@ -82,7 +83,7 @@ function initializeFSRS(settings: FSRSSettings): FSRS {
   const steps = parseLearningSteps(settings.learningSteps);
 
   const params = generatorParameters({
-    request_retention: 0.9,
+    request_retention: settings.requestRetention,
     enable_fuzz: settings.enableFuzz,
     enable_short_term: true,
     learning_steps: steps.map((m) => `${m}m` as `${number}m`),

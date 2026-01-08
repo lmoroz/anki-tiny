@@ -67,16 +67,14 @@ export const useTrainingStore = defineStore('training', () => {
           // New card
           sessionLimits.value.newCardsRemaining = Math.max(0, sessionLimits.value.newCardsRemaining - 1);
           sessionLimits.value.globalNewRemaining = Math.max(0, sessionLimits.value.globalNewRemaining - 1);
-        }
-        else {
+        } else {
           sessionLimits.value.reviewsRemaining = Math.max(0, sessionLimits.value.reviewsRemaining - 1);
           sessionLimits.value.globalReviewsRemaining = Math.max(0, sessionLimits.value.globalReviewsRemaining - 1);
         }
       }
 
       currentCardIndex.value++;
-    }
-    catch (err) {
+    } catch (err) {
       console.error('[Training Store] Failed to submit review:', err);
       throw err;
     }

@@ -3,6 +3,7 @@ export interface GlobalSettings {
   trainingEndHour: number; // 0-23, по умолчанию 22
   minTimeBeforeEnd: number; // часы, по умолчанию 4
   notificationsEnabled: boolean; // по умолчанию true
+  requestRetention?: number; // 0.70-1.00, по умолчанию 0.9
 }
 
 export interface CourseSettings extends GlobalSettings {
@@ -15,6 +16,7 @@ export interface UpdateSettingsDTO {
   trainingEndHour?: number;
   minTimeBeforeEnd?: number;
   notificationsEnabled?: boolean;
+  requestRetention?: number;
 }
 
 // Validation result
@@ -27,5 +29,6 @@ export interface SettingsValidation {
     timeRange?: string;
     minTime?: string;
     minTimeValue?: string;
+    requestRetention?: string;
   };
 }
