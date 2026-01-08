@@ -1,96 +1,96 @@
 <script setup>
-  import { ref, computed, onMounted } from 'vue'
-  import { toast } from 'vue3-toastify'
-  import { useConfirm } from '@/shared/lib/useConfirm'
-  import { useSettingsStore } from '@/entities/settings/model/useSettingsStore.js'
+  import { ref, computed, onMounted } from 'vue';
+  import { toast } from 'vue3-toastify';
+  import { useConfirm } from '@/shared/lib/useConfirm';
+  import { useSettingsStore } from '@/entities/settings/model/useSettingsStore.js';
 
   const props = defineProps({
     show: Boolean,
     courseId: {
       type: Number,
-      required: true
+      required: true,
     },
-    courseName: String
-  })
+    courseName: String,
+  });
 
-  const emit = defineEmits(['close', 'saved'])
+  const emit = defineEmits(['close', 'saved']);
 
-  const settingsStore = useSettingsStore()
-  const useCustomSettings = ref(false)
-  const settings = ref(null)
-  const saving = ref(false)
+  const settingsStore = useSettingsStore();
+  const useCustomSettings = ref(false);
+  const settings = ref(null);
+  const saving = ref(false);
 
   const effectiveSettings = computed(() => {
-    return settingsStore.getEffectiveSettings(props.courseId)
-  })
+    return settingsStore.getEffectiveSettings(props.courseId);
+  });
 
   const hasCustom = computed(() => {
-    return settingsStore.hasCustomSettings(props.courseId)
-  })
+    return settingsStore.hasCustomSettings(props.courseId);
+  });
 
   onMounted(async () => {
     // Убеждаемся что глобальные настройки загружены
     if (!settingsStore.globalSettings) {
-      await settingsStore.fetchGlobalSettings('CourseSettingsModal onMounted')
+      await settingsStore.fetchGlobalSettings('CourseSettingsModal onMounted');
     }
 
     // Загружаем настройки курса
     // Store сам определит, есть ли индивидуальные настройки или нет
-    await settingsStore.fetchCourseSettings(props.courseId)
+    await settingsStore.fetchCourseSettings(props.courseId);
 
     // Определяем, использует ли курс индивидуальные настройки
-    useCustomSettings.value = hasCustom.value
+    useCustomSettings.value = hasCustom.value;
 
     // Получаем эффективные настройки (индивидуальные или глобальные)
-    const effective = effectiveSettings.value
+    const effective = effectiveSettings.value;
 
     if (effective) {
-      settings.value = { ...effective }
+      settings.value = { ...effective };
     } else {
       // Фоллбэк
-      settings.value = { ...settingsStore.globalSettings }
+      settings.value = { ...settingsStore.globalSettings };
     }
-  })
+  });
 
   async function handleSave(formSettings) {
-    saving.value = true
+    saving.value = true;
     try {
       if (useCustomSettings.value) {
-        console.log('CourseSettingsModal handleSave', useCustomSettings.value, formSettings)
-        await settingsStore.updateCourseSettings(props.courseId, formSettings)
-        toast.success('Индивидуальные настройки курса сохранены!')
+        console.log('CourseSettingsModal handleSave', useCustomSettings.value, formSettings);
+        await settingsStore.updateCourseSettings(props.courseId, formSettings);
+        toast.success('Индивидуальные настройки курса сохранены!');
       } else {
         // Если юзер переключил на глобальные, сбросить индивидуальные
         if (hasCustom.value) {
-          await settingsStore.resetCourseSettings(props.courseId)
-          toast.success('Настройки переключены на глобальные')
+          await settingsStore.resetCourseSettings(props.courseId);
+          toast.success('Настройки переключены на глобальные');
         }
       }
-      emit('saved')
-      emit('close')
+      emit('saved');
+      emit('close');
     } catch (error) {
-      console.error('Failed to save settings:', error)
-      toast.error('Ошибка сохранения настроек!')
+      console.error('Failed to save settings:', error);
+      toast.error('Ошибка сохранения настроек!');
     } finally {
-      saving.value = false
+      saving.value = false;
     }
   }
 
   async function handleReset() {
-    const { confirm } = useConfirm()
-    const confirmed = await confirm('Сбросить настройки к глобальным?')
+    const { confirm } = useConfirm();
+    const confirmed = await confirm('Сбросить настройки к глобальным?');
     if (confirmed) {
-      await settingsStore.resetCourseSettings(props.courseId)
-      settings.value = { ...settingsStore.globalSettings }
-      useCustomSettings.value = false
-      toast.success('Настройки сброшены!')
+      await settingsStore.resetCourseSettings(props.courseId);
+      settings.value = { ...settingsStore.globalSettings };
+      useCustomSettings.value = false;
+      toast.success('Настройки сброшены!');
     }
   }
 
   function toggleCustomSettings(value) {
-    useCustomSettings.value = value
+    useCustomSettings.value = value;
     if (!value) {
-      settings.value = { ...settingsStore.globalSettings }
+      settings.value = { ...settingsStore.globalSettings };
     }
   }
 </script>

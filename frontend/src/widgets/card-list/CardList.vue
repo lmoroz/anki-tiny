@@ -1,53 +1,53 @@
 <script setup>
-  import { ref, useTemplateRef, onMounted, onUnmounted } from 'vue'
-  import useScrollAndHighlight from './composables/useScrollAndHighlight.js'
+  import { ref, useTemplateRef, onMounted, onUnmounted } from 'vue';
+  import useScrollAndHighlight from './composables/useScrollAndHighlight.js';
 
-  const { scrollTo, highlight, useFades, showTopFade, showBottomFade } = useScrollAndHighlight()
+  const { scrollTo, highlight, useFades, showTopFade, showBottomFade } = useScrollAndHighlight();
 
   const props = defineProps({
     cards: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     loading: {
       type: Boolean,
-      default: false
+      default: false,
     },
     selectionMode: {
       type: Boolean,
-      default: false
+      default: false,
     },
     selectedIds: {
       type: Set,
-      default: () => new Set()
-    }
-  })
+      default: () => new Set(),
+    },
+  });
 
-  const emit = defineEmits(['edit', 'delete', 'toggle-select'])
+  const emit = defineEmits(['edit', 'delete', 'toggle-select']);
 
-  const scrollContainer = useTemplateRef('cardsGrid')
-  useFades(scrollContainer)
+  const scrollContainer = useTemplateRef('cardsGrid');
+  useFades(scrollContainer);
 
-  const handleEdit = card => emit('edit', card)
+  const handleEdit = (card) => emit('edit', card);
 
-  const handleDelete = card => emit('delete', card)
+  const handleDelete = (card) => emit('delete', card);
 
-  const handleToggleSelect = card => emit('toggle-select', card)
+  const handleToggleSelect = (card) => emit('toggle-select', card);
 
-  const scrollToCardWithBounce = cardId => {
-    const cardElement = scrollContainer.value?.querySelector(`[data-card-id="${cardId}"]`)
+  const scrollToCardWithBounce = (cardId) => {
+    const cardElement = scrollContainer.value?.querySelector(`[data-card-id="${cardId}"]`);
 
     if (!cardElement) {
-      console.warn(`Card with id ${cardId} not found in list`)
-      return
+      console.warn(`Card with id ${cardId} not found in list`);
+      return;
     }
-    scrollTo(cardElement, scrollContainer.value)
-    highlight(cardElement, 'anim-bounce-in-bck', 500)
-  }
+    scrollTo(cardElement, scrollContainer.value);
+    highlight(cardElement, 'anim-bounce-in-bck', 500);
+  };
 
   defineExpose({
-    scrollToCardWithBounce
-  })
+    scrollToCardWithBounce,
+  });
 </script>
 
 <template>

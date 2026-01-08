@@ -9,6 +9,6 @@ export default {
     'rounded-xl',
     'rounded-2xl',
     'rounded-3xl',
-    'rounded-full'
-  ]
-}
+    'rounded-full',
+  ],
+};

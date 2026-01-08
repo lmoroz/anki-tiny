@@ -1,170 +1,170 @@
 <script setup>
-  import { computed, ref } from 'vue'
-  import { useMediaQuery } from '@vueuse/core'
+  import { computed, ref } from 'vue';
+  import { useMediaQuery } from '@vueuse/core';
 
   const props = defineProps({
     courseId: {
       type: Number,
-      required: true
-    }
-  })
+      required: true,
+    },
+  });
 
-  const emit = defineEmits(['added'])
-  const isDesktop = useMediaQuery('(min-width: 1025px)')
-  const isMobile = useMediaQuery('(max-width: 768px)')
+  const emit = defineEmits(['added']);
+  const isDesktop = useMediaQuery('(min-width: 1025px)');
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   const batchRows = computed(() => {
-    return isDesktop.value ? 8 : isMobile.value ? 3 : 5
-  })
+    return isDesktop.value ? 8 : isMobile.value ? 3 : 5;
+  });
 
-  const mode = ref('single')
+  const mode = ref('single');
   const formData = ref({
     front: '',
-    back: ''
-  })
-  const batchText = ref('')
+    back: '',
+  });
+  const batchText = ref('');
 
-  const loading = ref(false)
+  const loading = ref(false);
   const errors = ref({
     front: '',
     back: '',
-    batch: ''
-  })
+    batch: '',
+  });
 
   const validateForm = () => {
-    errors.value = { front: '', back: '', batch: '' }
-    let isValid = true
+    errors.value = { front: '', back: '', batch: '' };
+    let isValid = true;
 
     if (!formData.value.front.trim()) {
-      errors.value.front = 'Вопрос обязателен'
-      isValid = false
+      errors.value.front = 'Вопрос обязателен';
+      isValid = false;
     }
 
     if (!formData.value.back.trim()) {
-      errors.value.back = 'Ответ обязателен'
-      isValid = false
+      errors.value.back = 'Ответ обязателен';
+      isValid = false;
     }
 
-    return isValid
-  }
+    return isValid;
+  };
 
-  const parseBatchInput = text => {
-    const lines = text.split('\n').filter(line => line.trim())
-    const cards = []
-    const invalidLines = []
+  const parseBatchInput = (text) => {
+    const lines = text.split('\n').filter((line) => line.trim());
+    const cards = [];
+    const invalidLines = [];
 
     lines.forEach((line, index) => {
-      const trimmedLine = line.trim()
-      if (!trimmedLine) return
+      const trimmedLine = line.trim();
+      if (!trimmedLine) return;
 
       if (!trimmedLine.includes('|')) {
-        invalidLines.push(`Строка ${index + 1}: отсутствует разделитель |`)
-        return
+        invalidLines.push(`Строка ${index + 1}: отсутствует разделитель |`);
+        return;
       }
 
-      const parts = trimmedLine.split('|')
+      const parts = trimmedLine.split('|');
       if (parts.length !== 2) {
-        invalidLines.push(`Строка ${index + 1}: неверный формат (должно быть ровно один разделитель |)`)
-        return
+        invalidLines.push(`Строка ${index + 1}: неверный формат (должно быть ровно один разделитель |)`);
+        return;
       }
 
-      const [front, back] = parts.map(p => p.trim())
+      const [front, back] = parts.map((p) => p.trim());
 
       if (!front) {
-        invalidLines.push(`Строка ${index + 1}: пустая лицевая сторона`)
-        return
+        invalidLines.push(`Строка ${index + 1}: пустая лицевая сторона`);
+        return;
       }
 
       if (!back) {
-        invalidLines.push(`Строка ${index + 1}: пустая обратная сторона`)
-        return
+        invalidLines.push(`Строка ${index + 1}: пустая обратная сторона`);
+        return;
       }
 
-      cards.push({ front, back })
-    })
+      cards.push({ front, back });
+    });
 
-    return { cards, invalidLines }
-  }
+    return { cards, invalidLines };
+  };
 
   const validateBatchInput = () => {
-    errors.value.batch = ''
+    errors.value.batch = '';
 
     if (!batchText.value.trim()) {
-      errors.value.batch = 'Введите карточки для добавления'
-      return false
+      errors.value.batch = 'Введите карточки для добавления';
+      return false;
     }
 
-    const { cards, invalidLines } = parseBatchInput(batchText.value)
+    const { cards, invalidLines } = parseBatchInput(batchText.value);
 
     if (invalidLines.length > 0) {
-      errors.value.batch = invalidLines.join('\n')
-      return false
+      errors.value.batch = invalidLines.join('\n');
+      return false;
     }
 
     if (cards.length === 0) {
-      errors.value.batch = 'Не найдено корректных карточек'
-      return false
+      errors.value.batch = 'Не найдено корректных карточек';
+      return false;
     }
 
-    return true
-  }
+    return true;
+  };
 
   const handleAdd = async () => {
     if (!validateForm()) {
-      return
+      return;
     }
 
-    loading.value = true
+    loading.value = true;
 
     try {
       const cardData = {
         front: formData.value.front.trim(),
-        back: formData.value.back.trim()
-      }
+        back: formData.value.back.trim(),
+      };
 
-      emit('added', cardData)
+      emit('added', cardData);
 
       formData.value = {
         front: '',
-        back: ''
-      }
-      errors.value = { front: '', back: '', batch: '' }
+        back: '',
+      };
+      errors.value = { front: '', back: '', batch: '' };
     } catch (err) {
-      console.error('Error adding card:', err)
+      console.error('Error adding card:', err);
     } finally {
-      loading.value = false
+      loading.value = false;
     }
-  }
+  };
 
   const handleBatchAdd = async () => {
     if (!validateBatchInput()) {
-      return
+      return;
     }
 
-    loading.value = true
+    loading.value = true;
 
     try {
-      const { cards } = parseBatchInput(batchText.value)
+      const { cards } = parseBatchInput(batchText.value);
 
       for (const card of cards) {
-        emit('added', card)
-        await new Promise(resolve => setTimeout(resolve, 50))
+        emit('added', card);
+        await new Promise((resolve) => setTimeout(resolve, 50));
       }
 
-      batchText.value = ''
-      errors.value = { front: '', back: '', batch: '' }
+      batchText.value = '';
+      errors.value = { front: '', back: '', batch: '' };
     } catch (err) {
-      console.error('Error adding batch cards:', err)
-      errors.value.batch = 'Ошибка при добавлении карточек'
+      console.error('Error adding batch cards:', err);
+      errors.value.batch = 'Ошибка при добавлении карточек';
     } finally {
-      loading.value = false
+      loading.value = false;
     }
-  }
+  };
 
-  const switchMode = newMode => {
-    mode.value = newMode
-    errors.value = { front: '', back: '', batch: '' }
-  }
+  const switchMode = (newMode) => {
+    mode.value = newMode;
+    errors.value = { front: '', back: '', batch: '' };
+  };
 </script>
 
 <template>
@@ -246,7 +246,8 @@
         class="batch-help relative overflow-hidden rounded-2xl border border-2 border-blue-400/80 bg-gradient-to-r from-blue-600/20 via-blue-900/20 to-slate-900/20 p-4 backdrop-blur-md shadow-[0_0_20px_-5px_rgba(59,130,246,0.5),inset_0_0_20px_-5px_rgba(59,130,246,0.1)]">
         <div class="relative flex items-center gap-4">
           <!-- Glowing Icon -->
-          <div class="w-5 h-5 flex items-center justify-center rounded-full border border-white/90 shadow-[0_0_20px_-2px_rgba(255,255,255,0.8)]">
+          <div
+            class="w-5 h-5 flex items-center justify-center rounded-full border border-white/90 shadow-[0_0_20px_-2px_rgba(255,255,255,0.8)]">
             <i class="bi bi-info text-white leading-none" />
           </div>
 
@@ -255,11 +256,17 @@
             <span class="text-white font-medium tracking-wide drop-shadow-sm">Пример:</span>
 
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="px-3 py-1 rounded-lg bg-slate-700/50 border border-white/10 text-blue-100 font-mono text-base shadow-inner">вопрос</span>
+              <span
+                class="px-3 py-1 rounded-lg bg-slate-700/50 border border-white/10 text-blue-100 font-mono text-base shadow-inner">
+                вопрос
+              </span>
 
               <span class="text-blue-400/80 text-xl mx-0.5">|</span>
 
-              <span class="px-3 py-1 rounded-lg bg-slate-700/50 border border-white/10 text-blue-100 font-mono text-base shadow-inner">ответ</span>
+              <span
+                class="px-3 py-1 rounded-lg bg-slate-700/50 border border-white/10 text-blue-100 font-mono text-base shadow-inner">
+                ответ
+              </span>
             </div>
           </div>
           <div class="text-white/50 ml-8">(каждая строка — новая карточка)</div>

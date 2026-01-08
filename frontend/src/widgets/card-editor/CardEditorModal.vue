@@ -1,98 +1,98 @@
 <script setup>
-  import { ref, watch } from 'vue'
-  import Modal from '@/shared/ui/Modal.vue'
-  import Input from '@/shared/ui/Input.vue'
-  import Button from '@/shared/ui/Button.vue'
+  import { ref, watch } from 'vue';
+  import Modal from '@/shared/ui/Modal.vue';
+  import Input from '@/shared/ui/Input.vue';
+  import Button from '@/shared/ui/Button.vue';
 
   const props = defineProps({
     card: {
       type: Object,
-      default: null
+      default: null,
     },
     courseId: {
       type: Number,
-      required: true
-    }
-  })
+      required: true,
+    },
+  });
 
-  const emit = defineEmits(['close', 'save'])
+  const emit = defineEmits(['close', 'save']);
 
   const formData = ref({
     front: '',
-    back: ''
-  })
+    back: '',
+  });
 
   const errors = ref({
     front: '',
-    back: ''
-  })
+    back: '',
+  });
 
-  const isEditMode = ref(false)
-  const frontInput = ref(null)
+  const isEditMode = ref(false);
+  const frontInput = ref(null);
 
   // Инициализация формы
   const initForm = () => {
     if (props.card) {
-      isEditMode.value = true
+      isEditMode.value = true;
       formData.value = {
         front: props.card.front,
-        back: props.card.back
-      }
+        back: props.card.back,
+      };
     } else {
-      isEditMode.value = false
+      isEditMode.value = false;
       formData.value = {
         front: '',
-        back: ''
-      }
+        back: '',
+      };
     }
-    errors.value = { front: '', back: '' }
-  }
+    errors.value = { front: '', back: '' };
+  };
 
-  watch(() => props.card, initForm, { immediate: true })
+  watch(() => props.card, initForm, { immediate: true });
   watch(
     () => frontInput.value,
     () => frontInput.value?.focus()
-  )
+  );
 
   const validateForm = () => {
-    errors.value = { front: '', back: '' }
-    let isValid = true
+    errors.value = { front: '', back: '' };
+    let isValid = true;
 
     if (!formData.value.front.trim()) {
-      errors.value.front = 'Вопрос обязателен'
-      isValid = false
+      errors.value.front = 'Вопрос обязателен';
+      isValid = false;
     } else if (formData.value.front.length > 10000) {
-      errors.value.front = 'Вопрос слишком длинный (макс. 10000 символов)'
-      isValid = false
+      errors.value.front = 'Вопрос слишком длинный (макс. 10000 символов)';
+      isValid = false;
     }
 
     if (!formData.value.back.trim()) {
-      errors.value.back = 'Ответ обязателен'
-      isValid = false
+      errors.value.back = 'Ответ обязателен';
+      isValid = false;
     } else if (formData.value.back.length > 10000) {
-      errors.value.back = 'Ответ слишком длинный (макс. 10000 символов)'
-      isValid = false
+      errors.value.back = 'Ответ слишком длинный (макс. 10000 символов)';
+      isValid = false;
     }
 
-    return isValid
-  }
+    return isValid;
+  };
 
   const handleSave = () => {
     if (!validateForm()) {
-      return
+      return;
     }
 
     const data = {
       front: formData.value.front.trim(),
-      back: formData.value.back.trim()
-    }
+      back: formData.value.back.trim(),
+    };
 
-    emit('save', data)
-  }
+    emit('save', data);
+  };
 
   const handleClose = () => {
-    emit('close')
-  }
+    emit('close');
+  };
 </script>
 
 <template>

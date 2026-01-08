@@ -1,4 +1,4 @@
-import api from './client'
+import api from './client';
 
 export const trainingApi = {
   /**
@@ -8,9 +8,9 @@ export const trainingApi = {
    */
   async getDueCards(courseId, sessionMode = false) {
     const response = await api.get(`/courses/${courseId}/due-cards`, {
-      params: { session: sessionMode }
-    })
-    return response.data
+      params: { session: sessionMode },
+    });
+    return response.data;
   },
 
   /**
@@ -21,16 +21,16 @@ export const trainingApi = {
   async submitReview(cardId, rating) {
     const response = await api.post('/training/review', {
       cardId,
-      rating
-    })
-    return response.data
+      rating,
+    });
+    return response.data;
   },
 
   /**
    * Получить статистику за день
    */
   async getStats() {
-    const response = await api.get('/training/stats')
-    return response.data
-  }
-}
+    const response = await api.get('/training/stats');
+    return response.data;
+  },
+};

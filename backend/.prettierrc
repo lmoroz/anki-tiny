@@ -2,8 +2,20 @@
   "semi": true,
   "singleQuote": true,
   "tabWidth": 2,
+  "useTabs": false,
   "trailingComma": "es5",
-  "printWidth": 160,
+  "printWidth": 120,
+  "arrowParens": "always",
+  "endOfLine": "lf",
   "bracketSpacing": true,
-  "endOfLine": "auto"
+  "overrides": [
+    {
+      "files": "*.md",
+      "options": {
+        "printWidth": 120,
+        "proseWrap": "preserve",
+        "singleQuote": false
+      }
+    }
+  ]
 }

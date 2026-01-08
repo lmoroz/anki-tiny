@@ -31,18 +31,18 @@ SettingsForm.vue
 ```typescript
 // Props
 interface Props {
-  modelValue: number;       // Selected value (hour 0-23 or minute 0-59)
-  min?: number;             // Minimum value (default: 0)
-  max?: number;             // Maximum value (default: 23 for hours, 59 for minutes)
-  step?: number;            // Step between values (default: 1, can be 5, 10, 15 for minutes)
-  formatDigits?: number;    // Number of digits for padding (default: 2)
-  suffix?: string;          // Optional suffix for display (e.g., "ч" or "м")
-  disabled?: boolean;       // Disable scroll interaction
+  modelValue: number; // Selected value (hour 0-23 or minute 0-59)
+  min?: number; // Minimum value (default: 0)
+  max?: number; // Maximum value (default: 23 for hours, 59 for minutes)
+  step?: number; // Step between values (default: 1, can be 5, 10, 15 for minutes)
+  formatDigits?: number; // Number of digits for padding (default: 2)
+  suffix?: string; // Optional suffix for display (e.g., "ч" or "м")
+  disabled?: boolean; // Disable scroll interaction
 }
 
 // Events
 defineEmits<{
-  'update:modelValue': [value: number];
+  "update:modelValue": [value: number];
 }>();
 ```
 
@@ -57,14 +57,14 @@ const options = computed(() => {
   const maxVal = props.max ?? 23;
   const stepVal = props.step ?? 1;
   const digits = props.formatDigits ?? 2;
-  
+
   for (let i = minVal; i <= maxVal; i += stepVal) {
     result.push({
-      name: i.toString().padStart(digits, '0') + (props.suffix || ''),
-      value: i
+      name: i.toString().padStart(digits, "0") + (props.suffix || ""),
+      value: i,
     });
   }
-  
+
   return result;
 });
 ```
@@ -73,32 +73,22 @@ const options = computed(() => {
 
 ```vue
 <!-- Hours: 0-23 -->
-<ScrollTimePicker 
-  v-model="hours" 
-  :max="23" 
-  suffix="ч" />
+<ScrollTimePicker v-model="hours" :max="23" suffix="ч" />
 
 <!-- Minutes: 0-59 with step 5 (0, 5, 10, ..., 55) -->
-<ScrollTimePicker 
-  v-model="minutes" 
-  :max="59" 
-  :step="5" 
-  suffix="м" />
+<ScrollTimePicker v-model="minutes" :max="59" :step="5" suffix="м" />
 
 <!-- Minutes: 0-59 all values -->
-<ScrollTimePicker 
-  v-model="minutes" 
-  :max="59" 
-  suffix="м" />
+<ScrollTimePicker v-model="minutes" :max="59" suffix="м" />
 ```
 
 **Required Imports**:
 
 ```vue
 <script setup>
-import { computed } from 'vue';
-import { VueScrollPicker } from 'vue-scroll-picker';
-import 'vue-scroll-picker/style.css';
+import { computed } from "vue";
+import { VueScrollPicker } from "vue-scroll-picker";
+import "vue-scroll-picker/style.css";
 </script>
 ```
 
@@ -111,12 +101,14 @@ import 'vue-scroll-picker/style.css';
       :model-value="modelValue"
       :options="options"
       :disabled="disabled"
-      @update:model-value="$emit('update:modelValue', $event)" />
+      @update:model-value="$emit('update:modelValue', $event)"
+    />
   </div>
 </template>
 ```
 
 **Key Features**:
+
 - **Универсальность**: один компонент для часов и минут
 - **Гибкость**: настраиваемый диапазон (min/max) и шаг (step)
 - **Форматирование**: автоматическое добавление ведущих нулей
@@ -126,6 +118,7 @@ import 'vue-scroll-picker/style.css';
 - Автоматическая обработка disabled state библиотекой
 
 **Styling Strategy**:
+
 - Импорт базовых стилей библиотеки: `import 'vue-scroll-picker/style.css'`
 - Переопределение CSS variables через scoped styles в wrapper
 - Применение дизайн-системы: `--color-border`, `--color-text-primary`, `--input-bg`, `--color-primary`
@@ -134,6 +127,7 @@ import 'vue-scroll-picker/style.css';
 #### 2. TimeRangePicker.vue (Modified Component)
 
 **Changes**:
+
 - **Remove**: `<select>` elements и связанный с ними markup
 - **Add**: **Четыре** `<ScrollTimePicker>` компонента:
   - Start Hours (0-23) + Start Minutes (0, 15, 30, 45)
@@ -141,7 +135,7 @@ import 'vue-scroll-picker/style.css';
 - **Change API**: вместо часов (0-23), использовать **минуты с начала дня** (0-1439)
   - `trainingStartHour` → `trainingStartTime` (0-1439 minutes)
   - `trainingEndHour` → `trainingEndTime` (0-1439 minutes)
-- **Preserve**: 
+- **Preserve**:
   - Visual timeline component и logic
   - Props API: `start`, `end`, `disabled` (но значения теперь в минутах)
   - Events API: `update:start`, `update:end` (emit minutes)
@@ -152,12 +146,12 @@ import 'vue-scroll-picker/style.css';
 ```vue
 <script setup>
 const props = defineProps({
-  start: { type: Number, required: true },  // Minutes from midnight (0-1439)
-  end: { type: Number, required: true },    // Minutes from midnight (0-1439)
-  disabled: { type: Boolean, default: false }
+  start: { type: Number, required: true }, // Minutes from midnight (0-1439)
+  end: { type: Number, required: true }, // Minutes from midnight (0-1439)
+  disabled: { type: Boolean, default: false },
 });
 
-const emit = defineEmits(['update:start', 'update:end']);
+const emit = defineEmits(["update:start", "update:end"]);
 
 // Convert minutes to hours/minutes
 const startHours = computed(() => Math.floor(props.start / 60));
@@ -167,19 +161,19 @@ const endMinutes = computed(() => props.end % 60);
 
 // Handlers to convert back to minutes
 function updateStartHours(hours) {
-  emit('update:start', hours * 60 + startMinutes.value);
+  emit("update:start", hours * 60 + startMinutes.value);
 }
 
 function updateStartMinutes(minutes) {
-  emit('update:start', startHours.value * 60 + minutes);
+  emit("update:start", startHours.value * 60 + minutes);
 }
 
 function updateEndHours(hours) {
-  emit('update:end', hours * 60 + endMinutes.value);
+  emit("update:end", hours * 60 + endMinutes.value);
 }
 
 function updateEndMinutes(minutes) {
-  emit('update:end', endHours.value * 60 + minutes);
+  emit("update:end", endHours.value * 60 + minutes);
 }
 </script>
 ```
@@ -198,7 +192,8 @@ function updateEndMinutes(minutes) {
           :max="23"
           suffix="ч"
           :disabled="disabled"
-          @update:model-value="updateStartHours" />
+          @update:model-value="updateStartHours"
+        />
         <span class="separator">:</span>
         <ScrollTimePicker
           :model-value="startMinutes"
@@ -206,7 +201,8 @@ function updateEndMinutes(minutes) {
           :step="15"
           suffix="м"
           :disabled="disabled"
-          @update:model-value="updateStartMinutes" />
+          @update:model-value="updateStartMinutes"
+        />
       </div>
     </div>
 
@@ -219,7 +215,8 @@ function updateEndMinutes(minutes) {
           :max="23"
           suffix="ч"
           :disabled="disabled"
-          @update:model-value="updateEndHours" />
+          @update:model-value="updateEndHours"
+        />
         <span class="separator">:</span>
         <ScrollTimePicker
           :model-value="endMinutes"
@@ -227,7 +224,8 @@ function updateEndMinutes(minutes) {
           :step="15"
           suffix="м"
           :disabled="disabled"
-          @update:model-value="updateEndMinutes" />
+          @update:model-value="updateEndMinutes"
+        />
       </div>
     </div>
 
@@ -257,25 +255,21 @@ const visualRange = computed(() => {
   const endPercent = (props.end / totalMinutes) * 100;
   return {
     left: `${startPercent}%`,
-    width: `${endPercent - startPercent}%`
+    width: `${endPercent - startPercent}%`,
   };
 });
 ```
 
-**Breaking Change Note**: 
+**Breaking Change Note**:
 
 Parent components (SettingsForm) должны обновить API usage:
 
 ```vue
 <!-- OLD (hours only) -->
-<TimeRangePicker
-  :start="settings.trainingStartHour"
-  :end="settings.trainingEndHour" />
+<TimeRangePicker :start="settings.trainingStartHour" :end="settings.trainingEndHour" />
 
 <!-- NEW (minutes from midnight) -->
-<TimeRangePicker
-  :start="settings.trainingStartTime"
-  :end="settings.trainingEndTime" />
+<TimeRangePicker :start="settings.trainingStartTime" :end="settings.trainingEndTime" />
 ```
 
 **Migration**: Backend должен хранить время в минутах вместо часов, либо frontend должен конвертировать при загрузке/сохранении.
@@ -317,6 +311,7 @@ Visual feedback to user
 ```
 
 **Style Properties**:
+
 - Selected item: `font-weight: 600`, `color: var(--color-primary)`, `font-size: 18px`
 - Adjacent items: `opacity: 0.6`, `color: var(--color-text-secondary)`, `font-size: 14px`
 - Background: `background: var(--input-bg)`, `border: 1px solid var(--color-border)`
@@ -325,27 +320,32 @@ Visual feedback to user
 #### Interaction Design
 
 **Desktop**:
+
 - Mouse wheel scroll to change value
 - Click on arrow buttons (if library provides)
 - Hover state: `border-color: var(--color-border-focus)`
 
 **Touch**:
+
 - Vertical swipe to scroll through hours
 - Momentum scrolling with smooth deceleration
 - Haptic feedback (if device supports) on value snap
 
 **Keyboard**:
+
 - Arrow Up/Down to increment/decrement
 - Focus state: `box-shadow: 0 0 0 3px var(--input-focus-shadow)`
 
 ### Responsiveness
 
 **Desktop (> 768px)**:
+
 - Picker height: `120px`
 - Item height: `40px`
 - 3 visible items (previous, current, next)
 
 **Mobile (< 768px)**:
+
 - Picker height: `160px` (larger touch targets)
 - Item height: `53px`
 - 3 visible items maintained
@@ -355,6 +355,7 @@ Visual feedback to user
 ### Why vue-scroll-picker?
 
 **Criteria evaluated**:
+
 1. Vue 3 Composition API compatibility ✅
 2. TypeScript support ✅
 3. Active maintenance (last update < 6 months) ✅
@@ -363,6 +364,7 @@ Visual feedback to user
 6. Official documentation and examples ✅
 
 **Package Details**:
+
 - **Name**: `vue-scroll-picker`
 - **Import**: `{ VueScrollPicker } from 'vue-scroll-picker'`
 - **CSS**: `import 'vue-scroll-picker/style.css'` (REQUIRED)
@@ -372,6 +374,7 @@ Visual feedback to user
 **Важно**: Библиотека требует **обязательного импорта CSS** файла `vue-scroll-picker/style.css`. Без этого импорта компонент не будет корректно отображаться.
 
 **Alternatives considered**:
+
 - `@vueform/slider`: Не подходит, это slider, а не scroll picker
 - `vue3-scroll-picker`: Менее популярный, меньше stars на GitHub
 - Custom implementation: Излишне сложно для текущего scope
@@ -390,11 +393,11 @@ Visual feedback to user
 
 ### State Management
 
-**No Pinia Store Required**: 
+**No Pinia Store Required**:
 
 Компонент является презентационным (presentational component) и не управляет глобальным состоянием. Все данные передаются через props и emit events, что соответствует принципу unidirectional data flow.
 
-**Local State**: 
+**Local State**:
 
 `ScrollTimePicker` может содержать минимальное локальное состояние для управления UI behaviour (например, scroll animation state), но это инкапсулировано внутри компонента.
 
@@ -404,7 +407,8 @@ Visual feedback to user
 
 **Concern**: Рендеринг 24 элементов в двух scroll picker'ах может быть ресурсоёмким.
 
-**Mitigation**: 
+**Mitigation**:
+
 - `vue-scroll-picker` использует виртуализацию — рендерит только видимые элементы + buffer
 - Общее количество (24 hours) достаточно мало для производительности не быть проблемой
 - Используем `v-once` для статичных labels в timeline
@@ -414,6 +418,7 @@ Visual feedback to user
 **Concern**: Плавные scroll анимации должны работать на 60 FPS.
 
 **Mitigation**:
+
 - Используем CSS transitions вместо JavaScript анимаций где возможно
 - Применяем `will-change: transform` для элементов, которые анимируются
 - Тестируем на низкопроизводительных устройствах (если доступны)
@@ -423,17 +428,20 @@ Visual feedback to user
 ### Manual Testing Protocol
 
 **Phase 1: Component Isolation**
+
 1. Создать тестовую страницу с `ScrollTimePicker` в изоляции
 2. Проверить все interaction methods (mouse, touch, keyboard)
 3. Проверить disabled state
 4. Проверить edge values (0, 23)
 
 **Phase 2: Integration in TimeRangePicker**
+
 1. Проверить синхронизацию с timeline visualization
 2. Проверить update events
 3. Проверить validation flow (start >= end)
 
 **Phase 3: Settings Page E2E**
+
 1. Полный workflow: открыть Settings → изменить время → сохранить
 2. Проверить CourseSettingsModal
 3. Проверить theme switching
@@ -441,6 +449,7 @@ Visual feedback to user
 ### Regression Testing
 
 **Critical flows to verify**:
+
 - Global settings save
 - Course custom settings save
 - Validation error display

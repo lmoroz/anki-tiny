@@ -1,75 +1,75 @@
 <script setup>
-  import { computed } from 'vue'
+  import { computed } from 'vue';
 
   const props = defineProps({
     course: {
       type: Object,
-      required: true
-    }
-  })
+      required: true,
+    },
+  });
 
-  const emit = defineEmits(['click', 'edit', 'delete'])
+  const emit = defineEmits(['click', 'edit', 'delete']);
 
   const formattedDate = computed(() => {
     // Показываем максимальную дату из:
     // - course.updatedAt (редактирование метаданных курса)
     // - stats.lastCardAdded (последняя добавленная карточка)
-    let dateToShow = props.course.updatedAt
+    let dateToShow = props.course.updatedAt;
 
     if (props.course.stats?.lastCardAdded) {
-      const updatedAt = new Date(props.course.updatedAt)
-      const lastCardAdded = new Date(props.course.stats.lastCardAdded)
+      const updatedAt = new Date(props.course.updatedAt);
+      const lastCardAdded = new Date(props.course.stats.lastCardAdded);
 
-      if (lastCardAdded > updatedAt) dateToShow = props.course.stats.lastCardAdded
+      if (lastCardAdded > updatedAt) dateToShow = props.course.stats.lastCardAdded;
     }
 
-    const date = new Date(dateToShow)
+    const date = new Date(dateToShow);
     return new Intl.DateTimeFormat('ru-RU', {
       day: 'numeric',
       month: 'long',
-      year: 'numeric'
-    }).format(date)
-  })
+      year: 'numeric',
+    }).format(date);
+  });
 
   const formattedLastTraining = computed(() => {
-    if (!props.course.stats?.lastTraining) return null
+    if (!props.course.stats?.lastTraining) return null;
 
-    const date = new Date(props.course.stats.lastTraining)
-    const now = new Date()
-    const diffMs = now - date
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+    const date = new Date(props.course.stats.lastTraining);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 0) return 'сегодня'
-    if (diffDays === 1) return 'вчера'
-    if (diffDays < 7) return `${diffDays} ${getDaysWord(diffDays)} назад`
+    if (diffDays === 0) return 'сегодня';
+    if (diffDays === 1) return 'вчера';
+    if (diffDays < 7) return `${diffDays} ${getDaysWord(diffDays)} назад`;
 
     return new Intl.DateTimeFormat('ru-RU', {
       day: 'numeric',
-      month: 'short'
-    }).format(date)
-  })
+      month: 'short',
+    }).format(date);
+  });
 
-  const getDaysWord = days => {
-    if (days % 10 === 1 && days % 100 !== 11) return 'день'
-    if (days % 10 >= 2 && days % 10 <= 4 && (days % 100 < 10 || days % 100 >= 20)) return 'дня'
-    return 'дней'
-  }
+  const getDaysWord = (days) => {
+    if (days % 10 === 1 && days % 100 !== 11) return 'день';
+    if (days % 10 >= 2 && days % 10 <= 4 && (days % 100 < 10 || days % 100 >= 20)) return 'дня';
+    return 'дней';
+  };
 
-  const getCardsWord = count => {
-    if (count % 10 === 1 && count % 100 !== 11) return 'карточка'
-    if (count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 10 || count % 100 >= 20)) return 'карточки'
-    return 'карточек'
-  }
+  const getCardsWord = (count) => {
+    if (count % 10 === 1 && count % 100 !== 11) return 'карточка';
+    if (count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 10 || count % 100 >= 20)) return 'карточки';
+    return 'карточек';
+  };
 
-  const handleEdit = event => {
-    event.stopPropagation()
-    emit('edit', props.course)
-  }
+  const handleEdit = (event) => {
+    event.stopPropagation();
+    emit('edit', props.course);
+  };
 
-  const handleDelete = event => {
-    event.stopPropagation()
-    emit('delete', props.course)
-  }
+  const handleDelete = (event) => {
+    event.stopPropagation();
+    emit('delete', props.course);
+  };
 </script>
 
 <template>

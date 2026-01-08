@@ -105,15 +105,15 @@ interface Card {
   courseId: number;
   front: string;
   back: string;
-  state: CardState;     // New, Learning, Review, Relearning
-  due: string;          // ISO Date
-  stability: number;    // FSRS
-  difficulty: number;   // FSRS
+  state: CardState; // New, Learning, Review, Relearning
+  due: string; // ISO Date
+  stability: number; // FSRS
+  difficulty: number; // FSRS
   scheduledDays: number;
   reps: number;
   lapses: number;
   lastReview?: string;
-  stepIndex?: number;   // For learning steps
+  stepIndex?: number; // For learning steps
 }
 ```
 
@@ -122,27 +122,27 @@ interface Card {
 ```typescript
 interface Settings {
   // Time Range
-  trainingStartTime: string;   // "HH:MM" format (e.g., "08:00")
-  trainingEndTime: string;     // "HH:MM" format (e.g., "22:00")
-  
+  trainingStartTime: string; // "HH:MM" format (e.g., "08:00")
+  trainingEndTime: string; // "HH:MM" format (e.g., "22:00")
+
   // FSRS Parameters
-  learningSteps: number[];     // Minutes (e.g., [10, 1440, 4320])
-  requestRetention: number;    // 0.0-1.0 (default 0.9)
-  maximumInterval: number;     // Days (default 36500)
-  enableFuzz: boolean;         // Add randomness to intervals
-  
+  learningSteps: number[]; // Minutes (e.g., [10, 1440, 4320])
+  requestRetention: number; // 0.0-1.0 (default 0.9)
+  maximumInterval: number; // Days (default 36500)
+  enableFuzz: boolean; // Add randomness to intervals
+
   // Global Daily Limits (aggregate across all courses)
-  globalNewCardsPerDay: number;    // Default 20
-  globalMaxReviewsPerDay: number;  // Default 200
-  
+  globalNewCardsPerDay: number; // Default 20
+  globalMaxReviewsPerDay: number; // Default 200
+
   // Default Course Limits (fallbacks for courses without custom settings)
-  newCardsPerDay: number;      // Default 20
-  maxReviewsPerDay: number;    // Default 200
-  
+  newCardsPerDay: number; // Default 20
+  maxReviewsPerDay: number; // Default 200
+
   // Session Limits
-  newCardsPerSession: number;  // Default 10
+  newCardsPerSession: number; // Default 10
   maxReviewsPerSession: number; // Default 50
-  
+
   // Notifications
   notificationsEnabled: boolean;
 }
@@ -249,7 +249,7 @@ backend/src/
 
 - **Course Management**: Full CRUD operations with statistics.
 - **Card Management**: Full CRUD with visual feedback and progress tracking.
-- **Batch Operations**: 
+- **Batch Operations**:
   - Batch Add mode (text-based `question | answer` format)
   - Batch Delete with selection mode and custom checkboxes
   - Delete All Cards with confirmation
@@ -329,11 +329,13 @@ backend/src/
 🔄 **Next Phase (v0.6-0.9 → v1.0)**
 
 **Priority 1** (Desktop Integration):
+
 - System Tray: Minimize to tray, restore from tray
 - System Notifications: Native OS notifications for due cards
 - Deep Linking: Open app in training mode from notification
 
 **Priority 2** (Enhancements):
+
 - Statistics dashboard with charts
 - Import/Export (JSON, Anki)
 - Media support (images, audio)
@@ -421,17 +423,41 @@ Ready installer will appear in `dist` folder.
 
 ### Additional commands
 
-- **Lint all workspaces:**
+#### Code Quality
+
+- **Lint all workspaces (ESLint + Markdown):**
 
   ```bash
   npm run lint
   ```
 
-- **Format code in all workspaces:**
+- **Lint Markdown only:**
+
+  ```bash
+  npm run lint:md
+  ```
+
+- **Auto-fix Markdown issues:**
+
+  ```bash
+  npm run lint:md:fix
+  ```
+
+- **Format code in all workspaces (Prettier):**
 
   ```bash
   npm run format
   ```
+
+  This formats JavaScript, TypeScript, Vue, JSON, CSS, and Markdown files.
+
+- **Format Markdown only:**
+
+  ```bash
+  npm run format:md
+  ```
+
+#### Workspace-specific commands
 
 - **Commands for specific workspace:**
 

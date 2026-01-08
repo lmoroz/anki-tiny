@@ -52,5 +52,5 @@ export const coursesApi = {
   async delete(id) {
     const response = await api.delete(`/courses/${id}`);
     return response.data;
-  }
+  },
 };

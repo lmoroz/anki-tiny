@@ -82,8 +82,7 @@ else doSomethingElse();
 if (condition) {
   doFirstThing();
   doSecondThing();
-}
-else doOneThing();
+} else doOneThing();
 ```
 
 #### Импорты (Frontend)
@@ -96,14 +95,14 @@ else doOneThing();
 **Правильно:**
 
 ```ts
-import {useApiClient} from '@/shared/api/client';
+import { useApiClient } from "@/shared/api/client";
 ```
 
 **Неправильно:**
 
 ```ts
-import {useApiClient} from '../shared/api/client';
-import BaseButton from '@/components/BaseButton.vue'; // компоненты автоимпорт
+import { useApiClient } from "../shared/api/client";
+import BaseButton from "@/components/BaseButton.vue"; // компоненты автоимпорт
 ```
 
 #### Структура Vue-файлов
@@ -299,6 +298,7 @@ interface Settings {
 ### Реализовано ✅
 
 **Архитектура & Инфраструктура**
+
 - Полная структура проекта (FSD для frontend, Layered для backend)
 - Database Layer (SQLite + Kysely) с системой миграций
 - Кастомный Title Bar с управлением окном (acrylic blur)
@@ -306,6 +306,7 @@ interface Settings {
 - Кастомный протокол `lmorozanki://` для загрузки ресурсов
 
 **Управление Курсами и Карточками**
+
 - Courses API (полный CRUD) с статистикой
 - Cards API (полный CRUD) с FSRS интеграцией
 - QuickAddCard компонент для быстрого добавления
@@ -317,6 +318,7 @@ interface Settings {
 - Course Statistics на главной странице (total, new, last training)
 
 **Система Тренировок**
+
 - Training Page с FSRS-алгоритмом (ts-fsrs v5)
 - Card-based UI с flip-анимациями
 - Кнопки оценки ответа (Again/Hard/Good/Easy)
@@ -329,6 +331,7 @@ interface Settings {
 - Due cards с учетом времени дня и лимитов
 
 **Система Настроек**
+
 - Global Settings (глобальные настройки приложения)
 - Course Settings (индивидуальные для каждого курса с наследованием)
 - Settings UI с полной формой конфигурации:
@@ -339,6 +342,7 @@ interface Settings {
 - Inheritance Pattern (null = inherit from global)
 
 **UI/UX Система**
+
 - Системный дизайн с CSS-переменными
 - **Custom Dialogs & Notifications**:
   - vue3-toastify для alerts (success/error)
@@ -350,6 +354,7 @@ interface Settings {
 - Accessibility (ARIA, keyboard navigation, focus management)
 
 **Backend Services**
+
 - FSRS Service (интеграция ts-fsrs, custom parameters)
 - Limit Service (расчет доступных карточек с учетом лимитов)
 - Progress Repository (отслеживание дневного прогресса)
@@ -358,6 +363,7 @@ interface Settings {
 - Settings Repository (global + course with inheritance)
 
 **OpenSpec Specs (Актуальные)**
+
 - `course-ui` — UI управления курсами и карточками
 - `settings-global-management` — глобальные настройки
 - `settings-course-management` — настройки курсов
@@ -369,6 +375,7 @@ interface Settings {
 ### В работе 🔄
 
 **Desktop Integration (Priority 1 для v1.0)**
+
 - System Tray Integration — сворачивание в трей вместо закрытия
 - System Notifications — нативные уведомления ОС о готовых карточках
 - Deep Linking — открытие приложения в режиме тренировки из уведомления
@@ -376,6 +383,7 @@ interface Settings {
 ### Запланировано 📅
 
 **Priority 2 (Post v1.0)**
+
 - Statistics Dashboard — графики и визуализация прогресса обучения
 - Import/Export — поддержка JSON и Anki форматов
 - Media Support — изображения и аудио в карточках

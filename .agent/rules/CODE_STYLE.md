@@ -25,19 +25,16 @@ trigger: always_on
 if (condition) {
   doSomething1();
   doSomething2();
-}
-else {
+} else {
   doSomethingElse1();
   doSomethingElse2();
 }
 
 if (condition) {
   doSomething();
-}
-else if (anotherCondition) {
+} else if (anotherCondition) {
   doAnotherThing();
-}
-else {
+} else {
   doDefaultThing();
 }
 ```
@@ -47,8 +44,7 @@ else {
 ```ts
 if (condition) {
   doSomething();
-}
-else {
+} else {
   doSomethingElse();
 }
 ```
@@ -81,8 +77,7 @@ if (condition) {
 
 if (condition) {
   doSomething();
-}
-else {
+} else {
   doSomethingElse();
 }
 ```
@@ -98,8 +93,7 @@ else {
 if (condition) {
   doFirstThing();
   doSecondThing();
-}
-else doOneThing();
+} else doOneThing();
 ```
 
 ### 4. Вложенные условия
@@ -113,25 +107,24 @@ else doOneThing();
 if (outerCondition) {
   if (innerCondition) doSomething();
   else doSomethingElse();
-}
-else doDefaultThing();
+} else doDefaultThing();
 ```
 
 ### 5. Сложные выражения
 
 - Если тело условия содержит:
-    - объекты
-    - массивы
-    - многострочные выражения
-      → фигурные скобки ОБЯЗАТЕЛЬНЫ, даже если это формально один statement
+  - объекты
+  - массивы
+  - многострочные выражения
+    → фигурные скобки ОБЯЗАТЕЛЬНЫ, даже если это формально один statement
 
 **✅ Правильно:**
 
 ```ts
 if (condition) {
   const result = {
-    key1: 'value1',
-    key2: 'value2',
+    key1: "value1",
+    key2: "value2",
   };
 }
 ```

@@ -190,4 +190,3 @@ The system SHALL adapt settings UI for different screen sizes.
 - **WHEN** SettingsPage is rendered
 - **THEN** form uses single-column layout
 - **AND** modal adapts to full-screen width
-

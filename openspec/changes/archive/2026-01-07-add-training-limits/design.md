@@ -48,8 +48,8 @@
 ```typescript
 interface Settings {
   // ... existing fields
-  globalNewCardsPerDay: number;      // default: 20
-  globalMaxReviewsPerDay: number;    // default: 200
+  globalNewCardsPerDay: number; // default: 20
+  globalMaxReviewsPerDay: number; // default: 200
 }
 ```
 
@@ -58,10 +58,10 @@ interface Settings {
 ```typescript
 interface CourseSettings {
   // ... existing fields
-  newCardsPerDay: number | null;        // default: 20
-  maxReviewsPerDay: number | null;      // default: 200
-  newCardsPerSession: number | null;    // default: 10
-  maxReviewsPerSession: number | null;  // default: 50
+  newCardsPerDay: number | null; // default: 20
+  maxReviewsPerDay: number | null; // default: 200
+  newCardsPerSession: number | null; // default: 10
+  maxReviewsPerSession: number | null; // default: 50
 }
 ```
 
@@ -100,11 +100,11 @@ interface AvailableCards {
   newCards: Card[];
   reviews: Card[];
   limits: {
-    newCardsAvailable: number;      // Сколько можно показать новых
-    reviewsAvailable: number;       // Сколько можно показать повторений
-    newCardsRemaining: number;      // Осталось на сегодня (курс)
-    reviewsRemaining: number;       // Осталось на сегодня (курс)
-    globalNewRemaining: number;     // Осталось на сегодня (глобально)
+    newCardsAvailable: number; // Сколько можно показать новых
+    reviewsAvailable: number; // Сколько можно показать повторений
+    newCardsRemaining: number; // Осталось на сегодня (курс)
+    reviewsRemaining: number; // Осталось на сегодня (курс)
+    globalNewRemaining: number; // Осталось на сегодня (глобально)
     globalReviewsRemaining: number; // Осталось на сегодня (глобально)
   };
 }
@@ -135,19 +135,10 @@ function calculateAvailableCards(courseId: number, sessionMode: boolean): Availa
   let newLimit, reviewLimit;
 
   if (sessionMode) {
-    newLimit = Math.min(
-      courseSettings.newCardsPerSession,
-      courseNewRemaining,
-      globalNewRemaining
-    );
+    newLimit = Math.min(courseSettings.newCardsPerSession, courseNewRemaining, globalNewRemaining);
 
-    reviewLimit = Math.min(
-      courseSettings.maxReviewsPerSession,
-      courseReviewsRemaining,
-      globalReviewsRemaining
-    );
-  }
-  else {
+    reviewLimit = Math.min(courseSettings.maxReviewsPerSession, courseReviewsRemaining, globalReviewsRemaining);
+  } else {
     newLimit = Math.min(courseNewRemaining, globalNewRemaining);
     reviewLimit = Math.min(courseReviewsRemaining, globalReviewsRemaining);
   }
@@ -156,8 +147,8 @@ function calculateAvailableCards(courseId: number, sessionMode: boolean): Availa
   const allDueCards = await cardRepo.getDueCards(courseId, new Date());
 
   // 7. Распределяем по типам
-  const newCards = allDueCards.filter(c => c.state === CardState.NEW).slice(0, newLimit);
-  const reviews = allDueCards.filter(c => c.state !== CardState.NEW).slice(0, reviewLimit);
+  const newCards = allDueCards.filter((c) => c.state === CardState.NEW).slice(0, newLimit);
+  const reviews = allDueCards.filter((c) => c.state !== CardState.NEW).slice(0, reviewLimit);
 
   return {
     newCards,
@@ -168,8 +159,8 @@ function calculateAvailableCards(courseId: number, sessionMode: boolean): Availa
       newCardsRemaining: courseNewRemaining,
       reviewsRemaining: courseReviewsRemaining,
       globalNewRemaining,
-      globalReviewsRemaining
-    }
+      globalReviewsRemaining,
+    },
   };
 }
 ```
@@ -192,19 +183,17 @@ async function updateDailyProgress(cardId: number, isNew: boolean): Promise<void
   if (progress) {
     // Инкрементируем счётчик
     if (isNew) {
-      await progressRepo.increment(progress.id, 'newCardsStudied');
+      await progressRepo.increment(progress.id, "newCardsStudied");
+    } else {
+      await progressRepo.increment(progress.id, "reviewsCompleted");
     }
-    else {
-      await progressRepo.increment(progress.id, 'reviewsCompleted');
-    }
-  }
-  else {
+  } else {
     // Создаём новую запись
     await progressRepo.create({
       date: today,
       courseId: card.courseId,
       newCardsStudied: isNew ? 1 : 0,
-      reviewsCompleted: isNew ? 0 : 1
+      reviewsCompleted: isNew ? 0 : 1,
     });
   }
 }
@@ -352,41 +341,41 @@ async function updateDailyProgress(cardId: number, isNew: boolean): Promise<void
 export async function up(db: Kysely<Database>): Promise<void> {
   // 1. Добавляем глобальные лимиты
   await db.schema
-    .alterTable('settings')
-    .addColumn('globalNewCardsPerDay', 'integer', col => col.notNull().defaultTo(20))
-    .addColumn('globalMaxReviewsPerDay', 'integer', col => col.notNull().defaultTo(200))
+    .alterTable("settings")
+    .addColumn("globalNewCardsPerDay", "integer", (col) => col.notNull().defaultTo(20))
+    .addColumn("globalMaxReviewsPerDay", "integer", (col) => col.notNull().defaultTo(200))
     .execute();
 
   // 2. Добавляем курсовые лимиты
   await db.schema
-    .alterTable('courseSettings')
-    .addColumn('newCardsPerDay', 'integer')
-    .addColumn('maxReviewsPerDay', 'integer')
-    .addColumn('newCardsPerSession', 'integer')
-    .addColumn('maxReviewsPerSession', 'integer')
+    .alterTable("courseSettings")
+    .addColumn("newCardsPerDay", "integer")
+    .addColumn("maxReviewsPerDay", "integer")
+    .addColumn("newCardsPerSession", "integer")
+    .addColumn("maxReviewsPerSession", "integer")
     .execute();
 
   // 3. Создаём таблицу прогресса
   await db.schema
-    .createTable('dailyProgress')
-    .addColumn('id', 'integer', col => col.primaryKey().autoIncrement())
-    .addColumn('date', 'text', col => col.notNull())
-    .addColumn('courseId', 'integer', col => col.notNull().references('courses.id').onDelete('cascade'))
-    .addColumn('newCardsStudied', 'integer', col => col.notNull().defaultTo(0))
-    .addColumn('reviewsCompleted', 'integer', col => col.notNull().defaultTo(0))
-    .addColumn('createdAt', 'text', col => col.notNull())
-    .addColumn('updatedAt', 'text', col => col.notNull())
+    .createTable("dailyProgress")
+    .addColumn("id", "integer", (col) => col.primaryKey().autoIncrement())
+    .addColumn("date", "text", (col) => col.notNull())
+    .addColumn("courseId", "integer", (col) => col.notNull().references("courses.id").onDelete("cascade"))
+    .addColumn("newCardsStudied", "integer", (col) => col.notNull().defaultTo(0))
+    .addColumn("reviewsCompleted", "integer", (col) => col.notNull().defaultTo(0))
+    .addColumn("createdAt", "text", (col) => col.notNull())
+    .addColumn("updatedAt", "text", (col) => col.notNull())
     .execute();
 
   // 4. Индексы
-  await db.schema.createIndex('idx_dailyProgress_date').on('dailyProgress').column('date').execute();
-  await db.schema.createIndex('idx_dailyProgress_courseId').on('dailyProgress').column('courseId').execute();
+  await db.schema.createIndex("idx_dailyProgress_date").on("dailyProgress").column("date").execute();
+  await db.schema.createIndex("idx_dailyProgress_courseId").on("dailyProgress").column("courseId").execute();
 
   // 5. Уникальный индекс
   await db.schema
-    .createIndex('idx_dailyProgress_unique')
-    .on('dailyProgress')
-    .columns(['date', 'courseId'])
+    .createIndex("idx_dailyProgress_unique")
+    .on("dailyProgress")
+    .columns(["date", "courseId"])
     .unique()
     .execute();
 }
@@ -401,7 +390,6 @@ export async function up(db: Kysely<Database>): Promise<void> {
 **GlobalSettingsForm.vue:**
 
 ```vue
-
 <template>
   <!-- Existing fields -->
 
@@ -409,11 +397,11 @@ export async function up(db: Kysely<Database>): Promise<void> {
     <h3>Дневные лимиты (по всем курсам)</h3>
 
     <FormField label="Новых карточек в день">
-      <Input v-model.number="settings.globalNewCardsPerDay" type="number" min="0"/>
+      <Input v-model.number="settings.globalNewCardsPerDay" type="number" min="0" />
     </FormField>
 
     <FormField label="Повторений в день">
-      <Input v-model.number="settings.globalMaxReviewsPerDay" type="number" min="0"/>
+      <Input v-model.number="settings.globalMaxReviewsPerDay" type="number" min="0" />
     </FormField>
   </div>
 </template>
@@ -422,7 +410,6 @@ export async function up(db: Kysely<Database>): Promise<void> {
 **CourseSettingsModal.vue:**
 
 ```vue
-
 <template>
   <!-- Existing fields -->
 
@@ -430,11 +417,11 @@ export async function up(db: Kysely<Database>): Promise<void> {
     <h3>Дневные лимиты</h3>
 
     <FormField label="Новых карточек в день" :hint="`По умолчанию: ${globalSettings.newCardsPerDay}`">
-      <Input v-model.number="settings.newCardsPerDay" type="number" min="0" placeholder="Наследуется"/>
+      <Input v-model.number="settings.newCardsPerDay" type="number" min="0" placeholder="Наследуется" />
     </FormField>
 
     <FormField label="Повторений в день" :hint="`По умолчанию: ${globalSettings.maxReviewsPerDay}`">
-      <Input v-model.number="settings.maxReviewsPerDay" type="number" min="0" placeholder="Наследуется"/>
+      <Input v-model.number="settings.maxReviewsPerDay" type="number" min="0" placeholder="Наследуется" />
     </FormField>
   </div>
 
@@ -442,11 +429,11 @@ export async function up(db: Kysely<Database>): Promise<void> {
     <h3>Сессионные лимиты</h3>
 
     <FormField label="Новых карточек за сессию">
-      <Input v-model.number="settings.newCardsPerSession" type="number" min="0" placeholder="10"/>
+      <Input v-model.number="settings.newCardsPerSession" type="number" min="0" placeholder="10" />
     </FormField>
 
     <FormField label="Повторений за сессию">
-      <Input v-model.number="settings.maxReviewsPerSession" type="number" min="0" placeholder="50"/>
+      <Input v-model.number="settings.maxReviewsPerSession" type="number" min="0" placeholder="50" />
     </FormField>
   </div>
 </template>
@@ -457,13 +444,12 @@ export async function up(db: Kysely<Database>): Promise<void> {
 **TrainingPage.vue:**
 
 ```vue
-
 <template>
   <div class="training-page">
     <!-- Progress bar -->
     <div class="session-progress">
       <span>Сессия: {{ currentIndex + 1 }} / {{ totalCards }}</span>
-      <ProgressBar :value="(currentIndex / totalCards) * 100"/>
+      <ProgressBar :value="(currentIndex / totalCards) * 100" />
     </div>
 
     <!-- Limits info -->
@@ -481,12 +467,8 @@ export async function up(db: Kysely<Database>): Promise<void> {
       <h2>Сессия завершена!</h2>
       <p>Изучено: {{ stats.newInSession }} новых, {{ stats.reviewsInSession }} повторений</p>
 
-      <Button v-if="hasMoreCards" @click="startNewSession">
-        Продолжить тренировку
-      </Button>
-      <Button @click="handleBack">
-        Завершить
-      </Button>
+      <Button v-if="hasMoreCards" @click="startNewSession"> Продолжить тренировку </Button>
+      <Button @click="handleBack"> Завершить </Button>
     </div>
   </div>
 </template>
@@ -547,18 +529,18 @@ export async function up(db: Kysely<Database>): Promise<void> {
 ## Testing Strategy
 
 1. **Unit tests:**
-    - `calculateAvailableCards()` с различными комбинациями лимитов
-    - `updateDailyProgress()` с созданием/обновлением записей
+   - `calculateAvailableCards()` с различными комбинациями лимитов
+   - `updateDailyProgress()` с созданием/обновлением записей
 
 2. **Integration tests:**
-    - GET `/due-cards` с применением всех уровней лимитов
-    - POST `/review` с обновлением прогресса
-    - Проверка сброса лимитов на следующий день
+   - GET `/due-cards` с применением всех уровней лимитов
+   - POST `/review` с обновлением прогресса
+   - Проверка сброса лимитов на следующий день
 
 3. **Manual testing:**
-    - Сценарий с несколькими курсами
-    - Достижение глобального лимита
-    - Изменение лимитов в UI
+   - Сценарий с несколькими курсами
+   - Достижение глобального лимита
+   - Изменение лимитов в UI
 
 ---
 

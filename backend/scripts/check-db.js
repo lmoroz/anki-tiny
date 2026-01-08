@@ -20,7 +20,9 @@ tables.forEach((table) => {
   const columns = db.prepare(`PRAGMA table_info(${table.name})`).all();
   console.log(`    Колонки (${columns.length}):`);
   columns.forEach((col) => {
-    console.log(`      ${col.name}: ${col.type}${col.notnull ? ' NOT NULL' : ''}${col.dflt_value ? ` DEFAULT ${col.dflt_value}` : ''}`);
+    console.log(
+      `      ${col.name}: ${col.type}${col.notnull ? ' NOT NULL' : ''}${col.dflt_value ? ` DEFAULT ${col.dflt_value}` : ''}`
+    );
   });
   console.log('');
 });

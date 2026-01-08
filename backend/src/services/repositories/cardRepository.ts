@@ -78,7 +78,11 @@ export class CardRepository {
    * Удалить несколько карточек одной транзакцией
    */
   async deleteCardsBatch(ids: number[], courseId: number): Promise<number> {
-    const result = await db.deleteFrom('cards').where('id', 'in', ids).where('courseId', '=', courseId).executeTakeFirst();
+    const result = await db
+      .deleteFrom('cards')
+      .where('id', 'in', ids)
+      .where('courseId', '=', courseId)
+      .executeTakeFirst();
 
     return Number(result.numDeletedRows ?? 0);
   }
@@ -96,7 +100,11 @@ export class CardRepository {
    * Получить карточки, готовые к повторению
    */
   async getDueCards(courseId: number, now: Date, excludeNew = false): Promise<Card[]> {
-    let query = db.selectFrom('cards').where('courseId', '=', courseId).where('due', '<=', now.toISOString()).orderBy('due', 'asc');
+    let query = db
+      .selectFrom('cards')
+      .where('courseId', '=', courseId)
+      .where('due', '<=', now.toISOString())
+      .orderBy('due', 'asc');
 
     if (excludeNew) {
       // Исключаем NEW карточки (когда до конца дня < 4 часов)

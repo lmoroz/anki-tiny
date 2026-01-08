@@ -77,10 +77,10 @@ frontend/src/
 
 ```typescript
 interface GlobalSettings {
-  trainingStartHour: number;        // 0-23, default: 8
-  trainingEndHour: number;          // 0-23, default: 22
-  minTimeBeforeEnd: number;         // hours, default: 4
-  notificationsEnabled: boolean;    // default: true
+  trainingStartHour: number; // 0-23, default: 8
+  trainingEndHour: number; // 0-23, default: 22
+  minTimeBeforeEnd: number; // hours, default: 4
+  notificationsEnabled: boolean; // default: true
 }
 ```
 
@@ -154,9 +154,9 @@ interface GlobalSettings {
 
 - **Planning:** ~1 hour (this proposal)
 - **Implementation:** ~4-6 hours
-    - Entity Layer: ~1.5 hours
-    - Widgets: ~2 hours
-    - Integration & Testing: ~1.5 hours
+  - Entity Layer: ~1.5 hours
+  - Widgets: ~2 hours
+  - Integration & Testing: ~1.5 hours
 - **Documentation:** ~0.5 hours
 
 **Total:** ~5-7 hours of development work

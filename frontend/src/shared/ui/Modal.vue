@@ -1,42 +1,42 @@
 <script setup>
-  import { onMounted, onUnmounted } from 'vue'
+  import { onMounted, onUnmounted } from 'vue';
 
   const props = defineProps({
     show: {
       type: Boolean,
-      default: false
+      default: false,
     },
     title: {
       type: String,
-      default: ''
+      default: '',
     },
     closeOnBackdrop: {
       type: Boolean,
-      default: true
-    }
-  })
+      default: true,
+    },
+  });
 
-  const emit = defineEmits(['close'])
+  const emit = defineEmits(['close']);
 
   const handleBackdropClick = () => {
     if (props.closeOnBackdrop) {
-      emit('close')
+      emit('close');
     }
-  }
+  };
 
-  const handleEscKey = event => {
+  const handleEscKey = (event) => {
     if (event.key === 'Escape' && props.show) {
-      emit('close')
+      emit('close');
     }
-  }
+  };
 
   onMounted(() => {
-    document.addEventListener('keydown', handleEscKey)
-  })
+    document.addEventListener('keydown', handleEscKey);
+  });
 
   onUnmounted(() => {
-    document.removeEventListener('keydown', handleEscKey)
-  })
+    document.removeEventListener('keydown', handleEscKey);
+  });
 </script>
 
 <template>

@@ -102,7 +102,12 @@ const migrations: Migration[] = [
         .addColumn('updatedAt', 'text', (col) => col.notNull().defaultTo(sql`CURRENT_TIMESTAMP`))
         .execute();
 
-      await db.schema.createIndex('courseSettings_courseId_idx').ifNotExists().on('courseSettings').column('courseId').execute();
+      await db.schema
+        .createIndex('courseSettings_courseId_idx')
+        .ifNotExists()
+        .on('courseSettings')
+        .column('courseId')
+        .execute();
     },
   },
   {
@@ -187,7 +192,12 @@ const migrations: Migration[] = [
       await db.schema.createIndex('idx_dailyProgress_courseId').on('dailyProgress').column('courseId').execute();
 
       // 5. Create unique composite index for (date, courseId)
-      await db.schema.createIndex('idx_dailyProgress_date_course').on('dailyProgress').columns(['date', 'courseId']).unique().execute();
+      await db.schema
+        .createIndex('idx_dailyProgress_date_course')
+        .on('dailyProgress')
+        .columns(['date', 'courseId'])
+        .unique()
+        .execute();
     },
   },
   {

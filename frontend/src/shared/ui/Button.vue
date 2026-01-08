@@ -1,48 +1,48 @@
 <script setup>
-  import { computed } from 'vue'
+  import { computed } from 'vue';
 
   const props = defineProps({
     variant: {
       type: String,
       default: 'primary',
-      validator: value => ['primary', 'success', 'secondary', 'danger', 'ghost'].includes(value)
+      validator: (value) => ['primary', 'success', 'secondary', 'danger', 'ghost'].includes(value),
     },
     size: {
       type: String,
       default: 'md',
-      validator: value => ['xs', 'sm', 'md', 'lg'].includes(value)
+      validator: (value) => ['xs', 'sm', 'md', 'lg'].includes(value),
     },
     rounded: {
       type: String,
       default: 'xl',
-      validator: value => ['xl', 'sm', 'md', 'lg', 'full'].includes(value)
+      validator: (value) => ['xl', 'sm', 'md', 'lg', 'full'].includes(value),
     },
     disabled: {
       type: Boolean,
-      default: false
+      default: false,
     },
     ghost: {
       type: Boolean,
-      default: false
+      default: false,
     },
     fullWidth: {
       type: Boolean,
-      default: false
+      default: false,
     },
     stacked: {
       type: Boolean,
-      default: false
-    }
-  })
+      default: false,
+    },
+  });
 
-  const emit = defineEmits(['click'])
+  const emit = defineEmits(['click']);
 
   const buttonClasses = computed(() => {
-    let additional = ['cursor-pointer', 'outline-none', `rounded-${props.rounded}`]
-    if (props.stacked) additional.push(...['relative', 'group'])
-    if (props.variant === 'primary') additional.push('shadow-[0_10px_20px_-5px_var(--btn-primary-shadow)]')
-    return [...additional]
-  })
+    let additional = ['cursor-pointer', 'outline-none', `rounded-${props.rounded}`];
+    if (props.stacked) additional.push(...['relative', 'group']);
+    if (props.variant === 'primary') additional.push('shadow-[0_10px_20px_-5px_var(--btn-primary-shadow)]');
+    return [...additional];
+  });
   const innerClasses = computed(() => {
     let additional = [
       'btn',
@@ -50,29 +50,29 @@
       { 'btn-full-width': props.fullWidth },
       { 'btn-disabled': props.disabled },
       `rounded-${props.rounded}`,
-      { ghost: props.ghost }
-    ]
+      { ghost: props.ghost },
+    ];
     if (props.stacked && props.variant === 'primary') {
       additional.push(
         ...`relative z-20 bg-gradient-to-b from-[var(--btn-primary-gradient-from)] to-[var(--btn-primary-gradient-to)] hover:to-[var(--btn-primary-gradient-from)]  py-4 px-12 border-t border-t-white/20 border-b border-b-gray-800/50  shadow-[0_10px_20px_-5px_var(--btn-primary-shadow),inset_0_1px_0_var(--btn-primary-inner-shadow)] transition-transform duration-200 group-active:translate-y-[2px]`.split(
           ' '
         )
-      )
+      );
     } else if (props.variant === 'primary') {
       additional.push(
         'bg-gradient-to-b from-[var(--btn-primary-gradient-from)] to-[var(--btn-primary-gradient-to)] shadow-[0_10px_20px_-5px_var(--btn-primary-shadow),inset_0_1px_0_var(--btn-primary-inner-shadow)]'.split(
           ' '
         )
-      )
-    } else additional.push(`btn-${props.variant}`)
-    return additional
-  })
+      );
+    } else additional.push(`btn-${props.variant}`);
+    return additional;
+  });
 
-  const handleClick = event => {
+  const handleClick = (event) => {
     if (!props.disabled) {
-      emit('click', event)
+      emit('click', event);
     }
-  }
+  };
 </script>
 
 <template>

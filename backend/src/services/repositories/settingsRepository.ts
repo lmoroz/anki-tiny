@@ -63,7 +63,11 @@ export class SettingsRepository {
    * Получить настройки курса
    */
   async getCourseSettings(courseId: number): Promise<CourseSettings | null> {
-    const settings = await db.selectFrom('courseSettings').where('courseId', '=', courseId).selectAll().executeTakeFirst();
+    const settings = await db
+      .selectFrom('courseSettings')
+      .where('courseId', '=', courseId)
+      .selectAll()
+      .executeTakeFirst();
 
     return settings || null;
   }

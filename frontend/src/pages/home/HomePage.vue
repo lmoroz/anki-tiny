@@ -1,79 +1,79 @@
 <script setup>
-  import { ref, onMounted, computed } from 'vue'
-  import { useRouter } from 'vue-router'
-  import { toast } from 'vue3-toastify'
-  import { useConfirm } from '@/shared/lib/useConfirm'
-  import { useCourseStore } from '@/entities/course/model/useCourseStore'
+  import { ref, onMounted, computed } from 'vue';
+  import { useRouter } from 'vue-router';
+  import { toast } from 'vue3-toastify';
+  import { useConfirm } from '@/shared/lib/useConfirm';
+  import { useCourseStore } from '@/entities/course/model/useCourseStore';
 
-  const router = useRouter()
-  const courseStore = useCourseStore()
+  const router = useRouter();
+  const courseStore = useCourseStore();
 
-  const showEditorModal = ref(false)
-  const editingCourse = ref(null)
+  const showEditorModal = ref(false);
+  const editingCourse = ref(null);
 
-  const isLoading = computed(() => courseStore.loading)
-  const courses = computed(() => courseStore.sortedCourses)
+  const isLoading = computed(() => courseStore.loading);
+  const courses = computed(() => courseStore.sortedCourses);
 
   onMounted(async () => {
     try {
-      await courseStore.fetchCourses()
+      await courseStore.fetchCourses();
     } catch (error) {
-      console.error('[HomePage] Failed to load courses:', error)
-      toast.error('Ошибка при загрузке курсов. Попробуйте еще раз.')
+      console.error('[HomePage] Failed to load courses:', error);
+      toast.error('Ошибка при загрузке курсов. Попробуйте еще раз.');
     }
-  })
+  });
 
   const handleCreateCourse = () => {
-    editingCourse.value = null
-    showEditorModal.value = true
-  }
+    editingCourse.value = null;
+    showEditorModal.value = true;
+  };
 
-  const handleEditCourse = course => {
-    editingCourse.value = course
-    showEditorModal.value = true
-  }
+  const handleEditCourse = (course) => {
+    editingCourse.value = course;
+    showEditorModal.value = true;
+  };
 
-  const handleDeleteCourse = async course => {
-    const { confirm } = useConfirm()
+  const handleDeleteCourse = async (course) => {
+    const { confirm } = useConfirm();
     const confirmed = await confirm({
       title: 'Удаление курса',
       message: `Вы уверены, что хотите удалить курс "${course.name}"?`,
       confirmText: 'Удалить',
-      cancelText: 'Отмена'
-    })
-    if (!confirmed) return
+      cancelText: 'Отмена',
+    });
+    if (!confirmed) return;
 
     try {
-      await courseStore.deleteCourse(course.id)
+      await courseStore.deleteCourse(course.id);
     } catch (error) {
-      toast.error('Ошибка при удалении курса. Попробуйте еще раз.')
+      toast.error('Ошибка при удалении курса. Попробуйте еще раз.');
     }
-  }
+  };
 
-  const handleSelectCourse = course => {
-    router.push(`/course/${course.id}`)
-  }
+  const handleSelectCourse = (course) => {
+    router.push(`/course/${course.id}`);
+  };
 
-  const handleSaveCourse = async data => {
+  const handleSaveCourse = async (data) => {
     try {
       if (editingCourse.value) {
-        await courseStore.updateCourse(editingCourse.value.id, data)
-        toast.success('Курс успешно обновлен!')
+        await courseStore.updateCourse(editingCourse.value.id, data);
+        toast.success('Курс успешно обновлен!');
       } else {
-        await courseStore.createCourse(data)
-        toast.success('Курс успешно создан!')
+        await courseStore.createCourse(data);
+        toast.success('Курс успешно создан!');
       }
-      showEditorModal.value = false
-      editingCourse.value = null
+      showEditorModal.value = false;
+      editingCourse.value = null;
     } catch (error) {
-      toast.error('Ошибка при сохранении курса. Попробуйте еще раз.')
+      toast.error('Ошибка при сохранении курса. Попробуйте еще раз.');
     }
-  }
+  };
 
   const handleCloseModal = () => {
-    showEditorModal.value = false
-    editingCourse.value = null
-  }
+    showEditorModal.value = false;
+    editingCourse.value = null;
+  };
 </script>
 
 <template>
@@ -107,7 +107,9 @@
         <div class="empty-state-content">
           <i class="bi bi-journal-bookmark empty-state-icon" />
           <h2 class="empty-state-title">Нет курсов</h2>
-          <p class="empty-state-text">Создайте свой первый курс, чтобы начать обучение с помощью интервального повторения</p>
+          <p class="empty-state-text">
+            Создайте свой первый курс, чтобы начать обучение с помощью интервального повторения
+          </p>
           <Button
             @click="handleCreateCourse"
             variant="primary"

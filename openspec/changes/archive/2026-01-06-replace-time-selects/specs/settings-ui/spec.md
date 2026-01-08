@@ -68,6 +68,7 @@ The system SHALL provide an intuitive time range selection interface with visual
 ### Alternative Considered
 
 **Native HTML `<input type="time">`**: Рассмотрен и отклонён по следующим причинам:
+
 - Разный UX в разных браузерах (Chrome, Firefox, Edge имеют разные нативные picker'ы)
 - Невозможность полной кастомизации согласно дизайн-системе
 - Возвращает значение в формате "HH:MM", требует парсинга, текущий API использует числовые значения (0-23)

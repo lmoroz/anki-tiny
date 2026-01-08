@@ -1,51 +1,51 @@
 <script setup>
-  import { computed } from 'vue'
-  import { VueScrollPicker } from 'vue-scroll-picker'
-  import 'vue-scroll-picker/style.css'
+  import { computed } from 'vue';
+  import { VueScrollPicker } from 'vue-scroll-picker';
+  import 'vue-scroll-picker/style.css';
 
   const props = defineProps({
     modelValue: {
       type: Number,
-      required: true
+      required: true,
     },
     min: {
       type: Number,
-      default: 0
+      default: 0,
     },
     max: {
       type: Number,
-      default: 23
+      default: 23,
     },
     step: {
       type: Number,
-      default: 1
+      default: 1,
     },
     formatDigits: {
       type: Number,
-      default: 2
+      default: 2,
     },
     suffix: {
       type: String,
-      default: ''
+      default: '',
     },
     disabled: {
       type: Boolean,
-      default: false
-    }
-  })
+      default: false,
+    },
+  });
 
-  const emit = defineEmits(['update:modelValue'])
+  const emit = defineEmits(['update:modelValue']);
 
   const options = computed(() => {
-    const result = []
+    const result = [];
     for (let i = props.min; i <= props.max; i += props.step) {
       result.push({
         name: i.toString().padStart(props.formatDigits, '0') + props.suffix,
-        value: i
-      })
+        value: i,
+      });
     }
-    return result
-  })
+    return result;
+  });
 </script>
 
 <template>

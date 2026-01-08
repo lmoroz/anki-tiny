@@ -1,5 +1,5 @@
-import { createVNode, render } from 'vue'
-import ConfirmDialog from '@/shared/ui/ConfirmDialog.vue'
+import { createVNode, render } from 'vue';
+import ConfirmDialog from '@/shared/ui/ConfirmDialog.vue';
 
 /**
  * Composable для программного вызова диалога подтверждения.
@@ -15,27 +15,28 @@ export function useConfirm() {
    */
   const confirm = (options) => {
     return new Promise((resolve) => {
-      const props = typeof options === 'string'
-        ? { message: options, title: 'Подтверждение' }
-        : { title: 'Подтверждение', ...options }
+      const props =
+        typeof options === 'string'
+          ? { message: options, title: 'Подтверждение' }
+          : { title: 'Подтверждение', ...options };
 
-      const container = document.createElement('div')
-      document.body.appendChild(container)
+      const container = document.createElement('div');
+      document.body.appendChild(container);
 
       const close = () => {
-        render(null, container)
-        document.body.removeChild(container)
-      }
+        render(null, container);
+        document.body.removeChild(container);
+      };
 
       const vnode = createVNode(ConfirmDialog, {
         ...props,
         resolve,
         close,
-      })
+      });
 
-      render(vnode, container)
-    })
-  }
+      render(vnode, container);
+    });
+  };
 
-  return { confirm }
+  return { confirm };
 }

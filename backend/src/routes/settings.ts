@@ -39,7 +39,11 @@ router.put('/settings', async (req: Request, res: Response) => {
     validatedData = GlobalSettingsSchema.parse(req.body);
 
     // Преобразуем boolean в SQLite boolean (0/1)
-    updateData = { ...validatedData, enableFuzz: validatedData.enableFuzz ? 1 : 0, notificationsEnabled: validatedData.notificationsEnabled ? 1 : 0 };
+    updateData = {
+      ...validatedData,
+      enableFuzz: validatedData.enableFuzz ? 1 : 0,
+      notificationsEnabled: validatedData.notificationsEnabled ? 1 : 0,
+    };
 
     const settings = await settingsRepository.updateGlobalSettings(updateData);
 
@@ -111,7 +115,11 @@ router.put('/courses/:courseId/settings', async (req: Request, res: Response) =>
     // Преобразуем boolean в SQLite boolean (0/1)
     // const updateData: Record<string, unknown> = { ...validatedData };
     // Преобразуем boolean в SQLite boolean (0/1)
-    updateData = { ...validatedData, enableFuzz: validatedData.enableFuzz ? 1 : 0, notificationsEnabled: validatedData.notificationsEnabled ? 1 : 0 };
+    updateData = {
+      ...validatedData,
+      enableFuzz: validatedData.enableFuzz ? 1 : 0,
+      notificationsEnabled: validatedData.notificationsEnabled ? 1 : 0,
+    };
 
     const settings = await settingsRepository.updateCourseSettings(courseId, updateData);
 

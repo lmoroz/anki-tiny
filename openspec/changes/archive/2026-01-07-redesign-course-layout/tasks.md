@@ -3,6 +3,7 @@
 ## Phase 1: Desktop Two-Column Layout
 
 ### 1.1 Modify CoursePage.vue Structure
+
 - [ ] Wrap main content в grid container (`.course-page-grid`)
 - [ ] Move Course Info block to the left column (`.course-info-section`)
   - Title + description
@@ -23,6 +24,7 @@
 ---
 
 ### 1.2 Add Compact Card Mode
+
 - [ ] Add computed prop `isDesktop` через `useMediaQuery('(min-width: 1024px)')`
 - [ ] Pass prop `:compact="isDesktop"` to CardList
 - [ ] Pass prop to CardItem
@@ -39,6 +41,7 @@
 ## Phase 2: Mobile Slide-Out Panel
 
 ### 2.1 Add Panel State Management
+
 - [ ] Add `ref(false)` for `isCardsPanelOpen` in CoursePage.vue
 - [ ] Create functions `openCardsPanel()` and `closeCardsPanel()`
 - [ ] Add `onKeydown` listener for Escape (calls `closeCardsPanel`)
@@ -48,6 +51,7 @@
 ---
 
 ### 2.2 Create Floating Action Button (FAB)
+
 - [ ] Add FAB component (can be inline in CoursePage.vue):
   - Text: "Показать карточки ({{ cards.length }})"
   - Icon: `bi-list-ul`
@@ -61,7 +65,9 @@
 ---
 
 ### 2.3 Create Slide-Out Panel
+
 - [ ] Add panel structure:
+
   ```vue
   <div v-if="showCardsPanel" class="cards-panel-container">
     <div class="panel-backdrop" @click="closeCardsPanel" />
@@ -79,6 +85,7 @@
     </div>
   </div>
   ```
+
 - [ ] Add styles:
   - `.cards-panel`: fixed, right 0, transform: translateX(100%), transition, 85% width on tablet (max-width 400px) and 100% on mobile
   - `.cards-panel.open`: transform: translateX(0)
@@ -91,6 +98,7 @@
 ---
 
 ### 2.4 Implement Focus Trap
+
 - [ ] Install `@vueuse/core` (if not already installed)
 - [ ] Use `useFocusTrap` on `.cards-panel` ref
 - [ ] Activate trap when `isCardsPanelOpen === true`
@@ -103,7 +111,9 @@
 ## Phase 3: Enhanced Card Statistics
 
 ### 3.1 Add FSRS Metrics Display (CardItem.vue)
+
 - [ ] Add section `.card-stats` to `card-footer` (front side):
+
   ```vue
   <div class="card-stats">
     <span class="stat-item" title="Stability">
@@ -124,6 +134,7 @@
     </span>
   </div>
   ```
+
 - [ ] Add styles:
   - `.card-stats`: flex, gap: 12px, flex-wrap, margin-top: 8px
   - `.stat-item`: font-size: 12px, color: text-secondary, display: flex, align-items: center, gap: 4px
@@ -134,7 +145,9 @@
 ---
 
 ### 3.2 Add Timestamps Display
+
 - [ ] Add section `.card-timestamps` after `.card-stats`:
+
   ```vue
   <div class="card-timestamps">
     <span class="timestamp-item">
@@ -151,6 +164,7 @@
     </span>
   </div>
   ```
+
 - [ ] Implement helper functions:
   - `formatDate(dateString)` — already exists, reuse
   - `formatRelativeTime(dateString)` — "Today", "Yesterday", "N days ago"
@@ -162,6 +176,7 @@
 ---
 
 ### 3.3 Implement Tooltips
+
 - [ ] Ensure `title` attribute is used on all icons (already added in 3.1-3.2)
 - [ ] Optionally: add custom tooltip component for more controlled display
 - [ ] Test hover on desktop
@@ -173,6 +188,7 @@
 ## Phase 4: Accessibility Enhancements
 
 ### 4.1 Add ARIA Labels
+
 - [ ] FAB: `aria-label="Show card list"`
 - [ ] Close button in panel: `aria-label="Close card panel"`
 - [ ] All statistics icons: `aria-label` with full metric name
@@ -182,6 +198,7 @@
 ---
 
 ### 4.2 Keyboard Navigation
+
 - [ ] Ensure Escape closes panel (`onKeydown` in 2.1)
 - [ ] Focus trap works (from 2.4)
 - [ ] Tab order is logical: FAB → (panel open) → close button → create card → cards
@@ -193,6 +210,7 @@
 ## Phase 5: Testing \u0026 Verification
 
 ### 5.1 Responsive Testing
+
 - [ ] **Desktop (1920x1080)**:
   - Two columns are visible side by side
   - Cards are in compact mode
@@ -211,6 +229,7 @@
 ---
 
 ### 5.2 Functional Testing
+
 - [ ] QuickAddCard works in both modes
 - [ ] Card editing works (from CardItem)
 - [ ] Card deletion works
@@ -222,6 +241,7 @@
 ---
 
 ### 5.3 Performance Testing
+
 - [ ] Measure time to render for list of 50 cards
 - [ ] Ensure transitions are hardware-accelerated (check in DevTools Performance)
 - [ ] Check for memory leaks on panel open/close
@@ -233,6 +253,7 @@
 ## Phase 6: Documentation
 
 ### 6.1 Update Changelog
+
 - [ ] Add entry to `docs/Changelog.md`:
   - New two-column layout on desktop
   - Slide-out panel on mobile
@@ -243,6 +264,7 @@
 ---
 
 ### 6.2 Create Walkthrough
+
 - [ ] Create `docs/Walkthrough.md` or update existing
 - [ ] Screenshots:
   - Desktop two-column layout

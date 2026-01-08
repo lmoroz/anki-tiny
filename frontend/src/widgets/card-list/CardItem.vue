@@ -1,97 +1,97 @@
 <script setup>
-  import { ref, computed, useTemplateRef } from 'vue'
-  import { useMediaQuery } from '@vueuse/core'
-  import { CardState } from '@/shared/types/card'
+  import { ref, computed, useTemplateRef } from 'vue';
+  import { useMediaQuery } from '@vueuse/core';
+  import { CardState } from '@/shared/types/card';
 
   const props = defineProps({
     card: {
       type: Object,
-      required: true
+      required: true,
     },
     selectionMode: {
       type: Boolean,
-      default: false
+      default: false,
     },
     selected: {
       type: Boolean,
-      default: false
-    }
-  })
+      default: false,
+    },
+  });
 
-  const emit = defineEmits(['edit', 'delete', 'toggle-select'])
-  const isMobile = useMediaQuery('(max-width: 768px)')
-  const isTablet = useMediaQuery('(max-width: 1024px)')
+  const emit = defineEmits(['edit', 'delete', 'toggle-select']);
+  const isMobile = useMediaQuery('(max-width: 768px)');
+  const isTablet = useMediaQuery('(max-width: 1024px)');
 
   const cardPadding = computed(() => {
-    return !isMobile.value ? 'md' : 'sm'
-  })
+    return !isMobile.value ? 'md' : 'sm';
+  });
 
-  const isFlipped = ref(false)
+  const isFlipped = ref(false);
 
   const toggleFlip = () => {
     if (props.selectionMode) {
-      emit('toggle-select')
+      emit('toggle-select');
     } else {
-      isFlipped.value = !isFlipped.value
+      isFlipped.value = !isFlipped.value;
     }
-  }
+  };
 
-  const handleEdit = e => {
-    e.stopPropagation()
-    emit('edit', props.card)
-  }
+  const handleEdit = (e) => {
+    e.stopPropagation();
+    emit('edit', props.card);
+  };
 
-  const handleDelete = e => {
-    e.stopPropagation()
-    emit('delete', props.card)
-  }
+  const handleDelete = (e) => {
+    e.stopPropagation();
+    emit('delete', props.card);
+  };
 
-  const getStateBadge = state => {
+  const getStateBadge = (state) => {
     switch (state) {
       case CardState.New:
-        return { text: 'Новая', class: 'badge-new' }
+        return { text: 'Новая', class: 'badge-new' };
       case CardState.Learning:
-        return { text: 'Изучается', class: 'badge-learning' }
+        return { text: 'Изучается', class: 'badge-learning' };
       case CardState.Review:
-        return { text: 'Повторение', class: 'badge-review' }
+        return { text: 'Повторение', class: 'badge-review' };
       case CardState.Relearning:
-        return { text: 'Переучивание', class: 'badge-relearning' }
+        return { text: 'Переучивание', class: 'badge-relearning' };
       default:
-        return { text: 'Неизвестно', class: '' }
+        return { text: 'Неизвестно', class: '' };
     }
-  }
+  };
 
-  const formatDate = dateString => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffMs = date - now
-    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = date - now;
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 
-    if (diffDays < 0) return 'Просрочено'
-    else if (diffDays === 0) return 'Сегодня'
-    else if (diffDays === 1) return 'Завтра'
-    else if (diffDays < 7) return `Через ${diffDays} дней`
-    else return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
-  }
+    if (diffDays < 0) return 'Просрочено';
+    else if (diffDays === 0) return 'Сегодня';
+    else if (diffDays === 1) return 'Завтра';
+    else if (diffDays < 7) return `Через ${diffDays} дней`;
+    else return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+  };
 
-  const formatRelativeTime = dateString => {
-    if (!dateString) return null
+  const formatRelativeTime = (dateString) => {
+    if (!dateString) return null;
 
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffMs = now - date
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 0) return 'Сегодня'
-    else if (diffDays === 1) return 'Вчера'
-    else if (diffDays < 7) return `${diffDays} дней назад`
-    else return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
-  }
+    if (diffDays === 0) return 'Сегодня';
+    else if (diffDays === 1) return 'Вчера';
+    else if (diffDays < 7) return `${diffDays} дней назад`;
+    else return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+  };
 
-  const formatCreatedDate = dateString => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
-  }
+  const formatCreatedDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+  };
 </script>
 
 <template>

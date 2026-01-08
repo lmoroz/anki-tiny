@@ -20,7 +20,7 @@ Create proposal when you need to:
 
 - Add features or functionality
 - Make breaking changes (API, schema)
-- Change architecture or patterns  
+- Change architecture or patterns
 - Optimize performance (changes behavior)
 - Update security patterns
 
@@ -95,8 +95,8 @@ After deployment, create separate PR to:
 - Enumerate specs: `openspec spec list --long` (or `--json` for scripts)
 - Enumerate changes: `openspec list` (or `openspec change list --json` - deprecated but available)
 - Show details:
-    - Spec: `openspec show <spec-id> --type spec` (use `--json` for filters)
-    - Change: `openspec show <change-id> --json --deltas-only`
+  - Spec: `openspec show <spec-id> --type spec` (use `--json` for filters)
+  - Change: `openspec show <change-id> --json --deltas-only`
 - Full-text search (use ripgrep): `rg -n "Requirement:|Scenario:" openspec/specs`
 
 ## Quick Start
@@ -160,7 +160,7 @@ openspec/
 ```
 New request?
 ├─ Bug fix restoring spec behavior? → Fix directly
-├─ Typo/format/comment? → Fix directly  
+├─ Typo/format/comment? → Fix directly
 ├─ New feature/capability? → Create proposal
 ├─ Breaking change? → Create proposal
 ├─ Architecture change? → Create proposal
@@ -177,13 +177,16 @@ New request?
 # Change: [Brief description of change]
 
 ## Why
+
 [1-2 sentences on problem/opportunity]
 
 ## What Changes
+
 - [Bullet list of changes]
 - [Mark breaking changes with **BREAKING**]
 
 ## Impact
+
 - Affected specs: [list capabilities]
 - Affected code: [key files/systems]
 ```
@@ -192,19 +195,26 @@ New request?
 
 ```markdown
 ## ADDED Requirements
+
 ### Requirement: New Feature
+
 The system SHALL provide...
 
 #### Scenario: Success case
+
 - **WHEN** user performs action
 - **THEN** expected result
 
 ## MODIFIED Requirements
+
 ### Requirement: Existing Feature
+
 [Complete modified requirement]
 
 ## REMOVED Requirements
+
 ### Requirement: Old Feature
+
 **Reason**: [Why removing]
 **Migration**: [How to handle]
 ```
@@ -215,6 +225,7 @@ If multiple capabilities are affected, create multiple delta files under `change
 
 ```markdown
 ## 1. Implementation
+
 - [ ] 1.1 Create database schema
 - [ ] 1.2 Implement API endpoint
 - [ ] 1.3 Add frontend component
@@ -222,7 +233,7 @@ If multiple capabilities are affected, create multiple delta files under `change
 ```
 
 1. **Create design.md when needed:**
-Create `design.md` if any of the following apply; otherwise omit it:
+   Create `design.md` if any of the following apply; otherwise omit it:
 
 - Cross-cutting change (multiple services/modules) or a new architectural pattern
 - New external dependency or significant data model changes
@@ -233,23 +244,29 @@ Minimal `design.md` skeleton:
 
 ```markdown
 ## Context
+
 [Background, constraints, stakeholders]
 
 ## Goals / Non-Goals
+
 - Goals: [...]
 - Non-Goals: [...]
 
 ## Decisions
+
 - Decision: [What and why]
 - Alternatives considered: [Options + rationale]
 
 ## Risks / Trade-offs
+
 - [Risk] → Mitigation
 
 ## Migration Plan
+
 [Steps, rollback]
 
 ## Open Questions
+
 - [...]
 ```
 
@@ -261,6 +278,7 @@ Minimal `design.md` skeleton:
 
 ```markdown
 #### Scenario: User login success
+
 - **WHEN** valid credentials provided
 - **THEN** return JWT token
 ```
@@ -268,9 +286,10 @@ Minimal `design.md` skeleton:
 **WRONG** (don't use bullets or bold):
 
 ```markdown
-- **Scenario: User login**  ❌
-**Scenario**: User login     ❌
-### Scenario: User login      ❌
+- **Scenario: User login** ❌
+  **Scenario**: User login ❌
+
+### Scenario: User login ❌
 ```
 
 Every requirement MUST have at least one scenario.
@@ -298,15 +317,16 @@ Common pitfall: Using MODIFIED to add a new concern without including the previo
 
 Authoring a MODIFIED requirement correctly:
 
-1) Locate the existing requirement in `openspec/specs/<capability>/spec.md`.
-2) Copy the entire requirement block (from `### Requirement: ...` through its scenarios).
-3) Paste it under `## MODIFIED Requirements` and edit to reflect the new behavior.
-4) Ensure the header text matches exactly (whitespace-insensitive) and keep at least one `#### Scenario:`.
+1. Locate the existing requirement in `openspec/specs/<capability>/spec.md`.
+2. Copy the entire requirement block (from `### Requirement: ...` through its scenarios).
+3. Paste it under `## MODIFIED Requirements` and edit to reflect the new behavior.
+4. Ensure the header text matches exactly (whitespace-insensitive) and keep at least one `#### Scenario:`.
 
 Example for RENAMED:
 
 ```markdown
 ## RENAMED Requirements
+
 - FROM: `### Requirement: Login`
 - TO: `### Requirement: User Authentication`
 ```
@@ -391,7 +411,9 @@ auth/spec.md
 
 ```markdown
 ## ADDED Requirements
+
 ### Requirement: Two-Factor Authentication
+
 ...
 ```
 
@@ -399,7 +421,9 @@ notifications/spec.md
 
 ```markdown
 ## ADDED Requirements
+
 ### Requirement: OTP Email Notification
+
 ...
 ```
 
@@ -441,11 +465,11 @@ Only add complexity with:
 
 ## Tool Selection Guide
 
-| Task | Tool | Why |
-|------|------|-----|
-| Find files by pattern | Glob | Fast pattern matching |
-| Search code content | Grep | Optimized regex search |
-| Read specific files | Read | Direct file access |
+| Task                  | Tool | Why                      |
+| --------------------- | ---- | ------------------------ |
+| Find files by pattern | Glob | Fast pattern matching    |
+| Search code content   | Grep | Optimized regex search   |
+| Read specific files   | Read | Direct file access       |
 | Explore unknown scope | Task | Multi-step investigation |
 
 ## Error Recovery

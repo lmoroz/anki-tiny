@@ -1,61 +1,61 @@
 <script setup>
-  import { computed, useTemplateRef } from 'vue'
+  import { computed, useTemplateRef } from 'vue';
 
   const props = defineProps({
     modelValue: {
       type: [String, Number],
-      default: ''
+      default: '',
     },
     type: {
       type: String,
       default: 'text',
-      validator: value => ['text', 'textarea', 'number', 'email', 'password'].includes(value)
+      validator: (value) => ['text', 'textarea', 'number', 'email', 'password'].includes(value),
     },
     placeholder: {
       type: String,
-      default: ''
+      default: '',
     },
     disabled: {
       type: Boolean,
-      default: false
+      default: false,
     },
     error: {
       type: String,
-      default: ''
+      default: '',
     },
     label: {
       type: String,
-      default: ''
+      default: '',
     },
     rows: {
       type: Number,
-      default: 4
+      default: 4,
     },
     stacked: {
       type: Boolean,
-      default: false
-    }
-  })
+      default: false,
+    },
+  });
 
-  const emit = defineEmits(['update:modelValue'])
+  const emit = defineEmits(['update:modelValue']);
 
-  const inputElRef = useTemplateRef('inputEl')
+  const inputElRef = useTemplateRef('inputEl');
 
   const inputClasses = computed(() => {
-    return ['input-field', { 'input-error': props.error }]
-  })
+    return ['input-field', { 'input-error': props.error }];
+  });
 
-  const handleInput = event => {
-    emit('update:modelValue', event.target.value)
-  }
+  const handleInput = (event) => {
+    emit('update:modelValue', event.target.value);
+  };
 
   const putFocus = () => {
-    if (inputElRef.value) inputElRef.value.focus()
-  }
+    if (inputElRef.value) inputElRef.value.focus();
+  };
 
   defineExpose({
-    focus: putFocus
-  })
+    focus: putFocus,
+  });
 </script>
 
 <template>
@@ -70,10 +70,12 @@
       v-if="type === 'textarea' && stacked"
       class="relative w-full mb-8">
       <!-- Bottom Stack Layer -->
-      <div class="absolute inset-0 bg-gray-700 rounded-2xl transform translate-y-5 scale-[0.95] border border-white/5 z-0 opacity-70" />
+      <div
+        class="absolute inset-0 bg-gray-700 rounded-2xl transform translate-y-5 scale-[0.95] border border-white/5 z-0 opacity-70" />
 
       <!-- Middle Stack Layer -->
-      <div class="absolute inset-0 bg-gray-700 rounded-2xl transform translate-y-1.75 scale-[0.975] border border-white/5 z-0 opacity-70" />
+      <div
+        class="absolute inset-0 bg-gray-700 rounded-2xl transform translate-y-1.75 scale-[0.975] border border-white/5 z-0 opacity-70" />
 
       <!-- Top Layer (Actual Textarea) -->
       <textarea

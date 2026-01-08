@@ -15,12 +15,14 @@
 ### Phase 1: Architecture & Foundation ✅
 
 **Stack выбран**:
+
 - Frontend: Vue 3 + Vite + TailwindCSS v4 + Pinia
 - Backend: Node.js + TypeScript + Express + Electron
 - Database: SQLite + Kysely (query builder)
 - Algorithm: ts-fsrs v5.2+
 
 **Реализовано**:
+
 - Feature-Sliced Design для frontend
 - Layered Architecture для backend
 - Custom protocol `lmorozanki://` для Electron
@@ -32,6 +34,7 @@
 **OpenSpec Change**: `2026-01-06-systemize-styling`
 
 **Реализовано**:
+
 - Централизованная система CSS-переменных
 - Dark/Light theme support
 - Design tokens (colors, typography, shadows, borders)
@@ -39,17 +42,20 @@
 - Responsive design система
 
 **Файлы**:
+
 - `frontend/src/app/assets/css/styles.css` — centralized CSS variables
 
 ### Phase 3: Settings System ✅
 
 **OpenSpec Changes**:
+
 - `2026-01-06-add-settings-page`
 - `2026-01-06-replace-time-selects`
 
 **Реализовано**:
 
 #### Global Settings
+
 - Training time range (trainingStartTime, trainingEndTime)
 - FSRS parameters:
   - `learningSteps` — массив интервалов в минутах (e.g., [10, 1440, 4320])
@@ -64,18 +70,21 @@
 - Notifications toggle
 
 #### Course Settings
+
 - Полное наследование от global settings
 - Возможность override любого параметра
 - `null` = inherit from global
 - Individual time ranges, FSRS params, limits per course
 
 #### UI Components
+
 - **ScrollTimePicker.vue** — generic scroll picker для hour/minute selection
 - **TimeRangePicker.vue** — диапазон времени с двумя парами пикеров
 - **SettingsForm.vue** — unified form для global и course settings
 - **CourseSettingsModal.vue** — modal для редактирования настроек курса
 
 **Specs**:
+
 - `settings-global-management`
 - `settings-course-management`
 - `settings-ui`
@@ -83,6 +92,7 @@
 ### Phase 4: Course & Card Management ✅
 
 **OpenSpec Changes**:
+
 - `2026-01-07-redesign-course-layout`
 - `2026-01-07-card-edit-form`
 - `2026-01-07-add-batch-card-delete`
@@ -90,6 +100,7 @@
 **Реализовано**:
 
 #### Course Management
+
 - Full CRUD operations
 - Course statistics на главной странице:
   - Total cards count
@@ -99,6 +110,7 @@
 - Settings inheritance visualization
 
 #### Card Management
+
 - Full CRUD с модальными окнами
 - **QuickAdd режим** — inline добавление карточек
 - **Batch Add** — массовое добавление через текст (`question | answer` format)
@@ -109,12 +121,14 @@
   - Visual feedback (scroll to card + bounce animation)
 
 #### Visual Feedback
+
 - `useScrollAndHighlight` composable для прокрутки к карточке
 - Bounce animation (`bounce-in-bck`) при создании/редактировании
 - Opacity transitions в selection mode
 - Custom checkbox component с gradient styling
 
 **Specs**:
+
 - `course-ui`
 
 ### Phase 5: Training System ✅
@@ -124,12 +138,14 @@
 **Реализовано**:
 
 #### FSRS Integration
+
 - Full ts-fsrs v5 integration
 - Custom parameters support
 - Card states: New, Learning, Review, Relearning
 - FSRS metrics: stability, difficulty, scheduled days, reps, lapses
 
 #### Training Page
+
 - Card-based review interface
 - Flip animation (click to reveal answer)
 - Answer buttons:
@@ -167,6 +183,7 @@
    - Lazy reset: check on each request, no cron needed
 
 **Формула расчета**:
+
 ```
 availableCards = min(
   sessionLimit,
@@ -176,15 +193,18 @@ availableCards = min(
 ```
 
 **API**:
+
 - `GET /api/courses/:courseId/due-cards?session=true` — returns cards with limit metadata
 - `POST /api/training/review` — updates daily progress
 - `GET /api/training/stats` — retrieves daily statistics
 
 **Services**:
+
 - `limitService.ts` — business logic для расчета лимитов
 - `progressRepository.ts` — отслеживание дневного прогресса
 
 **Specs**:
+
 - `training-limits`
 
 ### Phase 6: UI Enhancements ✅
@@ -196,6 +216,7 @@ availableCards = min(
 #### Custom Dialogs & Notifications
 
 **Toast Notifications** (vue3-toastify):
+
 - Position: top-right
 - AutoClose: 3000ms
 - Theme: auto (light/dark)
@@ -203,6 +224,7 @@ availableCards = min(
 - CSS variables integration
 
 **Custom ConfirmDialog**:
+
 - Modal dialog с backdrop
 - Props: title, message, confirmText, cancelText
 - Animations: fadeIn (backdrop), slideIn (content), 300ms ease
@@ -210,29 +232,35 @@ availableCards = min(
 - Accessibility: `role="dialog"`, `aria-modal="true"`, keyboard nav
 
 **useConfirm Composable**:
+
 - Promise-based API: `const {confirm} = useConfirm()`
 - Usage: `const result = await confirm(message | options)`
 - Returns: Promise<boolean>
 - Dynamic mounting/unmounting
 
 **Migration**:
+
 - Replaced 4× `alert()` calls → toasts
 - Replaced 5× `confirm()` calls → custom dialog
 - Полная замена нативных диалогов
 
 **Specs**:
+
 - `ui-notifications`
 
 #### Button Component Extensions
 
 **New sizes**:
+
 - `xs` — 4px/8px padding, extra small text
 
 **New variants**:
+
 - `success` — green theme для положительных действий
 - `ghost` — transparent background, border only
 
 **Improvements**:
+
 - Enhanced shadows: `0 10px 20px -5px` (deeper, modern)
 - All sizes use CSS variables
 - Better hover states
@@ -242,6 +270,7 @@ availableCards = min(
 **Latest Changes** (2026-01-08):
 
 #### Course Statistics on Home Page
+
 - Backend: `cardRepository.getAllCoursesStats()` — one query for all courses
 - API: `GET /api/courses` теперь возвращает `stats` для каждого курса
 - Frontend: `CourseCard.vue` footer displays:
@@ -250,6 +279,7 @@ availableCards = min(
   - Last training date (human-readable: "сегодня", "вчера", "3 дня назад")
 
 #### Training UI Redesign
+
 - Complete rewrite of `TrainingPage.vue`
 - Card flip animations
 - Answer buttons with visual feedback
@@ -257,10 +287,12 @@ availableCards = min(
 - Limit counters with badges
 
 **Files Modified** (last session):
+
 - Backend: `cardRepository.ts`, `courses.ts`
 - Frontend: `CourseCard.vue`, `TrainingPage.vue`, `Button.vue`, `styles.css`
 
 #### Data Model Simplification
+
 - **Removed `elapsedDays` field**:
   - Не используется FSRS (рассчитывается внутренне)
   - Упрощена модель данных
@@ -386,30 +418,35 @@ backend/src/
 ## Key Technical Decisions
 
 ### 1. FSRS Integration
+
 - Используем `ts-fsrs` v5.2+ (latest stable)
 - Custom parameters: learningSteps, requestRetention, maximumInterval, enableFuzz
 - Card states: New, Learning, Review, Relearning
 - Progress reset при редактировании карточки (card becomes New)
 
 ### 2. Limits System
+
 - 4-tier hierarchy для гибкого контроля
 - Daily reset based on `trainingStartTime` (NOT midnight) — matches user's actual day cycle
 - Lazy reset (no cron jobs) — check on each request
 - First-come first-served между курсами для global limits
 
 ### 3. Settings Architecture
+
 - Inheritance pattern: null = inherit from global/default
 - Partial<Settings> для course settings
 - Unified SettingsForm component для global и course
 - Time stored as "HH:MM" strings (easy to display/validate)
 
 ### 4. UI/UX Patterns
+
 - Custom dialogs вместо нативных (consistent design, theme support)
 - Visual feedback для всех user actions (animations, toasts)
 - Responsive design с slide-out panels на mobile
 - Accessibility: ARIA, keyboard navigation, focus management
 
 ### 5. Database Design
+
 - SQLite с migration system (table `_migrations`)
 - Kysely для type-safe queries
 - Transaction support для batch operations
@@ -420,22 +457,26 @@ backend/src/
 ## Code Quality Standards
 
 ### Formatting
+
 - Indentation: 2 spaces
 - Line endings: LF (Unix)
 - Encoding: UTF-8
 - Max line length: 160 (code), 120 (markdown)
 
 ### Code Style
+
 - If/else: opening brace on same line, `else` on new line
 - Single statement: no braces (one-line)
 - Multiple statements: braces required
 
 ### Imports (Frontend)
+
 - Always use `@` alias for src imports
 - Never use relative paths (`../`, `./`)
 - No manual Vue component imports (unplugin-vue-components)
 
 ### Vue Files
+
 - `<script setup>` block always ABOVE `<template>`
 
 ---
@@ -471,6 +512,7 @@ backend/src/
 ## Conclusion
 
 **v0.5.0** — полнофункциональное SRS-приложение с:
+
 - ✅ FSRS v5 algorithm
 - ✅ Гибкой системой настроек
 - ✅ 4-уровневыми лимитами

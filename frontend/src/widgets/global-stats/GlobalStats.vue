@@ -1,15 +1,15 @@
 <script setup>
-  import { onMounted } from 'vue'
-  import { useStatsStore } from '@/entities/stats/model/useStatsStore'
+  import { onMounted } from 'vue';
+  import { useStatsStore } from '@/entities/stats/model/useStatsStore';
 
-  const statsStore = useStatsStore()
+  const statsStore = useStatsStore();
 
   onMounted(() => {
-    statsStore.fetchGlobalStats()
-  })
+    statsStore.fetchGlobalStats();
+  });
 
   function handleRetry() {
-    statsStore.fetchGlobalStats()
+    statsStore.fetchGlobalStats();
   }
 </script>
 

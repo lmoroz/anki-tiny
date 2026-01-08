@@ -15,18 +15,20 @@
   - Import CSS: `import 'vue-scroll-picker/style.css'`
   - Implement **universal** wrapper with props: `modelValue`, `min`, `max`, `step`, `suffix`, `formatDigits`, `disabled`
   - Implement computed `options` array generator:
+
     ```js
     const options = computed(() => {
       const result = [];
-      for (let i = props.min ?? 0; i <= (props.max ?? 23); i += (props.step ?? 1)) {
+      for (let i = props.min ?? 0; i <= (props.max ?? 23); i += props.step ?? 1) {
         result.push({
-          name: i.toString().padStart(props.formatDigits ?? 2, '0') + (props.suffix || ''),
-          value: i
+          name: i.toString().padStart(props.formatDigits ?? 2, "0") + (props.suffix || ""),
+          value: i,
         });
       }
       return result;
     });
     ```
+
   - Test cases: hours (0-23), minutes all (0-59), minutes with step (0, 15, 30, 45)
   - Apply design system styles using CSS variables
   - **Validation:** Test with different configurations (hours, minutes with step 5, minutes with step 15)

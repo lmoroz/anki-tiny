@@ -1,30 +1,30 @@
 <script setup>
-  import { ref, onMounted } from 'vue'
-  import { useRouter } from 'vue-router'
+  import { ref, onMounted } from 'vue';
+  import { useRouter } from 'vue-router';
 
-  const router = useRouter()
-  const isMaximized = ref(false)
+  const router = useRouter();
+  const isMaximized = ref(false);
 
   const handleMinimize = () => {
-    window.electronAPI?.minimize()
-  }
+    window.electronAPI?.minimize();
+  };
 
   const handleToggleMaximize = () => {
-    window.electronAPI?.toggleMaximize()
-    isMaximized.value = !isMaximized.value
-  }
+    window.electronAPI?.toggleMaximize();
+    isMaximized.value = !isMaximized.value;
+  };
 
   const handleClose = () => {
-    window.electronAPI?.close()
-  }
+    window.electronAPI?.close();
+  };
 
   const handleOpenSettings = () => {
-    router.push('/settings')
-  }
+    router.push('/settings');
+  };
 
   onMounted(() => {
-    console.log('[TitleBar] Mounted')
-  })
+    console.log('[TitleBar] Mounted');
+  });
 </script>
 
 <template>

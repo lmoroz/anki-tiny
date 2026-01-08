@@ -1,53 +1,53 @@
 <script setup>
-  import { ref, onMounted, computed, onUnmounted, watch, nextTick, useTemplateRef } from 'vue'
-  import { useRoute, useRouter } from 'vue-router'
-  import { useMediaQuery } from '@vueuse/core'
-  import { useFocusTrap } from '@vueuse/integrations/useFocusTrap'
-  import MarkdownIt from 'markdown-it'
-  import hljs from 'highlight.js'
-  import 'highlight.js/styles/github-dark.css' // Стиль подсветки (можно выбрать другой)
-  import { useConfirm } from '@/shared/lib/useConfirm'
-  import { useCourseStore } from '@/entities/course/model/useCourseStore'
-  import { useCardStore } from '@/entities/card/model/useCardStore'
-  import { useSettingsStore } from '@/entities/settings/model/useSettingsStore'
-  import { useTrainingStore } from '@/entities/training/model/useTrainingStore'
-  import { toast } from 'vue3-toastify'
+  import { ref, onMounted, computed, onUnmounted, watch, nextTick, useTemplateRef } from 'vue';
+  import { useRoute, useRouter } from 'vue-router';
+  import { useMediaQuery } from '@vueuse/core';
+  import { useFocusTrap } from '@vueuse/integrations/useFocusTrap';
+  import MarkdownIt from 'markdown-it';
+  import hljs from 'highlight.js';
+  import 'highlight.js/styles/github-dark.css'; // Стиль подсветки (можно выбрать другой)
+  import { useConfirm } from '@/shared/lib/useConfirm';
+  import { useCourseStore } from '@/entities/course/model/useCourseStore';
+  import { useCardStore } from '@/entities/card/model/useCardStore';
+  import { useSettingsStore } from '@/entities/settings/model/useSettingsStore';
+  import { useTrainingStore } from '@/entities/training/model/useTrainingStore';
+  import { toast } from 'vue3-toastify';
 
-  const route = useRoute()
-  const router = useRouter()
-  const courseId = parseInt(route.params.id, 10)
+  const route = useRoute();
+  const router = useRouter();
+  const courseId = parseInt(route.params.id, 10);
 
   // Stores
-  const courseStore = useCourseStore()
-  const cardStore = useCardStore()
-  const settingsStore = useSettingsStore()
-  const trainingStore = useTrainingStore()
+  const courseStore = useCourseStore();
+  const cardStore = useCardStore();
+  const settingsStore = useSettingsStore();
+  const trainingStore = useTrainingStore();
 
   // State
-  const isLoading = ref(true)
-  const showEditorModal = ref(false)
-  const editingCard = ref(null)
-  const showSettingsModal = ref(false)
-  const quickAddCardRef = ref(null)
-  const cardListDesktopRef = ref(null)
-  const cardListMobileRef = ref(null)
-  const trainingStats = ref(null)
+  const isLoading = ref(true);
+  const showEditorModal = ref(false);
+  const editingCard = ref(null);
+  const showSettingsModal = ref(false);
+  const quickAddCardRef = ref(null);
+  const cardListDesktopRef = ref(null);
+  const cardListMobileRef = ref(null);
+  const trainingStats = ref(null);
 
   // Responsive layout state
-  const isDesktop = useMediaQuery('(min-width: 1025px)')
-  const isCardsPanelOpen = ref(false)
-  const cardsPanelRef = useTemplateRef('cardsPanel')
-  let focusTrap
+  const isDesktop = useMediaQuery('(min-width: 1025px)');
+  const isCardsPanelOpen = ref(false);
+  const cardsPanelRef = useTemplateRef('cardsPanel');
+  let focusTrap;
 
   // Selection Mode State
-  const isSelectionMode = ref(false)
-  const selectedCardIds = ref(new Set())
+  const isSelectionMode = ref(false);
+  const selectedCardIds = ref(new Set());
 
   // Computed
-  const course = computed(() => courseStore.getCourseById(courseId))
-  const cards = computed(() => cardStore.getCardsByCourse(courseId))
-  const stats = computed(() => cardStore.getCourseStats(courseId))
-  const cardsLoading = computed(() => cardStore.loading)
+  const course = computed(() => courseStore.getCourseById(courseId));
+  const cards = computed(() => cardStore.getCardsByCourse(courseId));
+  const stats = computed(() => cardStore.getCourseStats(courseId));
+  const cardsLoading = computed(() => cardStore.loading);
 
   // Инициализация парсера Markdown с настройкой подсветки
   const md = new MarkdownIt({
@@ -57,244 +57,244 @@
     highlight: function (str, lang) {
       if (lang && hljs.getLanguage(lang)) {
         try {
-          return hljs.highlight(str, { language: lang }).value
+          return hljs.highlight(str, { language: lang }).value;
         } catch (__) {}
       }
-      return '' // Использовать стандартное экранирование, если язык не найден
-    }
-  })
+      return ''; // Использовать стандартное экранирование, если язык не найден
+    },
+  });
 
   // Преобразуем markdown-текст вопроса в HTML
   const parsedDescription = computed(() => {
-    if (!course.value?.description) return ''
-    return md.render(course.value?.description)
-  })
+    if (!course.value?.description) return '';
+    return md.render(course.value?.description);
+  });
 
-  const handleKeydown = e => {
+  const handleKeydown = (e) => {
     if (e.key === 'Escape' && isCardsPanelOpen.value) {
-      closeCardsPanel()
+      closeCardsPanel();
     }
-  }
+  };
 
   onMounted(async () => {
-    isLoading.value = true
+    isLoading.value = true;
     try {
       await Promise.all([
         courseStore.fetchCourses(),
         cardStore.fetchCourseStats(courseId),
         cardStore.fetchCardsByCourse(courseId),
-        settingsStore.fetchGlobalSettings('CoursePage onMounted')
-      ])
+        settingsStore.fetchGlobalSettings('CoursePage onMounted'),
+      ]);
 
       // Fetch stats
-      const dailyStats = await trainingStore.fetchDailyStats()
+      const dailyStats = await trainingStore.fetchDailyStats();
       if (dailyStats) {
-        trainingStats.value = dailyStats.courses.find(c => c.courseId === courseId)
+        trainingStats.value = dailyStats.courses.find((c) => c.courseId === courseId);
       }
     } catch (error) {
-      console.error('Failed to load course data:', error)
-      toast.error('Ошибка загрузки данных курса')
+      console.error('Failed to load course data:', error);
+      toast.error('Ошибка загрузки данных курса');
     } finally {
-      isLoading.value = false
+      isLoading.value = false;
     }
     // Add keyboard listener for panel
-    window.addEventListener('keydown', handleKeydown)
-  })
+    window.addEventListener('keydown', handleKeydown);
+  });
 
   onUnmounted(() => {
-    window.removeEventListener('keydown', handleKeydown)
-    document.body.style.overflow = ''
+    window.removeEventListener('keydown', handleKeydown);
+    document.body.style.overflow = '';
     if (focusTrap) {
-      focusTrap.deactivate()
+      focusTrap.deactivate();
     }
-  })
+  });
 
   const handleBack = () => {
-    router.push('/')
-  }
+    router.push('/');
+  };
 
   const handleStartTraining = () => {
-    router.push(`/training/${courseId}`)
-  }
+    router.push(`/training/${courseId}`);
+  };
 
-  const handleQuickAdd = async cardData => {
+  const handleQuickAdd = async (cardData) => {
     try {
-      const newCard = await cardStore.createCard(courseId, cardData)
-      toast.success('Карточка создана!')
-      nextTick(() => scrollToCardWithBounce(newCard.id))
+      const newCard = await cardStore.createCard(courseId, cardData);
+      toast.success('Карточка создана!');
+      nextTick(() => scrollToCardWithBounce(newCard.id));
     } catch (err) {
-      console.error('Failed to create card:', err)
-      toast.error('Ошибка создания: ' + err.message)
+      console.error('Failed to create card:', err);
+      toast.error('Ошибка создания: ' + err.message);
     }
-  }
+  };
 
-  const handleEditCard = card => {
-    editingCard.value = card
-    showEditorModal.value = true
-  }
+  const handleEditCard = (card) => {
+    editingCard.value = card;
+    showEditorModal.value = true;
+  };
 
-  const handleDeleteCard = async card => {
-    const { confirm } = useConfirm()
-    const confirmed = await confirm('Удалить карточку?')
+  const handleDeleteCard = async (card) => {
+    const { confirm } = useConfirm();
+    const confirmed = await confirm('Удалить карточку?');
 
     if (confirmed) {
       try {
-        await cardStore.deleteCard(card.id, courseId)
-        toast.success('Карточка удалена!')
+        await cardStore.deleteCard(card.id, courseId);
+        toast.success('Карточка удалена!');
       } catch (err) {
-        console.error('Failed to delete card:', err)
-        toast.error('Ошибка удаления: ' + err.message)
+        console.error('Failed to delete card:', err);
+        toast.error('Ошибка удаления: ' + err.message);
       }
     }
-  }
+  };
 
-  const handleToggleCardSelection = card => {
+  const handleToggleCardSelection = (card) => {
     if (selectedCardIds.value.has(card.id)) {
-      selectedCardIds.value.delete(card.id)
+      selectedCardIds.value.delete(card.id);
     } else {
-      selectedCardIds.value.add(card.id)
+      selectedCardIds.value.add(card.id);
     }
     // Force reactivity
-    selectedCardIds.value = new Set(selectedCardIds.value)
-  }
+    selectedCardIds.value = new Set(selectedCardIds.value);
+  };
 
   const handleBatchDelete = async () => {
-    const { confirm } = useConfirm()
-    const count = selectedCardIds.value.size
+    const { confirm } = useConfirm();
+    const count = selectedCardIds.value.size;
     const confirmed = await confirm({
       title: 'Удаление карточек',
-      message: `Удалить выбранные карточки (${count})?`
-    })
+      message: `Удалить выбранные карточки (${count})?`,
+    });
 
     if (confirmed) {
       try {
-        await cardStore.deleteBatchCards(Array.from(selectedCardIds.value), courseId)
-        toast.success('Карточки удалены!')
-        exitSelectionMode()
+        await cardStore.deleteBatchCards(Array.from(selectedCardIds.value), courseId);
+        toast.success('Карточки удалены!');
+        exitSelectionMode();
       } catch (err) {
-        console.error('Failed to batch delete cards:', err)
-        toast.error('Ошибка удаления: ' + err.message)
+        console.error('Failed to batch delete cards:', err);
+        toast.error('Ошибка удаления: ' + err.message);
       }
     }
-  }
+  };
 
   const handleDeleteAllCards = async () => {
-    const { confirm } = useConfirm()
-    const count = cards.value.length
+    const { confirm } = useConfirm();
+    const count = cards.value.length;
     const confirmed = await confirm({
       title: 'Удаление всех карточек',
       message: `Вы уверены, что хотите удалить ВСЕ карточки курса (${count})?\n\nЭто действие необратимо!`,
       confirmText: 'Удалить все',
-      cancelText: 'Отмена'
-    })
+      cancelText: 'Отмена',
+    });
 
     if (confirmed) {
       try {
-        await cardStore.deleteAllCards(courseId)
-        toast.success('Все карточки удалены!')
+        await cardStore.deleteAllCards(courseId);
+        toast.success('Все карточки удалены!');
       } catch (err) {
-        console.error('Failed to delete all cards:', err)
-        toast.error('Ошибка удаления: ' + err.message)
+        console.error('Failed to delete all cards:', err);
+        toast.error('Ошибка удаления: ' + err.message);
       }
     }
-  }
+  };
 
   const exitSelectionMode = () => {
-    isSelectionMode.value = false
-    selectedCardIds.value.clear()
-  }
+    isSelectionMode.value = false;
+    selectedCardIds.value.clear();
+  };
 
-  const handleSaveCard = async data => {
+  const handleSaveCard = async (data) => {
     try {
       if (editingCard.value) {
         // Режим редактирования
-        await cardStore.updateCard(editingCard.value.id, { ...data, resetProgress: true })
-        toast.success('Карточка обновлена!')
-        const editedCardId = editingCard.value.id
+        await cardStore.updateCard(editingCard.value.id, { ...data, resetProgress: true });
+        toast.success('Карточка обновлена!');
+        const editedCardId = editingCard.value.id;
 
         // Обновляем список карточек
-        await cardStore.fetchCardsByCourse(courseId)
-        handleCloseModal()
+        await cardStore.fetchCardsByCourse(courseId);
+        handleCloseModal();
 
         // Прокручиваем к отредактированной карточке с анимацией
         nextTick(() => {
-          scrollToCardWithBounce(editedCardId)
-        })
+          scrollToCardWithBounce(editedCardId);
+        });
       } else {
         // Режим создания
-        const newCard = await cardStore.createCard(courseId, data)
-        toast.success('Карточка создана!')
-        handleCloseModal()
+        const newCard = await cardStore.createCard(courseId, data);
+        toast.success('Карточка создана!');
+        handleCloseModal();
 
         nextTick(() => {
-          scrollToCardWithBounce(newCard.id)
-        })
+          scrollToCardWithBounce(newCard.id);
+        });
       }
     } catch (err) {
-      console.error('Failed to save card:', err)
-      toast.error('Ошибка сохранения: ' + err.message)
+      console.error('Failed to save card:', err);
+      toast.error('Ошибка сохранения: ' + err.message);
     }
-  }
+  };
 
   const handleCloseModal = () => {
-    showEditorModal.value = false
-    editingCard.value = null
-  }
+    showEditorModal.value = false;
+    editingCard.value = null;
+  };
 
   const handleCreateCard = () => {
-    editingCard.value = null
-    showEditorModal.value = true
-  }
+    editingCard.value = null;
+    showEditorModal.value = true;
+  };
 
   const handleOpenSettings = () => {
-    showSettingsModal.value = true
-  }
+    showSettingsModal.value = true;
+  };
 
   const handleCloseSettings = () => {
-    showSettingsModal.value = false
-  }
+    showSettingsModal.value = false;
+  };
 
   const handleSettingsSaved = () => {
-    console.log('Settings saved for course:', courseId)
-  }
+    console.log('Settings saved for course:', courseId);
+  };
 
   // MobilePanel controls
   const openCardsPanel = () => {
-    isCardsPanelOpen.value = true
-    document.body.style.overflow = 'hidden'
-  }
+    isCardsPanelOpen.value = true;
+    document.body.style.overflow = 'hidden';
+  };
 
   const closeCardsPanel = () => {
-    isCardsPanelOpen.value = false
-    document.body.style.overflow = ''
-  }
+    isCardsPanelOpen.value = false;
+    document.body.style.overflow = '';
+  };
 
-  const scrollToCardWithBounce = async cardId => {
-    if (!isDesktop.value && !isCardsPanelOpen.value) openCardsPanel()
-    await nextTick()
-    const cardListComponent = isDesktop.value ? cardListDesktopRef.value : cardListMobileRef.value
-    if (cardListComponent) cardListComponent.scrollToCardWithBounce(cardId)
-  }
+  const scrollToCardWithBounce = async (cardId) => {
+    if (!isDesktop.value && !isCardsPanelOpen.value) openCardsPanel();
+    await nextTick();
+    const cardListComponent = isDesktop.value ? cardListDesktopRef.value : cardListMobileRef.value;
+    if (cardListComponent) cardListComponent.scrollToCardWithBounce(cardId);
+  };
 
   // Watchers
-  watch(isCardsPanelOpen, async isOpen => {
+  watch(isCardsPanelOpen, async (isOpen) => {
     if (isOpen && !isDesktop.value) {
-      await nextTick()
+      await nextTick();
       if (cardsPanelRef.value) {
         focusTrap = useFocusTrap(cardsPanelRef, {
           clickOutsideDeactivates: true,
           escapeDeactivates: false, // We handle Escape manually in handleKeydown
-          fallbackFocus: '.panel-close-btn'
-        })
-        focusTrap.activate()
+          fallbackFocus: '.panel-close-btn',
+        });
+        focusTrap.activate();
       }
     } else {
       if (focusTrap) {
-        focusTrap.deactivate()
-        focusTrap = null
+        focusTrap.deactivate();
+        focusTrap = null;
       }
     }
-  })
+  });
 </script>
 
 <template>
@@ -330,7 +330,10 @@
           <Card
             class="mb-6"
             padding="lg">
-            <h1 class="course-title lg:mb-2 md:mb-1 sm:mb-1 text-3xl font-bold text-white leading-tight tracking-tight drop-shadow-sm">{{ course?.name }}</h1>
+            <h1
+              class="course-title lg:mb-2 md:mb-1 sm:mb-1 text-3xl font-bold text-white leading-tight tracking-tight drop-shadow-sm">
+              {{ course?.name }}
+            </h1>
             <div
               v-if="course?.description"
               class="course-description lg:mb-2 md:mb-1 sm:mb-1 rounded-[12px] p-3 text-gray-100 leading-relaxed shadow-xl bg-gray-500/20 border border-white/30 backdrop-blur-md bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.15)_0%,transparent_50%)]"
@@ -396,7 +399,11 @@
                 @click="handleStartTraining">
                 <span class="text-lg font-semibold text-white drop-shadow-md tracking-wide">
                   <i class="bi bi-play-fill" />
-                  {{ stats && stats.dueToday > 0 ? `Начать тренировку (${stats.dueToday})` : 'Нет карточек для повторения' }}
+                  {{
+                    stats && stats.dueToday > 0
+                      ? `Начать тренировку (${stats.dueToday})`
+                      : 'Нет карточек для повторения'
+                  }}
                 </span>
               </Button>
             </div>

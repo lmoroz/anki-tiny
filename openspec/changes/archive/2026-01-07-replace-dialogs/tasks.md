@@ -41,7 +41,7 @@
 
 ```javascript
 const { confirm } = useConfirm();
-const result = await confirm('Test message');
+const result = await confirm("Test message");
 console.log(result); // true или false
 ```
 
@@ -53,9 +53,9 @@ console.log(result); // true или false
 
 - [x] Добавить import `toast` из `'vue3-toastify'`
 - [x] **Line 48**: заменить `alert('Глобальные настройки сохранены!')` на
-  `toast.success('Глобальные настройки сохранены!')`
+      `toast.success('Глобальные настройки сохранены!')`
 - [x] **Line 50**: заменить `alert('Ошибка сохранения: ' + error.message)` на
-  `toast.error('Ошибка сохранения: ' + error.message)`
+      `toast.error('Ошибка сохранения: ' + error.message)`
 
 **Verification**: Открыть SettingsPage, сохранить настройки с успехом и с ошибкой (отключив backend), проверить toast
 
@@ -65,9 +65,9 @@ console.log(result); // true или false
 
 - [x] Добавить import `toast` из `'vue3-toastify'`
 - [x] **Line 40**: заменить `alert('Ошибка при удалении курса...')` на
-  `toast.error('Ошибка при удалении курса. Попробуйте еще раз.')`
+      `toast.error('Ошибка при удалении курса. Попробуйте еще раз.')`
 - [x] **Line 58**: заменить `alert('Ошибка при сохранении курса...')` на
-  `toast.error('Ошибка при сохранении курса. Попробуйте еще раз.')`
+      `toast.error('Ошибка при сохранении курса. Попробуйте еще раз.')`
 
 **Verification**: Открыть HomePage, симулировать ошибку (отключив backend), проверить toast
 
@@ -80,11 +80,13 @@ console.log(result); // true или false
 - [x] Добавить import `useConfirm` из `'@/shared/lib/useConfirm'`
 - [x] Получить `confirm` из `useConfirm()` composable
 - [x] **Line 81**: заменить `if (confirm('Сбросить настройки к глобальным?'))` на:
+
   ```javascript
   const {confirm} = useConfirm();
   const confirmed = await confirm('Сбросить настройки к глобальным?');
   if (confirmed)
   ```
+
 - [x] Сделать метод обработчика `async`
 
 **Verification**: Открыть CourseSettingsModal, нажать "Сбросить к глобальным", проверить ConfirmDialog
@@ -96,15 +98,17 @@ console.log(result); // true или false
 - [x] Добавить import `useConfirm` из `'@/shared/lib/useConfirm'`
 - [x] Получить `confirm` из `useConfirm()` composable
 - [x] **Line 34**: заменить `const confirmed = confirm(\`Вы уверены...\`)` на:
+
   ```javascript
-  const {confirm} = useConfirm();
+  const { confirm } = useConfirm();
   const confirmed = await confirm({
-    title: 'Удаление курса',
+    title: "Удаление курса",
     message: `Вы уверены, что хотите удалить курс "${course.name}"?`,
-    confirmText: 'Удалить',
-    cancelText: 'Отмена'
+    confirmText: "Удалить",
+    cancelText: "Отмена",
   });
   ```
+
 - [x] Сделать метод `deleteCourse` async
 
 **Verification**: Открыть HomePage, удалить курс, проверить ConfirmDialog с кастомными текстами кнопок
@@ -116,26 +120,32 @@ console.log(result); // true или false
 - [x] Добавить import `useConfirm` из `'@/shared/lib/useConfirm'`
 - [x] Получить `confirm` из `useConfirm()` composable
 - [x] **Line 117**: заменить `const confirmed = confirm('Удалить карточку?')` на:
+
   ```javascript
-  const {confirm} = useConfirm();
-  const confirmed = await confirm('Удалить карточку?');
+  const { confirm } = useConfirm();
+  const confirmed = await confirm("Удалить карточку?");
   ```
+
 - [x] **Line 142**: заменить `const confirmed = confirm(\`Удалить выбранные карточки (\${count})?\`)` на:
+
   ```javascript
   const confirmed = await confirm({
-    title: 'Удаление карточек',
+    title: "Удаление карточек",
     message: `Удалить выбранные карточки (${count})?`,
   });
   ```
+
 - [x] **Line 156**: заменить `const confirmed = confirm(\`Вы уверены...\`)` на:
+
   ```javascript
   const confirmed = await confirm({
-    title: 'Удаление всех карточек',
+    title: "Удаление всех карточек",
     message: `Вы уверены, что хотите удалить ВСЕ карточки курса (${count})?\n\nЭто действие необратимо!`,
-    confirmText: 'Удалить все',
-    cancelText: 'Отмена'
+    confirmText: "Удалить все",
+    cancelText: "Отмена",
   });
   ```
+
 - [x] Сделать соответствующие методы async (`deleteCard`, `deleteSelectedCards`, `deleteAllCards`)
 
 **Verification**: Открыть CoursePage:

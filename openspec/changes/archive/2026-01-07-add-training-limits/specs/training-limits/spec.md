@@ -158,8 +158,8 @@
 
 1. Получить последний `updatedAt` из `dailyProgress` для курса
 2. Вычислить последний прошедший `trainingStartTime`:
-    - Если сейчас >= `trainingStartTime` сегодня → `trainingStartTime` сегодня
-    - Если сейчас < `trainingStartTime` сегодня → `trainingStartTime` вчера
+   - Если сейчас >= `trainingStartTime` сегодня → `trainingStartTime` сегодня
+   - Если сейчас < `trainingStartTime` сегодня → `trainingStartTime` вчера
 3. Если `updatedAt` < последний `trainingStartTime` → это новый день, сбросить лимиты
 4. Иначе → продолжение текущего дня, использовать существующий прогресс
 
@@ -234,11 +234,11 @@
 **THEN** ДОЛЖНЫ быть поля:
 
 - **Дневные лимиты:**
-    - "Новых карточек в день" — nullable, placeholder показывает глобальное значение
-    - "Повторений в день" — nullable, placeholder показывает глобальное значение
+  - "Новых карточек в день" — nullable, placeholder показывает глобальное значение
+  - "Повторений в день" — nullable, placeholder показывает глобальное значение
 - **Сессионные лимиты:**
-    - "Новых карточек за сессию" — число, default 10
-    - "Повторений за сессию" — число, default 50
+  - "Новых карточек за сессию" — число, default 10
+  - "Повторений за сессию" — число, default 50
 
 ---
 
@@ -276,25 +276,25 @@
 ```typescript
 // Глобальные настройки
 interface GlobalSettings {
-  globalNewCardsPerDay: number;     // default: 20
-  globalMaxReviewsPerDay: number;   // default: 200
+  globalNewCardsPerDay: number; // default: 20
+  globalMaxReviewsPerDay: number; // default: 200
 }
 
 // Курсовые настройки
 interface CourseSettings {
-  newCardsPerDay: number | null;        // default: наследуется от global
-  maxReviewsPerDay: number | null;      // default: наследуется от global
-  newCardsPerSession: number | null;    // default: 10
-  maxReviewsPerSession: number | null;  // default: 50
+  newCardsPerDay: number | null; // default: наследуется от global
+  maxReviewsPerDay: number | null; // default: наследуется от global
+  newCardsPerSession: number | null; // default: 10
+  maxReviewsPerSession: number | null; // default: 50
 }
 
 // Дневной прогресс
 interface DailyProgress {
   id: number;
-  date: string;                  // YYYY-MM-DD
+  date: string; // YYYY-MM-DD
   courseId: number;
-  newCardsStudied: number;       // сколько новых изучено
-  reviewsCompleted: number;      // сколько повторений выполнено
+  newCardsStudied: number; // сколько новых изучено
+  reviewsCompleted: number; // сколько повторений выполнено
   createdAt: string;
   updatedAt: string;
 }

@@ -32,7 +32,7 @@
 
 ```typescript
 const BatchDeleteSchema = z.object({
-  cardIds: z.array(z.number().int().positive()).min(1).max(100)
+  cardIds: z.array(z.number().int().positive()).min(1).max(100),
 });
 ```
 
@@ -188,14 +188,14 @@ async deleteAllCards(courseId: number): Promise<number> {
 <!-- Card Header -->
 <div class="card-header">
   <span class="state-badge">...</span>
-  
+
   <!-- Selection Mode: Show Checkbox -->
-  <CardCheckbox 
+  <CardCheckbox
     v-if="selectionMode"
     :checked="selected"
     @click.stop="emit('toggle-select')"
   />
-  
+
   <!-- Normal Mode: Show Edit/Delete -->
   <div v-else class="card-actions">
     <button @click="handleEdit">...</button>
@@ -209,9 +209,8 @@ async deleteAllCards(courseId: number): Promise<number> {
 ```typescript
 const handleCardClick = () => {
   if (props.selectionMode) {
-    emit('toggle-select');
-  }
-  else {
+    emit("toggle-select");
+  } else {
     toggleFlip();
   }
 };
@@ -256,18 +255,15 @@ const selectedCardIds = ref(new Set());
 const handleToggleCardSelection = (cardId: string) => {
   if (selectedCardIds.value.has(cardId)) {
     selectedCardIds.value.delete(cardId);
-  }
-  else {
+  } else {
     selectedCardIds.value.add(cardId);
   }
 };
 
 const handleBatchDelete = async () => {
   const count = selectedCardIds.value.size;
-  const confirmed = confirm(
-    `Удалить выбранные карточки (${count})?`
-  );
-  
+  const confirmed = confirm(`Удалить выбранные карточки (${count})?`);
+
   if (confirmed) {
     await cardStore.deleteBatchCards(Array.from(selectedCardIds.value), courseId);
     exitSelectionMode();
@@ -277,9 +273,9 @@ const handleBatchDelete = async () => {
 const handleDeleteAllCards = async () => {
   const count = cards.value.length;
   const confirmed = confirm(
-    `Вы уверены, что хотите удалить ВСЕ карточки курса (${count})?\\n\\nЭто действие необратимо!`
+    `Вы уверены, что хотите удалить ВСЕ карточки курса (${count})?\\n\\nЭто действие необратимо!`,
   );
-  
+
   if (confirmed) {
     await cardStore.deleteAllCards(courseId);
   }
@@ -328,16 +324,16 @@ const exitSelectionMode = () => {
 ```javascript
 export const cardsApi = {
   // ...existing methods
-  
+
   deleteBatch(courseId, cardIds) {
     return apiClient.delete(`/courses/${courseId}/cards/batch`, {
-      data: { cardIds }
+      data: { cardIds },
     });
   },
-  
+
   deleteAll(courseId) {
     return apiClient.delete(`/courses/${courseId}/cards`);
-  }
+  },
 };
 ```
 
@@ -355,19 +351,18 @@ async function deleteBatchCards(ids, courseId) {
   error.value = null;
   try {
     const response = await cardsApi.deleteBatch(courseId, ids);
-    
+
     // Удаляем карточки из локального состояния
     if (cardsByCourse.value[courseId]) {
-      cardsByCourse.value[courseId] = cardsByCourse.value[courseId]
-        .filter(c => !ids.includes(c.id));
+      cardsByCourse.value[courseId] = cardsByCourse.value[courseId].filter((c) => !ids.includes(c.id));
     }
-    
+
     // Обновляем статистику
     await fetchCourseStats(courseId);
-    
+
     return response.data.deletedCount;
   } catch (err) {
-    error.value = err.response?.data?.error || 'Ошибка массового удаления';
+    error.value = err.response?.data?.error || "Ошибка массового удаления";
     throw err;
   } finally {
     loading.value = false;
@@ -379,16 +374,16 @@ async function deleteAllCards(courseId) {
   error.value = null;
   try {
     const response = await cardsApi.deleteAll(courseId);
-    
+
     // Очищаем локальное состояние
     cardsByCourse.value[courseId] = [];
-    
+
     // Обновляем статистику
     await fetchCourseStats(courseId);
-    
+
     return response.data.deletedCount;
   } catch (err) {
-    error.value = err.response?.data?.error || 'Ошибка удаления карточек';
+    error.value = err.response?.data?.error || "Ошибка удаления карточек";
     throw err;
   } finally {
     loading.value = false;

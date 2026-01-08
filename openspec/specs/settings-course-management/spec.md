@@ -3,7 +3,9 @@
 ## Purpose
 
 TBD - created by archiving change add-settings-page. Update Purpose after archive.
+
 ## Requirements
+
 ### Requirement: View Course Settings
 
 The system SHALL allow users to view settings for individual courses, showing whether they use global defaults or custom
@@ -194,10 +196,10 @@ The system SHALL use effective settings (course-specific or global) when determi
 **Раздел "Дневные лимиты":**
 
 - Number input "Новых карточек в день"
-    - Placeholder: "Наследуется (глобально: 20)"
-    - Hint: "Оставьте пустым для использования глобального значения"
+  - Placeholder: "Наследуется (глобально: 20)"
+  - Hint: "Оставьте пустым для использования глобального значения"
 - Number input "Повторений в день"
-    - Placeholder: "Наследуется (глобально: 200)"
+  - Placeholder: "Наследуется (глобально: 200)"
 
 **Раздел "Сессионные лимиты":**
 
@@ -241,4 +243,3 @@ The system SHALL use effective settings (course-specific or global) when determi
 **BUT** ДОЛЖЕН разрешить сохранение (не блокировать)
 
 ---
-

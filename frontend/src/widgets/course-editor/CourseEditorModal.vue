@@ -1,101 +1,101 @@
 <script setup>
-  import { ref, computed, watch } from 'vue'
-  import Modal from '@/shared/ui/Modal.vue'
-  import Input from '@/shared/ui/Input.vue'
-  import Button from '@/shared/ui/Button.vue'
+  import { ref, computed, watch } from 'vue';
+  import Modal from '@/shared/ui/Modal.vue';
+  import Input from '@/shared/ui/Input.vue';
+  import Button from '@/shared/ui/Button.vue';
 
   const props = defineProps({
     show: {
       type: Boolean,
-      default: false
+      default: false,
     },
     course: {
       type: Object,
-      default: null
-    }
-  })
+      default: null,
+    },
+  });
 
-  const emit = defineEmits(['close', 'save'])
+  const emit = defineEmits(['close', 'save']);
 
   const formData = ref({
     name: '',
-    description: ''
-  })
+    description: '',
+  });
 
   const errors = ref({
-    name: ''
-  })
+    name: '',
+  });
 
-  const isEditing = computed(() => !!props.course)
+  const isEditing = computed(() => !!props.course);
 
   const modalTitle = computed(() => {
-    return isEditing.value ? 'Редактирование курса' : 'Создание курса'
-  })
+    return isEditing.value ? 'Редактирование курса' : 'Создание курса';
+  });
   const resetForm = () => {
     formData.value = {
       name: '',
-      description: ''
-    }
+      description: '',
+    };
     errors.value = {
-      name: ''
-    }
-  }
+      name: '',
+    };
+  };
 
   const validateForm = () => {
-    let valid = true
+    let valid = true;
 
     if (!formData.value.name.trim()) {
-      errors.value.name = 'Название курса обязательно'
-      valid = false
+      errors.value.name = 'Название курса обязательно';
+      valid = false;
     } else if (formData.value.name.trim().length < 3) {
-      errors.value.name = 'Название должно содержать минимум 3 символа'
-      valid = false
+      errors.value.name = 'Название должно содержать минимум 3 символа';
+      valid = false;
     } else {
-      errors.value.name = ''
+      errors.value.name = '';
     }
 
-    return valid
-  }
+    return valid;
+  };
 
   const handleSave = () => {
     if (!validateForm()) {
-      return
+      return;
     }
 
     const data = {
       name: formData.value.name.trim(),
-      description: formData.value.description.trim() || undefined
-    }
+      description: formData.value.description.trim() || undefined,
+    };
 
-    emit('save', data)
-  }
+    emit('save', data);
+  };
 
   const handleClose = () => {
-    resetForm()
-    emit('close')
-  }
+    resetForm();
+    emit('close');
+  };
 
   const handleNameInput = () => {
     if (errors.value.name) {
-      errors.value.name = ''
+      errors.value.name = '';
     }
-  }
+  };
 
   // Обновляем форму при изменении курса
   watch(
     () => props.course,
-    newCourse => {
+    (newCourse) => {
       if (newCourse) {
         formData.value = {
           name: newCourse.name || '',
-          description: newCourse.description || ''
-        }
+          description: newCourse.description || '',
+        };
       } else {
-        resetForm()
+        resetForm();
       }
     },
     { immediate: true }
-  )
+  );
 </script>
 
 <template>

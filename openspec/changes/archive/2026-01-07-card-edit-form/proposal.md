@@ -91,12 +91,34 @@
        animation-name: bounce-in-bck;
      }
      @keyframes bounce-in-bck {
-       0% { opacity: 0; animation-timing-function: ease-in; transform: scale(7); }
-       38% { opacity: 1; animation-timing-function: ease-out; transform: scale(1); }
-       55% { animation-timing-function: ease-in; transform: scale(1.5); }
-       72%, 89%, to { animation-timing-function: ease-out; transform: scale(1); }
-       81% { animation-timing-function: ease-in; transform: scale(1.24); }
-       95% { animation-timing-function: ease-in; transform: scale(1.04); }
+       0% {
+         opacity: 0;
+         animation-timing-function: ease-in;
+         transform: scale(7);
+       }
+       38% {
+         opacity: 1;
+         animation-timing-function: ease-out;
+         transform: scale(1);
+       }
+       55% {
+         animation-timing-function: ease-in;
+         transform: scale(1.5);
+       }
+       72%,
+       89%,
+       to {
+         animation-timing-function: ease-out;
+         transform: scale(1);
+       }
+       81% {
+         animation-timing-function: ease-in;
+         transform: scale(1.24);
+       }
+       95% {
+         animation-timing-function: ease-in;
+         transform: scale(1.04);
+       }
      }
      ```
 
@@ -108,10 +130,12 @@
 ### Alternative 1: Создать новый inline компонент `CardEditForm`
 
 **Pros**:
+
 - Inline форма (видна в контексте страницы)
 - Не требует дополнительного клика для открытия
 
 **Cons**:
+
 - Больше кода (новый компонент с дублированием логики `QuickAddCard`)
 - Сложность управления видимостью форм на странице
 - Не соответствует текущему паттерну редактирования (используется модалка)

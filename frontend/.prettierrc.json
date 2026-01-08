@@ -1,15 +1,25 @@
 {
   "$schema": "https://json.schemastore.org/prettierrc",
-  "semi": false,
-  "tabWidth": 2,
+  "semi": true,
   "singleQuote": true,
-  "arrowParens": "avoid",
-  "printWidth": 160,
+  "tabWidth": 2,
+  "useTabs": false,
+  "trailingComma": "es5",
+  "printWidth": 120,
+  "arrowParens": "always",
+  "endOfLine": "lf",
   "bracketSameLine": true,
   "vueIndentScriptAndStyle": true,
-  "vueIndentTemplate": true,
-  "vueSinglelineBlockIndentation": true,
-  "trailingComma": "none",
   "htmlWhitespaceSensitivity": "ignore",
-  "singleAttributePerLine": true
+  "singleAttributePerLine": true,
+  "overrides": [
+    {
+      "files": "*.md",
+      "options": {
+        "printWidth": 120,
+        "proseWrap": "preserve",
+        "singleQuote": false
+      }
+    }
+  ]
 }

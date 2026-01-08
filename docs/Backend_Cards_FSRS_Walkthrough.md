@@ -36,16 +36,16 @@ Added 3 new interfaces:
 
 ```typescript
 {
-  due: string;              // Next repetition date
-  stability: number;        // Memory stability
-  difficulty: number;       // Card difficulty
-  elapsedDays: number;      // Days since last review
-  scheduledDays: number;    // Scheduled interval
-  reps: number;            // Total repetitions
-  lapses: number;          // Times forgotten (Again)
-  state: number;            // 0=New, 1=Learning, 2=Review, 3=Relearning
+  due: string; // Next repetition date
+  stability: number; // Memory stability
+  difficulty: number; // Card difficulty
+  elapsedDays: number; // Days since last review
+  scheduledDays: number; // Scheduled interval
+  reps: number; // Total repetitions
+  lapses: number; // Times forgotten (Again)
+  state: number; // 0=New, 1=Learning, 2=Review, 3=Relearning
   lastReview: string | null; // Last answer
-  stepIndex: number;        // Current learning step
+  stepIndex: number; // Current learning step
 }
 ```
 
@@ -128,16 +128,16 @@ stateDiagram-v2
 #### [schemas/card.ts](file:///e:/Develop/anki-tiny/backend/src/schemas/card.ts)
 
 ```typescript
-CreateCardSchema     // front, back
-UpdateCardSchema     // front?, back?
-ReviewCardSchema     // cardId, rating: '1'|'2'|'3'|'4'
+CreateCardSchema; // front, back
+UpdateCardSchema; // front?, back?
+ReviewCardSchema; // cardId, rating: '1'|'2'|'3'|'4'
 ```
 
 #### [schemas/settings.ts](file:///e:/Develop/anki-tiny/backend/src/schemas/settings.ts)
 
 ```typescript
-GlobalSettingsSchema     // trainingStartHour, trainingEndHour, etc.
-CourseSettingsSchema     // same + nullable for inheritance
+GlobalSettingsSchema; // trainingStartHour, trainingEndHour, etc.
+CourseSettingsSchema; // same + nullable for inheritance
 ```
 
 Validation for `learningSteps`: checks that it is a valid JSON array of numbers.
@@ -149,7 +149,7 @@ Validation for `learningSteps`: checks that it is a valid JSON array of numbers.
 #### [routes/cards.ts](file:///e:/Develop/anki-tiny/backend/src/routes/cards.ts)
 
 | Method | Endpoint                       | Description       |
-|--------|--------------------------------|-------------------|
+| ------ | ------------------------------ | ----------------- |
 | GET    | `/api/courses/:courseId/cards` | Course card list  |
 | POST   | `/api/courses/:courseId/cards` | Create card       |
 | GET    | `/api/cards/:id`               | Get card          |
@@ -160,7 +160,7 @@ Validation for `learningSteps`: checks that it is a valid JSON array of numbers.
 #### [routes/training.ts](file:///e:/Develop/anki-tiny/backend/src/routes/training.ts)
 
 | Method | Endpoint                           | Description            |
-|--------|------------------------------------|------------------------|
+| ------ | ---------------------------------- | ---------------------- |
 | GET    | `/api/courses/:courseId/due-cards` | Cards for review       |
 | POST   | `/api/training/review`             | Submit result (Rating) |
 
@@ -169,8 +169,8 @@ Validation for `learningSteps`: checks that it is a valid JSON array of numbers.
 1. Check training time (`trainingStartHour` / `trainingEndHour`)
 2. Calculate time until end of day
 3. If < 4 hours until end:
-    - Exclude NEW cards
-    - Return message: `"Too close to end of day for new cards"`
+   - Exclude NEW cards
+   - Return message: `"Too close to end of day for new cards"`
 4. Otherwise return all due cards
 
 **Request body for `/training/review`:**
@@ -186,7 +186,7 @@ Validation for `learningSteps`: checks that it is a valid JSON array of numbers.
 #### [routes/settings.ts](file:///e:/Develop/anki-tiny/backend/src/routes/settings.ts)
 
 | Method | Endpoint                          | Description                 |
-|--------|-----------------------------------|-----------------------------|
+| ------ | --------------------------------- | --------------------------- |
 | GET    | `/api/settings`                   | Global settings             |
 | PUT    | `/api/settings`                   | Update global               |
 | GET    | `/api/courses/:courseId/settings` | Course settings + effective |
@@ -237,14 +237,14 @@ router.use(settingsRouter);
 
 ```typescript
 // Was:
-rating: z.enum(['1', '2', '3', '4'], {
-  errorMap: () => ({message: '...'})
-})
+rating: z.enum(["1", "2", "3", "4"], {
+  errorMap: () => ({ message: "..." }),
+});
 
 // Became:
-rating: z.enum(['1', '2', '3', '4'], {
-  message: '...'
-})
+rating: z.enum(["1", "2", "3", "4"], {
+  message: "...",
+});
 ```
 
 ### 3. ZodError handling
@@ -255,8 +255,8 @@ rating: z.enum(['1', '2', '3', '4'], {
 ```typescript
 if (error instanceof ZodError) {
   return res.status(400).json({
-    error: 'Validation error',
-    details: error.issues  // was: error.errors
+    error: "Validation error",
+    details: error.issues, // was: error.errors
   });
 }
 ```

@@ -3,6 +3,7 @@
 ## Phase 1: Backend API Implementation
 
 ### Task 1.1: Add Global Stats Endpoint
+
 **Duration**: 30 min  
 **Dependencies**: None
 
@@ -12,6 +13,7 @@
 - [ ] **Validation**: `curl http://localhost:3000/api/stats/global` возвращает `{"totalNewCards": <number>}`
 
 ### Task 1.2: Extend Card Repository
+
 **Duration**: 20 min  
 **Dependencies**: None
 
@@ -20,6 +22,7 @@
 - [ ] **Validation**: Метод возвращает корректное количество новых карточек из БД
 
 ### Task 1.3: Test Backend API
+
 **Duration**: 15 min  
 **Dependencies**: 1.1, 1.2
 
@@ -32,12 +35,14 @@
 ## Phase 2: Frontend State Management
 
 ### Task 2.1: Create Stats Store
+
 **Duration**: 45 min  
 **Dependencies**: 1.1, 1.2
 
 - [ ] Создать директорию `frontend/src/entities/stats/model`
 - [ ] Создать файл `useStatsStore.js` с Pinia store
 - [ ] Определить state:
+
   ```typescript
   {
     totalNewCards: 0,
@@ -49,6 +54,7 @@
     error: null
   }
   ```
+
 - [ ] Реализовать action `fetchGlobalStats()`:
   - Вызвать `GET /api/training/stats`
   - Вызвать `GET /api/stats/global`
@@ -56,6 +62,7 @@
 - [ ] **Validation**: Store корректно обновляет state после вызова `fetchGlobalStats()`
 
 ### Task 2.2: Test Stats Store in DevTools
+
 **Duration**: 15 min  
 **Dependencies**: 2.1
 
@@ -69,6 +76,7 @@
 ## Phase 3: UI Components
 
 ### Task 3.1: Create StatItem Component
+
 **Duration**: 30 min  
 **Dependencies**: None
 
@@ -79,6 +87,7 @@
 - [ ] **Validation**: Компонент отображается корректно в изоляции
 
 ### Task 3.2: Create GlobalStats Component
+
 **Duration**: 60 min  
 **Dependencies**: 2.1, 3.1
 
@@ -97,11 +106,13 @@
 - [ ] **Validation**: Компонент отображает все метрики корректно
 
 ### Task 3.3: Update HomePage Layout
+
 **Duration**: 45 min  
 **Dependencies**: 3.2
 
 - [ ] Открыть `frontend/src/pages/home/HomePage.vue`
 - [ ] Изменить layout на двухколоночный grid:
+
   ```css
   .home-grid {
     display: grid;
@@ -109,6 +120,7 @@
     gap: 24px;
   }
   ```
+
 - [ ] Добавить `GlobalStats` компонент в правую колонку
 - [ ] Добавить `onMounted` hook для вызова `statsStore.fetchGlobalStats()`
 - [ ] **Validation**: Desktop layout показывает 2 колонки (50%/50%)
@@ -118,10 +130,12 @@
 ## Phase 4: Responsive Design
 
 ### Task 4.1: Add Mobile Layout
+
 **Duration**: 30 min  
 **Dependencies**: 3.3
 
 - [ ] Добавить media query для `< 1024px`:
+
   ```css
   @media (max-width: 1024px) {
     .home-grid {
@@ -132,9 +146,11 @@
     }
   }
   ```
+
 - [ ] **Validation**: Mobile layout показывает статистику выше списка курсов
 
 ### Task 4.2: Test Responsive Behavior
+
 **Duration**: 15 min  
 **Dependencies**: 4.1
 
@@ -147,6 +163,7 @@
 ## Phase 5: Integration and Polish
 
 ### Task 5.1: Refresh Statistics After Training
+
 **Duration**: 30 min  
 **Dependencies**: 2.1, 3.2
 
@@ -155,6 +172,7 @@
 - [ ] **Validation**: Статистика обновляется после завершения тренировки
 
 ### Task 5.2: Theme Support Verification
+
 **Duration**: 15 min  
 **Dependencies**: 3.2
 
@@ -163,6 +181,7 @@
 - [ ] **Validation**: Все цвета используют CSS variables и адаптируются к теме
 
 ### Task 5.3: Accessibility Review
+
 **Duration**: 20 min  
 **Dependencies**: 3.1, 3.2
 
@@ -176,6 +195,7 @@
 ## Phase 6: Documentation and Cleanup
 
 ### Task 6.1: Update Walkthrough
+
 **Duration**: 30 min  
 **Dependencies**: All previous tasks
 
@@ -188,11 +208,13 @@
 - [ ] **Validation**: Документация актуальна и понятна
 
 ### Task 6.2: Update Changelog
+
 **Duration**: 10 min  
 **Dependencies**: 6.1
 
 - [ ] Открыть `docs/Changelog.md`
 - [ ] Добавить новую запись:
+
   ```
   ## [0.6.0] - YYYY-MM-DD
   ### Added
@@ -201,9 +223,11 @@
   - Новый API endpoint GET /api/stats/global
   - Pinia store для управления глобальной статистикой
   ```
+
 - [ ] **Validation**: Changelog отражает все изменения
 
 ### Task 6.3: Final Linting and Formatting
+
 **Duration**: 10 min  
 **Dependencies**: All previous tasks
 
@@ -219,14 +243,17 @@
 **Total Estimated Duration**: ~6-7 hours
 
 **Parallelizable Tasks**:
+
 - Task 1.1 + 1.2 могут выполняться параллельно
 - Task 3.1 может начаться до завершения Phase 2
 - Task 5.2 + 5.3 могут выполняться параллельно
 
 **Critical Path**:
+
 1. Backend API (Phase 1) → Stats Store (Phase 2) → UI Components (Phase 3) → Integration (Phase 5)
 
 **Acceptance Criteria**:
+
 - [ ] Главная страница показывает 5 ключевых метрик статистики
 - [ ] Layout адаптируется для desktop и mobile
 - [ ] Статистика обновляется после тренировки

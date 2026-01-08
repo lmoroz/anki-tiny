@@ -25,10 +25,13 @@
 1. Открыть `backend/src/routes/cards.ts`
 2. Найти endpoint `PUT /courses/:courseId/cards/:cardId`
 3. Добавить извлечение `resetProgress` из `req.body`:
+
    ```typescript
-   const { front, back, resetProgress } = req.body
+   const { front, back, resetProgress } = req.body;
    ```
+
 4. Если `resetProgress === true`, добавить в `updates`:
+
    ```typescript
    if (resetProgress) {
      Object.assign(updates, {
@@ -40,16 +43,17 @@
        lastReview: null,
        due: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
        interval: null,
-     })
+     });
    }
    ```
+
 5. Сохранить изменения
 
 **Validation**:
 
 - [x] Код компилируется без ошибок TypeScript
 - [x] Тестирование через API: `PUT /api/courses/1/cards/123` с
-  `{ front: "test", back: "test", resetProgress: true }` сбрасывает прогресс
+      `{ front: "test", back: "test", resetProgress: true }` сбрасывает прогресс
 - [x] Response возвращает обновлённую карточку с `state = New`, `reps = 0`, etc.
 
 **Estimated Time**: 15 минут
@@ -71,45 +75,75 @@
 
 1. Открыть `CardList.vue`
 2. Добавить метод:
+
    ```typescript
    const scrollToCardWithBounce = (cardId: string) => {
-     const cardElement = scrollContainer.value?.querySelector(`[data-card-id="${cardId}"]`)
+     const cardElement = scrollContainer.value?.querySelector(`[data-card-id="${cardId}"]`);
      if (!cardElement) {
-       console.warn(`Card with id ${cardId} not found in list`)
-       return
+       console.warn(`Card with id ${cardId} not found in list`);
+       return;
      }
-     cardElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
+     cardElement.scrollIntoView({ behavior: "smooth", block: "start" });
      setTimeout(() => {
-       cardElement.classList.add('anim-bounce-in-bck')
+       cardElement.classList.add("anim-bounce-in-bck");
        setTimeout(() => {
-         cardElement.classList.remove('anim-bounce-in-bck')
-       }, 1000)
-     }, 500)
-   }
+         cardElement.classList.remove("anim-bounce-in-bck");
+       }, 1000);
+     }, 500);
+   };
    ```
+
 3. Экспортировать метод через `defineExpose({ scrollToCardWithBounce })`
 4. В template добавить `data-card-id` атрибут на `CardItem`:
+
    ```vue
    <CardItem :data-card-id="card.id" ... />
    ```
+
 5. Добавить CSS анимацию в `<style scoped>`:
+
    ```css
    .anim-bounce-in-bck {
      animation-duration: 2s;
      animation-name: bounce-in-bck;
    }
    @keyframes bounce-in-bck {
-     0% { opacity: 0; animation-timing-function: ease-in; transform: scale(7); }
-     38% { opacity: 1; animation-timing-function: ease-out; transform: scale(1); }
-     55% { animation-timing-function: ease-in; transform: scale(1.5); }
-     72%, 89%, to { animation-timing-function: ease-out; transform: scale(1); }
-     81% { animation-timing-function: ease-in; transform: scale(1.24); }
-     95% { animation-timing-function: ease-in; transform: scale(1.04); }
+     0% {
+       opacity: 0;
+       animation-timing-function: ease-in;
+       transform: scale(7);
+     }
+     38% {
+       opacity: 1;
+       animation-timing-function: ease-out;
+       transform: scale(1);
+     }
+     55% {
+       animation-timing-function: ease-in;
+       transform: scale(1.5);
+     }
+     72%,
+     89%,
+     to {
+       animation-timing-function: ease-out;
+       transform: scale(1);
+     }
+     81% {
+       animation-timing-function: ease-in;
+       transform: scale(1.24);
+     }
+     95% {
+       animation-timing-function: ease-in;
+       transform: scale(1.04);
+     }
    }
    @media (prefers-reduced-motion: reduce) {
-     .anim-bounce-in-bck { animation: none; }
+     .anim-bounce-in-bck {
+       animation: none;
+     }
    }
    ```
+
 6. Сохранить файл
 
 **Validation**:
@@ -139,49 +173,55 @@
 
 1. Открыть `CoursePage.vue`
 2. Добавить ref на `CardList`:
+
    ```typescript
-   const cardListRef = ref(null)
+   const cardListRef = ref(null);
    ```
+
 3. В template добавить ref на CardList (и desktop, и mobile версии — выбрать подходящий):
+
    ```vue
    <CardList ref="cardListRef" ... />
    ```
+
 4. Добавить метод `scrollToCardWithBounce`:
+
    ```typescript
    const scrollToCardWithBounce = (cardId: string) => {
-     const cardListComponent = cardListRef.value
+     const cardListComponent = cardListRef.value;
      if (cardListComponent) {
-       cardListComponent.scrollToCardWithBounce(cardId)
+       cardListComponent.scrollToCardWithBounce(cardId);
      }
-   }
+   };
    ```
+
 5. Изменить `handleSaveCard`:
+
    ```typescript
    const handleSaveCard = async (data) => {
      try {
        if (editingCard.value) {
-         await cardStore.updateCard(editingCard.value.id, { ...data, resetProgress: true })
-         const editedCardId = editingCard.value.id
-         await cardStore.fetchCardsByCourse(courseId)
-         handleCloseModal()
+         await cardStore.updateCard(editingCard.value.id, { ...data, resetProgress: true });
+         const editedCardId = editingCard.value.id;
+         await cardStore.fetchCardsByCourse(courseId);
+         handleCloseModal();
          nextTick(() => {
-           scrollToCardWithBounce(editedCardId)
-         })
-       }
-       else {
-         const newCard = await cardStore.createCard(courseId, data)
-         await cardStore.fetchCardsByCourse(courseId)
-         handleCloseModal()
+           scrollToCardWithBounce(editedCardId);
+         });
+       } else {
+         const newCard = await cardStore.createCard(courseId, data);
+         await cardStore.fetchCardsByCourse(courseId);
+         handleCloseModal();
          nextTick(() => {
-           scrollToCardWithBounce(newCard.id)
-         })
+           scrollToCardWithBounce(newCard.id);
+         });
        }
+     } catch (err) {
+       console.error("Failed to save card:", err);
      }
-     catch (err) {
-       console.error('Failed to save card:', err)
-     }
-   }
+   };
    ```
+
 6. Сохранить файл
 
 **Validation**:
@@ -213,17 +253,18 @@
 3. Если нет — изменить метод, чтобы возвращать `newCard` из response
 4. Открыть `CoursePage.vue`
 5. Изменить `handleQuickAdd`:
+
    ```typescript
    const handleQuickAdd = async (cardData: { front: string; back: string }) => {
      try {
-       const newCard = await cardStore.createCard(courseId, cardData)
-       nextTick(() => scrollToCardWithBounce(newCard.id))
+       const newCard = await cardStore.createCard(courseId, cardData);
+       nextTick(() => scrollToCardWithBounce(newCard.id));
+     } catch (err) {
+       console.error("Failed to create card:", err);
      }
-     catch (err) {
-       console.error('Failed to create card:', err)
-     }
-   }
+   };
    ```
+
 6. Сохранить файл
 
 **Validation**:
@@ -317,18 +358,22 @@
 
 1. Открыть `docs/Changelog.md`
 2. Добавить новую запись в начало файла:
+
    ```markdown
    ## [Unreleased]
-   
+
    ### Added
+
    - Visual feedback after card creation/edit: automatic scroll to card with bounce animation
    - Card progress reset on edit (card becomes "new" with fresh FSRS metrics)
-   
+
    ### Changed
+
    - CardList.vue now exposes `scrollToCardWithBounce()` method
    - CoursePage.vue now triggers scroll and animation after card save/create
    - Card update endpoint now supports `resetProgress` parameter
    ```
+
 3. Сохранить файл
 
 **Validation**:
@@ -349,9 +394,11 @@
 **Steps**:
 
 1. Выполнить команду:
+
    ```bash
    npx @fission-ai/openspec validate card-edit-form --strict
    ```
+
 2. Исправить все найденные ошибки (если есть)
 3. Повторить валидацию до успешного результата
 

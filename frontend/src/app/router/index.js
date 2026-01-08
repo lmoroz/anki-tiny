@@ -5,31 +5,31 @@ const routes = [
     path: '/',
     name: 'home',
     component: () => import('@/pages/home/HomePage.vue'),
-    meta: { title: 'Главная' }
+    meta: { title: 'Главная' },
   },
   {
     path: '/course/:id',
     name: 'course',
     component: () => import('@/pages/course/CoursePage.vue'),
-    meta: { title: 'Курс' }
+    meta: { title: 'Курс' },
   },
   {
     path: '/training/:id',
     name: 'training',
     component: () => import('@/pages/training/TrainingPage.vue'),
-    meta: { title: 'Тренировка' }
+    meta: { title: 'Тренировка' },
   },
   {
     path: '/settings',
     name: 'settings',
     component: () => import('@/pages/settings/SettingsPage.vue'),
-    meta: { title: 'Настройки' }
-  }
+    meta: { title: 'Настройки' },
+  },
 ];
 
 const router = createRouter({
   history: createWebHashHistory(),
-  routes
+  routes,
 });
 
 router.afterEach((to) => {

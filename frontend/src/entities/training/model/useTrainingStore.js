@@ -26,7 +26,7 @@ export const useTrainingStore = defineStore('training', () => {
   const progress = computed(() => {
     return {
       current: currentCardIndex.value + 1,
-      total: sessionCards.value.length
+      total: sessionCards.value.length,
     };
   });
 
@@ -57,10 +57,11 @@ export const useTrainingStore = defineStore('training', () => {
 
     try {
       await trainingApi.submitReview(currentCard.value.id, rating);
-      
+
       // Обновляем локальные счетчики лимитов если они есть
       if (sessionLimits.value) {
-        if (currentCard.value.state === 0) { // New card
+        if (currentCard.value.state === 0) {
+          // New card
           sessionLimits.value.newCardsRemaining = Math.max(0, sessionLimits.value.newCardsRemaining - 1);
           sessionLimits.value.globalNewRemaining = Math.max(0, sessionLimits.value.globalNewRemaining - 1);
         } else {
@@ -108,6 +109,6 @@ export const useTrainingStore = defineStore('training', () => {
     startSession,
     submitReview,
     fetchDailyStats,
-    resetSession
+    resetSession,
   };
 });

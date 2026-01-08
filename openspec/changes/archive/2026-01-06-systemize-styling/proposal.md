@@ -22,11 +22,11 @@ We will establish a unified design system using Tailwind CSS v4 and CSS variable
 ## Scope
 
 - **Files**:
-    - `frontend/src/app/assets/css/styles.css`: Definition of variables and theme.
-    - `frontend/src/shared/ui/**`: All shared components (`Button.vue`, `Card.vue`, etc.).
-    - `frontend/src/features/**`: Feature-specific styles (on a best-effort basis).
-    - `frontend/src/widgets/**`: Widget-specific styles.
-    - `frontend/src/pages/**`: Page-specific styles.
+  - `frontend/src/app/assets/css/styles.css`: Definition of variables and theme.
+  - `frontend/src/shared/ui/**`: All shared components (`Button.vue`, `Card.vue`, etc.).
+  - `frontend/src/features/**`: Feature-specific styles (on a best-effort basis).
+  - `frontend/src/widgets/**`: Widget-specific styles.
+  - `frontend/src/pages/**`: Page-specific styles.
 
 ## Risks
 

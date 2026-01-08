@@ -3,7 +3,9 @@
 ## Purpose
 
 TBD - created by archiving change add-settings-page. Update Purpose after archive.
+
 ## Requirements
+
 ### Requirement: View Global Settings
 
 The system SHALL allow users to view current global application settings through a dedicated settings interface.
@@ -162,4 +164,3 @@ The system SHALL persist global settings across application restarts.
 **AND** новое значение ДОЛЖНО применяться немедленно
 
 ---
-

@@ -27,7 +27,7 @@ The `QuickAddCard.vue` component received a complete visual redesign to create a
 
 ```css
 background: linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(51, 65, 85, 0.85));
-box-shadow: 
+box-shadow:
   0 4px 6px -1px rgba(0, 0, 0, 0.3),
   0 2px 4px -1px rgba(0, 0, 0, 0.2),
   inset 0 1px 0 0 rgba(148, 163, 184, 0.1);
@@ -74,7 +74,7 @@ box-shadow:
 ```css
 .mode-btn.active {
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  box-shadow: 
+  box-shadow:
     0 4px 8px rgba(59, 130, 246, 0.3),
     0 1px 3px rgba(59, 130, 246, 0.4),
     inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
@@ -100,10 +100,8 @@ box-shadow:
 
 ```css
 .batch-help {
-  background: linear-gradient(135deg, 
-    rgba(59, 130, 246, 0.12) 0%, 
-    rgba(37, 99, 235, 0.08) 100%);
-  box-shadow: 
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(37, 99, 235, 0.08) 100%);
+  box-shadow:
     0 2px 4px rgba(59, 130, 246, 0.08),
     inset 0 1px 0 0 rgba(59, 130, 246, 0.1);
 }

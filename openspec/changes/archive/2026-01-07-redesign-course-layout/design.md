@@ -124,22 +124,22 @@ CoursePage.vue (modified)
 
 ### Statistics Icons Mapping
 
-| Метрика       | Иконка Bootstrap Icons | Tooltip                    |
-|---------------|------------------------|----------------------------|
-| Stability     | `bi-graph-up`          | Стабильность запоминания   |
-| Difficulty    | `bi-speedometer2`      | Сложность карточки         |
-| Reps          | `bi-arrow-repeat`      | Количество повторений      |
-| Lapses        | `bi-x-circle`          | Количество ошибок          |
-| Created at    | `bi-plus-circle`       | Дата создания              |
-| Last review   | `bi-clock-history`     | Последнее повторение       |
-| Due date      | `bi-calendar3`         | Следующее повторение       |
+| Метрика     | Иконка Bootstrap Icons | Tooltip                  |
+| ----------- | ---------------------- | ------------------------ |
+| Stability   | `bi-graph-up`          | Стабильность запоминания |
+| Difficulty  | `bi-speedometer2`      | Сложность карточки       |
+| Reps        | `bi-arrow-repeat`      | Количество повторений    |
+| Lapses      | `bi-x-circle`          | Количество ошибок        |
+| Created at  | `bi-plus-circle`       | Дата создания            |
+| Last review | `bi-clock-history`     | Последнее повторение     |
+| Due date    | `bi-calendar3`         | Следующее повторение     |
 
 ## Responsive Behavior
 
 ### State Management
 
 - **Desktop**: Cards section всегда видна (static в grid)
-- **Mobile**: 
+- **Mobile**:
   - Добавить `ref(false)` для `isCardsPanelOpen`
   - FAB с индикатором количества карточек
   - Panel с transition `transform: translateX(100%)` → `translateX(0)`
@@ -147,11 +147,11 @@ CoursePage.vue (modified)
 ### Breakpoint Logic
 
 ```ts
-import { useMediaQuery } from '@vueuse/core'
+import { useMediaQuery } from "@vueuse/core";
 
-const isDesktop = useMediaQuery('(min-width: 1024px)')
-const showCardsInline = computed(() => isDesktop.value)
-const showCardsPanel = computed(() => !isDesktop.value && isCardsPanelOpen.value)
+const isDesktop = useMediaQuery("(min-width: 1024px)");
+const showCardsInline = computed(() => isDesktop.value);
+const showCardsPanel = computed(() => !isDesktop.value && isCardsPanelOpen.value);
 ```
 
 ## Styling Strategy

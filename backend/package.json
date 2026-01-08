@@ -16,7 +16,7 @@
     "dist": "npm run rebuild:electron && npm run build && node build-installer.js",
     "bundle": "cd ../frontend && npm run build && cd ../backend && npm run rebuild:electron && npm run build && node build-installer.js",
     "lint": "eslint .",
-    "format": "prettier --write .",
+    "format": "prettier --write \"./**/*.{js,ts,json,md}\"",
     "structure": "node utils/run-tree.js > STRUCTURE.md"
   },
   "build": {

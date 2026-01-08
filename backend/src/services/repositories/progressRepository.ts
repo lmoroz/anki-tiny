@@ -9,7 +9,12 @@ export class ProgressRepository {
    * Получить прогресс для конкретного курса за конкретную дату
    */
   async getProgress(date: string, courseId: number): Promise<DailyProgress | null> {
-    const progress = await db.selectFrom('dailyProgress').where('date', '=', date).where('courseId', '=', courseId).selectAll().executeTakeFirst();
+    const progress = await db
+      .selectFrom('dailyProgress')
+      .where('date', '=', date)
+      .where('courseId', '=', courseId)
+      .selectAll()
+      .executeTakeFirst();
 
     return progress || null;
   }
@@ -21,7 +26,10 @@ export class ProgressRepository {
     const result = await db
       .selectFrom('dailyProgress')
       .where('date', '=', date)
-      .select((eb) => [eb.fn.sum<number>('newCardsStudied').as('newCardsStudied'), eb.fn.sum<number>('reviewsCompleted').as('reviewsCompleted')])
+      .select((eb) => [
+        eb.fn.sum<number>('newCardsStudied').as('newCardsStudied'),
+        eb.fn.sum<number>('reviewsCompleted').as('reviewsCompleted'),
+      ])
       .executeTakeFirst();
 
     return {

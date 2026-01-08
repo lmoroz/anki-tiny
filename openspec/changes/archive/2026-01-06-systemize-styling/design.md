@@ -13,13 +13,13 @@ Colors will be defined loosely in `styles.css` using CSS variables, for example:
   /* Semantic Tokens */
   --color-primary: #1a73e8;
   --color-primary-hover: #1557b0;
-  
+
   --color-bg-base: #f8f9fa;
   --color-bg-card: #ffffff;
-  
+
   --color-text-main: #212529;
   --color-text-muted: #868e96;
-  
+
   /* Status */
   --color-success: ...;
   --color-error: ...;

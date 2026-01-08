@@ -14,6 +14,7 @@
    - Дополнительный endpoint для получения общего количества новых карточек: `GET /api/stats/global`
 
 3. **Data Flow**:
+
    ```
    HomePage.vue → useStatsStore → GET /api/training/stats → limitService.getDailyStats()
                 → useStatsStore → GET /api/stats/global → cardRepository.getGlobalNewCardsCount()
@@ -28,21 +29,24 @@
 **Purpose**: Отображение агрегированной статистики тренировок.
 
 **Props**:
+
 - Нет (использует `useStatsStore`)
 
 **Data**:
+
 ```typescript
 interface GlobalStatsData {
-  totalNewCards: number;           // Общее кол-во новых карточек по всем курсам
-  studiedToday: number;            // newCardsStudied + reviewsCompleted
-  remainingToday: number;          // Осталось на сегодня (с учётом лимитов)
-  dailyNewLimit: number;           // Глобальный лимит новых карточек
-  trainingsToday: number;          // Количество тренировок за день
+  totalNewCards: number; // Общее кол-во новых карточек по всем курсам
+  studiedToday: number; // newCardsStudied + reviewsCompleted
+  remainingToday: number; // Осталось на сегодня (с учётом лимитов)
+  dailyNewLimit: number; // Глобальный лимит новых карточек
+  trainingsToday: number; // Количество тренировок за день
   loading: boolean;
 }
 ```
 
 **UI Structure**:
+
 ```vue
 <Card padding="lg">
   <h2>Статистика</h2>
@@ -90,6 +94,7 @@ interface GlobalStatsData {
 ```
 
 **Styling**:
+
 - Vertical layout с gap между элементами
 - Каждый `StatItem` — inline layout: icon + label + value
 - Icons: Bootstrap Icons (24px, primary color)
@@ -101,16 +106,17 @@ interface GlobalStatsData {
 ### HomePage.vue Layout
 
 **Desktop (≥1024px)**:
+
 ```vue
 <div class="home-container">
   <header class="page-header">...</header>
-  
+
   <div class="home-grid">
     <!-- Левая колонка: Курсы -->
     <div class="courses-column">
       <CourseList ... />
     </div>
-    
+
     <!-- Правая колонка: Статистика -->
     <div class="stats-column">
       <GlobalStats />
@@ -120,6 +126,7 @@ interface GlobalStatsData {
 ```
 
 **Mobile (< 1024px)**:
+
 ```vue
 <div class="home-container">
   <header class="page-header">...</header>
@@ -132,6 +139,7 @@ interface GlobalStatsData {
 ```
 
 **CSS**:
+
 ```css
 .home-grid {
   display: grid;
@@ -143,7 +151,7 @@ interface GlobalStatsData {
   .home-grid {
     grid-template-columns: 1fr; /* Single column */
   }
-  
+
   .stats-column {
     order: -1; /* Статистика выше курсов */
   }
@@ -157,6 +165,7 @@ interface GlobalStatsData {
 ### useStatsStore (Pinia)
 
 **State**:
+
 ```typescript
 {
   totalNewCards: number;
@@ -170,27 +179,28 @@ interface GlobalStatsData {
 ```
 
 **Actions**:
+
 ```typescript
 async fetchGlobalStats() {
   this.loading = true;
-  
+
   try {
     // 1. Получить статистику за день
     const dailyStats = await api.get('/api/training/stats');
-    
+
     // 2. Получить общее количество новых карточек
     const globalStats = await api.get('/api/stats/global');
-    
+
     // 3. Рассчитать метрики
     this.totalNewCards = globalStats.totalNewCards;
     this.studiedToday = dailyStats.global.newCardsStudied + dailyStats.global.reviewsCompleted;
     this.trainingsToday = this.studiedToday; // Синоним
-    
+
     // Remaining = globalNewRemaining + globalReviewsRemaining
-    this.remainingToday = 
+    this.remainingToday =
       dailyStats.global.limits.globalNewCardsPerDay - dailyStats.global.newCardsStudied +
       dailyStats.global.limits.globalMaxReviewsPerDay - dailyStats.global.reviewsCompleted;
-    
+
     this.dailyNewLimit = dailyStats.global.limits.globalNewCardsPerDay;
   } catch (error) {
     this.error = 'Failed to load statistics';
@@ -209,6 +219,7 @@ async fetchGlobalStats() {
 **Purpose**: Получить общее количество новых карточек по всем курсам.
 
 **Response**:
+
 ```typescript
 {
   totalNewCards: number; // Сумма карточек со state = NEW по всем курсам
@@ -216,20 +227,22 @@ async fetchGlobalStats() {
 ```
 
 **Implementation**:
+
 ```typescript
 // routes/stats.ts (NEW file)
-router.get('/stats/global', async (req: Request, res: Response) => {
+router.get("/stats/global", async (req: Request, res: Response) => {
   try {
     const totalNewCards = await cardRepository.getGlobalNewCardsCount();
     res.json({ totalNewCards });
   } catch (error) {
-    console.error('Error fetching global stats:', error);
-    res.status(500).json({ error: 'Failed to fetch global stats' });
+    console.error("Error fetching global stats:", error);
+    res.status(500).json({ error: "Failed to fetch global stats" });
   }
 });
 ```
 
 **cardRepository.getGlobalNewCardsCount()**:
+
 ```typescript
 async getGlobalNewCardsCount(): Promise<number> {
   const result = await db
@@ -237,7 +250,7 @@ async getGlobalNewCardsCount(): Promise<number> {
     .select(({ fn }) => [fn.count('id').as('count')])
     .where('state', '=', CardState.New)
     .executeTakeFirst();
-  
+
   return Number(result?.count ?? 0);
 }
 ```
@@ -280,14 +293,16 @@ async getGlobalNewCardsCount(): Promise<number> {
 
 ## Testing Strategy
 
-### Manual Testing:
+### Manual Testing
+
 - [ ] Статистика отображается корректно на desktop (1920x1080)
 - [ ] Layout переключается на single column на mobile (375x667)
 - [ ] Статистика обновляется после тренировки
 - [ ] Loading state отображается при загрузке
 - [ ] Error state отображается при ошибке API
 
-### Integration Testing:
+### Integration Testing
+
 - [ ] `GET /api/stats/global` возвращает корректное количество новых карточек
 - [ ] `useStatsStore.fetchGlobalStats()` корректно рассчитывает метрики
 
@@ -295,10 +310,10 @@ async getGlobalNewCardsCount(): Promise<number> {
 
 ## Risks and Mitigations
 
-| Risk | Mitigation |
-|------|------------|
-| Перегрузка главной страницы информацией | Минималистичный дизайн, фокус на ключевых метриках |
-| Дополнительная загрузка API при открытии HomePage | Кэширование в Pinia store, refresh только при необходимости |
+| Risk                                                         | Mitigation                                                               |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------ |
+| Перегрузка главной страницы информацией                      | Минималистичный дизайн, фокус на ключевых метриках                       |
+| Дополнительная загрузка API при открытии HomePage            | Кэширование в Pinia store, refresh только при необходимости              |
 | Несоответствие метрик между курсами и глобальной статистикой | Использовать те же источники данных (progressRepository, cardRepository) |
 
 ---

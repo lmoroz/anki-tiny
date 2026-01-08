@@ -2,19 +2,19 @@
   const props = defineProps({
     checked: {
       type: Boolean,
-      required: true
+      required: true,
     },
     disabled: {
       type: Boolean,
-      default: false
-    }
-  })
+      default: false,
+    },
+  });
 
-  const emit = defineEmits(['update:checked'])
+  const emit = defineEmits(['update:checked']);
 
   const handleClick = () => {
-    if (!props.disabled) emit('update:checked', !props.checked)
-  }
+    if (!props.disabled) emit('update:checked', !props.checked);
+  };
 </script>
 
 <template>

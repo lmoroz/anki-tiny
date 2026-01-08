@@ -14,52 +14,52 @@
 ### ✅ Backend: Cards and FSRS System
 
 1. **Database Schema extended for FSRS**
-    - Created `CardsTable` with 13 FSRS fields (due, stability, difficulty, reps, lapses, state, etc.)
-    - Created `SettingsTable` for global settings
-    - Created `CourseSettingsTable` for individual course settings
-    - Added 5 indexes for optimization (courseId, due, state)
+   - Created `CardsTable` with 13 FSRS fields (due, stability, difficulty, reps, lapses, state, etc.)
+   - Created `SettingsTable` for global settings
+   - Created `CourseSettingsTable` for individual course settings
+   - Added 5 indexes for optimization (courseId, due, state)
 
 2. **Migration System with tracking**
-    - Implemented `_migrations` table for tracking applied migrations
-    - 4 separate migrations: courses, cards, settings, courseSettings
-    - `runMigrations()` function with automatic application
-    - Idempotency via `.ifNotExists()` for tables and indexes
-    - Successfully tested on existing DB
+   - Implemented `_migrations` table for tracking applied migrations
+   - 4 separate migrations: courses, cards, settings, courseSettings
+   - `runMigrations()` function with automatic application
+   - Idempotency via `.ifNotExists()` for tables and indexes
+   - Successfully tested on existing DB
 
 3. **FSRS Service** (`services/fsrs/index.ts`)
-    - `ts-fsrs` library integration
-    - Custom Learning Steps: 10 min → 4 hours → REVIEW
-    - State Machine: NEW → LEARNING → REVIEW → RELEARNING
-    - Functions: `calculateNextReview()`, `canShowNewCards()`, `initializeNewCard()`
-    - Time limit check (4 hours before day end)
+   - `ts-fsrs` library integration
+   - Custom Learning Steps: 10 min → 4 hours → REVIEW
+   - State Machine: NEW → LEARNING → REVIEW → RELEARNING
+   - Functions: `calculateNextReview()`, `canShowNewCards()`, `initializeNewCard()`
+   - Time limit check (4 hours before day end)
 
 4. **Repositories**
-    - `CardRepository`: CRUD + `getDueCards()` + `getCourseStats()`
-    - `SettingsRepository`: global + course + `getEffectiveSettings()`
-    - Singleton instances via `db` proxy
+   - `CardRepository`: CRUD + `getDueCards()` + `getCourseStats()`
+   - `SettingsRepository`: global + course + `getEffectiveSettings()`
+   - Singleton instances via `db` proxy
 
 5. **Validation Schemas (Zod)**
-    - `schemas/card.ts`: CreateCard, UpdateCard, ReviewCard
-    - `schemas/settings.ts`: GlobalSettings, CourseSettings
-    - JSON validation for `learningSteps`
+   - `schemas/card.ts`: CreateCard, UpdateCard, ReviewCard
+   - `schemas/settings.ts`: GlobalSettings, CourseSettings
+   - JSON validation for `learningSteps`
 
 6. **REST API Endpoints (13 endpoints)**
-    - **Cards API** (6): GET/POST/PUT/DELETE cards + stats
-    - **Training API** (2): GET due-cards + POST review
-    - **Settings API** (5): GET/PUT global + GET/PUT/DELETE course settings
+   - **Cards API** (6): GET/POST/PUT/DELETE cards + stats
+   - **Training API** (2): GET due-cards + POST review
+   - **Settings API** (5): GET/PUT global + GET/PUT/DELETE course settings
 
 ### ✅ Bug Fixes
 
 1. **TypeScript errors**
-    - FSRS types: usage of `Rating` enum with type cast
-    - Zod schema syntax: fixed `errorMap` → `message`
-    - ZodError: replaced `.errors` with `.issues`
-    - Removed unused imports
+   - FSRS types: usage of `Rating` enum with type cast
+   - Zod schema syntax: fixed `errorMap` → `message`
+   - ZodError: replaced `.errors` with `.issues`
+   - Removed unused imports
 
 2. **Code Quality**
-    - Prettier formatting applied to all files
-    - ESLint: 0 errors, 7 warnings (any types - acceptable)
-    - TypeScript compilation: successful
+   - Prettier formatting applied to all files
+   - ESLint: 0 errors, 7 warnings (any types - acceptable)
+   - TypeScript compilation: successful
 
 ### ✅ Documentation
 
@@ -252,45 +252,45 @@ No breaking changes in existing dependencies
 ### Immediate (Next Session)
 
 1. **Frontend Integration - Entity Layer**
-    - Card types and API service
-    - Pinia store for cards
-    - TypeScript types (CardState, Rating enum)
+   - Card types and API service
+   - Pinia store for cards
+   - TypeScript types (CardState, Rating enum)
 
 2. **Frontend Integration - Widgets**
-    - CardList widget
-    - CardItem component
-    - CardEditor Modal
-    - QuickAddCard component
+   - CardList widget
+   - CardItem component
+   - CardEditor Modal
+   - QuickAddCard component
 
 3. **Frontend Integration - Pages**
-    - CoursePage — cards integration
-    - TrainingPage — FSRS training
-    - SettingsPage — settings management
+   - CoursePage — cards integration
+   - TrainingPage — FSRS training
+   - SettingsPage — settings management
 
 ### Short-term
 
 1. **Backend API Testing**
-    - Postman collection for all endpoints
-    - Unit tests for FSRS service
-    - Integration tests for repositories
+   - Postman collection for all endpoints
+   - Unit tests for FSRS service
+   - Integration tests for repositories
 
 2. **E2E Testing**
-    - Create card
-    - Complete training
-    - Verify FSRS calculations
+   - Create card
+   - Complete training
+   - Verify FSRS calculations
 
 ### Medium-term
 
 1. **Extended Features**
-    - Progress statistics
-    - Course Import/Export
-    - Media in cards
-    - Search and tags
+   - Progress statistics
+   - Course Import/Export
+   - Media in cards
+   - Search and tags
 
 2. **Notification System**
-    - Backend: check due cards
-    - Electron: system notifications
-    - Tray integration
+   - Backend: check due cards
+   - Electron: system notifications
+   - Tray integration
 
 ---
 
@@ -299,15 +299,15 @@ No breaking changes in existing dependencies
 ### 🎯 Session Goals
 
 | Goal                     | Status | Note                      |
-|--------------------------|--------|---------------------------|
-| Database schema for FSRS | ✅      | 3 new tables              |
-| Migration system         | ✅      | With tracking             |
-| FSRS Service             | ✅      | ts-fsrs integration       |
-| 13 API endpoints         | ✅      | Cards, Training, Settings |
-| Repositories             | ✅      | Card + Settings           |
-| Validation               | ✅      | Zod schemas               |
-| Bug fixes                | ✅      | TypeScript + Prettier     |
-| Documentation            | ✅      | 6 new documents           |
+| ------------------------ | ------ | ------------------------- |
+| Database schema for FSRS | ✅     | 3 new tables              |
+| Migration system         | ✅     | With tracking             |
+| FSRS Service             | ✅     | ts-fsrs integration       |
+| 13 API endpoints         | ✅     | Cards, Training, Settings |
+| Repositories             | ✅     | Card + Settings           |
+| Validation               | ✅     | Zod schemas               |
+| Bug fixes                | ✅     | TypeScript + Prettier     |
+| Documentation            | ✅     | 6 new documents           |
 
 ### 📊 Metrics
 
@@ -326,16 +326,16 @@ No breaking changes in existing dependencies
 ### Known Limitations
 
 1. **ts-fsrs type compatibility**
-    - Used `as any` type cast for Rating
-    - Not critical, but requires attention when updating library
+   - Used `as any` type cast for Rating
+   - Not critical, but requires attention when updating library
 
 2. **SQLite boolean handling**
-    - Booleans stored as INTEGER (0/1)
-    - Conversion required in API responses
+   - Booleans stored as INTEGER (0/1)
+   - Conversion required in API responses
 
 3. **Migration rollback**
-    - Only `rollbackAllMigrations()` implemented (for testing)
-    - No individual migration rollback
+   - Only `rollbackAllMigrations()` implemented (for testing)
+   - No individual migration rollback
 
 ### Potential Improvements
 

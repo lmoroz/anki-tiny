@@ -52,14 +52,14 @@
 ### Database Changes
 
 1. **Добавить поля в `settings` таблицу** (глобальные лимиты):
-    - `globalNewCardsPerDay: number` (default: 20)
-    - `globalMaxReviewsPerDay: number` (default: 200)
+   - `globalNewCardsPerDay: number` (default: 20)
+   - `globalMaxReviewsPerDay: number` (default: 200)
 
 2. **Добавить поля в `courseSettings` таблицу** (курсовые лимиты):
-    - `newCardsPerDay: number | null` (default: 20)
-    - `maxReviewsPerDay: number | null` (default: 200)
-    - `newCardsPerSession: number | null` (default: 10)
-    - `maxReviewsPerSession: number | null` (default: 50)
+   - `newCardsPerDay: number | null` (default: 20)
+   - `maxReviewsPerDay: number | null` (default: 200)
+   - `newCardsPerSession: number | null` (default: 10)
+   - `maxReviewsPerSession: number | null` (default: 50)
 
 3. **Создать таблицу `dailyProgress`** для отслеживания прогресса:
 
@@ -99,18 +99,18 @@ CREATE TABLE dailyProgress
 ### Frontend Changes
 
 1. **Настройки — глобальные** (`SettingsForm.vue`):
-    - Добавить поля для `globalNewCardsPerDay`, `globalMaxReviewsPerDay`
+   - Добавить поля для `globalNewCardsPerDay`, `globalMaxReviewsPerDay`
 
 2. **Настройки — курсовые** (`CourseSettingsModal.vue`):
-    - Добавить поля для всех 4 курсовых лимитов
-    - Показывать наследование от глобальных настроек
+   - Добавить поля для всех 4 курсовых лимитов
+   - Показывать наследование от глобальных настроек
 
 3. **Страница курса** (`CoursePage.vue`):
-    - Показывать "Осталось сегодня: X новых / Y повторений"
+   - Показывать "Осталось сегодня: X новых / Y повторений"
 
 4. **Страница тренировки** (`TrainingPage.vue`):
-    - Показывать прогресс сессии: "10/50 карточек в сессии"
-    - Кнопка "Продолжить" для новой сессии
+   - Показывать прогресс сессии: "10/50 карточек в сессии"
+   - Кнопка "Продолжить" для новой сессии
 
 ## Success Criteria
 
@@ -146,8 +146,7 @@ CREATE TABLE dailyProgress
 
 - **Митигация**: "Новый день" начинается в `trainingStartTime` (например, 08:00)
 - **Реализация**: При запросе карточек проверяем:
-    1. Последний сохранённый прогресс был до сегодняшнего `trainingStartTime`?
-    2. Если да → считаем это новым днём, игнорируем старый прогресс
-    3. Если нет → используем прогресс из `dailyProgress`
+  1. Последний сохранённый прогресс был до сегодняшнего `trainingStartTime`?
+  2. Если да → считаем это новым днём, игнорируем старый прогресс
+  3. Если нет → используем прогресс из `dailyProgress`
 - **Преимущество**: Не требует background процессов, работает даже если приложение было закрыто
-

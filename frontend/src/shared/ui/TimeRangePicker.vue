@@ -1,55 +1,55 @@
 <script setup>
-  import { computed } from 'vue'
+  import { computed } from 'vue';
 
   const props = defineProps({
     start: {
       type: Number,
-      required: true // Minutes from midnight (0-1439)
+      required: true, // Minutes from midnight (0-1439)
     },
     end: {
       type: Number,
-      required: true // Minutes from midnight (0-1439)
+      required: true, // Minutes from midnight (0-1439)
     },
     disabled: {
       type: Boolean,
-      default: false
-    }
-  })
+      default: false,
+    },
+  });
 
-  const emit = defineEmits(['update:start', 'update:end'])
+  const emit = defineEmits(['update:start', 'update:end']);
 
   // Convert minutes to hours/minutes
-  const startHours = computed(() => Math.floor(props.start / 60))
-  const startMinutes = computed(() => props.start % 60)
-  const endHours = computed(() => Math.floor(props.end / 60))
-  const endMinutes = computed(() => props.end % 60)
+  const startHours = computed(() => Math.floor(props.start / 60));
+  const startMinutes = computed(() => props.start % 60);
+  const endHours = computed(() => Math.floor(props.end / 60));
+  const endMinutes = computed(() => props.end % 60);
 
   // Handlers to convert back to minutes
   function updateStartHours(hours) {
-    emit('update:start', hours * 60 + startMinutes.value)
+    emit('update:start', hours * 60 + startMinutes.value);
   }
 
   function updateStartMinutes(minutes) {
-    emit('update:start', startHours.value * 60 + minutes)
+    emit('update:start', startHours.value * 60 + minutes);
   }
 
   function updateEndHours(hours) {
-    emit('update:end', hours * 60 + endMinutes.value)
+    emit('update:end', hours * 60 + endMinutes.value);
   }
 
   function updateEndMinutes(minutes) {
-    emit('update:end', endHours.value * 60 + minutes)
+    emit('update:end', endHours.value * 60 + minutes);
   }
 
   const visualRange = computed(() => {
-    const totalMinutes = 24 * 60 // 1440 minutes in a day
-    const startPercent = (props.start / totalMinutes) * 100
-    const endPercent = (props.end / totalMinutes) * 100
+    const totalMinutes = 24 * 60; // 1440 minutes in a day
+    const startPercent = (props.start / totalMinutes) * 100;
+    const endPercent = (props.end / totalMinutes) * 100;
     return {
       left: `${startPercent}%`,
-      width: `${endPercent - startPercent}%`
-    }
-  })
+      width: `${endPercent - startPercent}%`,
+    };
+  });
 </script>
 
 <template>

@@ -19,7 +19,7 @@ export const useCourseStore = defineStore('course', () => {
   });
 
   const getCourseById = computed(() => {
-    return (id) => courses.value.find(course => course.id === id);
+    return (id) => courses.value.find((course) => course.id === id);
   });
 
   // Actions
@@ -58,7 +58,7 @@ export const useCourseStore = defineStore('course', () => {
     error.value = null;
     try {
       const updatedCourse = await coursesApi.update(id, data);
-      const index = courses.value.findIndex(c => c.id === id);
+      const index = courses.value.findIndex((c) => c.id === id);
       if (index !== -1) {
         courses.value[index] = updatedCourse;
       }
@@ -77,7 +77,7 @@ export const useCourseStore = defineStore('course', () => {
     error.value = null;
     try {
       await coursesApi.delete(id);
-      courses.value = courses.value.filter(c => c.id !== id);
+      courses.value = courses.value.filter((c) => c.id !== id);
     } catch (err) {
       error.value = err.response?.data?.error || 'Ошибка удаления курса';
       console.error('[Course Store] Failed to delete course:', err);
@@ -99,6 +99,6 @@ export const useCourseStore = defineStore('course', () => {
     fetchCourses,
     createCourse,
     updateCourse,
-    deleteCourse
+    deleteCourse,
   };
 });

@@ -3,32 +3,32 @@
     padding: {
       type: String,
       default: 'md',
-      validator: value => ['sm', 'md', 'lg'].includes(value)
+      validator: (value) => ['sm', 'md', 'lg'].includes(value),
     },
     hoverable: {
       type: Boolean,
-      default: false
+      default: false,
     },
     highlight: {
       type: Boolean,
-      default: false
+      default: false,
     },
     noShadow: {
       type: Boolean,
-      default: false
+      default: false,
     },
     rounded: {
       type: String,
       default: 'xl',
-      validator: value => ['xl', 'sm', 'md', 'lg', 'full'].includes(value)
-    }
-  })
+      validator: (value) => ['xl', 'sm', 'md', 'lg', 'full'].includes(value),
+    },
+  });
 
   const paddingMap = {
     sm: 'p-2',
     md: 'p-4',
-    lg: 'p-8'
-  }
+    lg: 'p-8',
+  };
 </script>
 
 <template>
@@ -39,7 +39,7 @@
       paddingMap[padding],
       { 'card-hoverable': hoverable },
       { 'card-highlighted': highlight },
-      { 'shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)]': !noShadow }
+      { 'shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)]': !noShadow },
     ]">
     <!-- Card Background Layers -->
     <!-- 1. Base dark tint -->
@@ -52,7 +52,8 @@
       class="absolute -top-[20%] -right-[20%] w-[80%] h-[80%] bg-[radial-gradient(circle,rgba(255,255,255,0.1)_0%,transparent_50%)] blur-2xl pointer-events-none" />
 
     <!-- 3. Bottom Gradient Glow -->
-    <div class="absolute bottom-0 inset-x-0 h-2/3 bg-gradient-to-t from-blue-600/30 via-blue-900/50 to-transparent pointer-events-none" />
+    <div
+      class="absolute bottom-0 inset-x-0 h-2/3 bg-gradient-to-t from-blue-600/30 via-blue-900/50 to-transparent pointer-events-none" />
 
     <div
       v-if="highlight"

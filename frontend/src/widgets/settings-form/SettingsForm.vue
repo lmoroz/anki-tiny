@@ -1,126 +1,126 @@
 <script setup>
-  import { ref, computed, watch } from 'vue'
+  import { ref, computed, watch } from 'vue';
 
   const props = defineProps({
     modelValue: {
       type: Object,
-      required: true
+      required: true,
     },
     readonly: {
       type: Boolean,
-      default: false
+      default: false,
     },
     showSaveButton: {
       type: Boolean,
-      default: true
+      default: true,
     },
     isCourseSettings: {
       type: Boolean,
-      default: false
-    }
-  })
+      default: false,
+    },
+  });
 
-  const emit = defineEmits(['update:modelValue', 'save'])
+  const emit = defineEmits(['update:modelValue', 'save']);
 
-  const localSettings = ref({ ...props.modelValue })
+  const localSettings = ref({ ...props.modelValue });
 
   // Helper для конвертации learningSteps из JSON в user-friendly формат
   function parseLearningStepsForDisplay(jsonString) {
-    if (!jsonString) return ''
+    if (!jsonString) return '';
     try {
-      const parsed = JSON.parse(jsonString)
-      if (Array.isArray(parsed)) return parsed.join(', ')
+      const parsed = JSON.parse(jsonString);
+      if (Array.isArray(parsed)) return parsed.join(', ');
     } catch {
       // Если это уже строка с запятыми, оставляем как есть
-      return jsonString
+      return jsonString;
     }
-    return jsonString
+    return jsonString;
   }
 
   // Helper для конвертации learningSteps из user-friendly в JSON
   function formatLearningStepsForBackend(input) {
-    if (!input) return ''
+    if (!input) return '';
     // Если это уже JSON-массив, возвращаем как есть
-    if (input.trim().startsWith('[')) return input
+    if (input.trim().startsWith('[')) return input;
     // Конвертируем строку с числами через запятую в JSON-массив
     const numbers = input
       .split(',')
-      .map(s => parseFloat(s.trim()))
-      .filter(n => !isNaN(n) && n > 0)
-    return JSON.stringify(numbers)
+      .map((s) => parseFloat(s.trim()))
+      .filter((n) => !isNaN(n) && n > 0);
+    return JSON.stringify(numbers);
   }
 
   // Computed для отображения learningSteps в удобном формате
   const displayLearningSteps = computed({
     get: () => parseLearningStepsForDisplay(localSettings.value.learningSteps),
-    set: value => {
-      localSettings.value.learningSteps = formatLearningStepsForBackend(value)
-    }
-  })
+    set: (value) => {
+      localSettings.value.learningSteps = formatLearningStepsForBackend(value);
+    },
+  });
 
   // Helper function to format minutes to HH:MM
   function formatTime(minutes) {
-    const hours = Math.floor(minutes / 60)
-    const mins = minutes % 60
-    return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
   }
 
   // Validation
   const validation = computed(() => {
-    const errors = {}
+    const errors = {};
 
     if (localSettings.value.trainingStartTime >= localSettings.value.trainingEndTime) {
-      errors.timeRange = 'Начало дня должно быть раньше конца'
+      errors.timeRange = 'Начало дня должно быть раньше конца';
     }
 
-    const durationMinutes = localSettings.value.trainingEndTime - localSettings.value.trainingStartTime
-    const durationHours = durationMinutes / 60
+    const durationMinutes = localSettings.value.trainingEndTime - localSettings.value.trainingStartTime;
+    const durationHours = durationMinutes / 60;
     if (durationHours < localSettings.value.minTimeBeforeEnd) {
-      errors.minTime = 'Диапазон тренировок слишком короткий для указанного минимального времени'
+      errors.minTime = 'Диапазон тренировок слишком короткий для указанного минимального времени';
     }
 
     if (localSettings.value.minTimeBeforeEnd < 1 || localSettings.value.minTimeBeforeEnd > 12) {
-      errors.minTimeValue = 'Минимальное время должно быть от 1 до 12 часов'
+      errors.minTimeValue = 'Минимальное время должно быть от 1 до 12 часов';
     }
 
     // Validate learningSteps
     if (localSettings.value.learningSteps) {
       try {
-        const parsed = JSON.parse(localSettings.value.learningSteps)
-        if (!Array.isArray(parsed) || !parsed.every(n => typeof n === 'number' && n > 0)) {
-          errors.learningSteps = 'Шаги обучения должны быть положительными числами'
+        const parsed = JSON.parse(localSettings.value.learningSteps);
+        if (!Array.isArray(parsed) || !parsed.every((n) => typeof n === 'number' && n > 0)) {
+          errors.learningSteps = 'Шаги обучения должны быть положительными числами';
         }
       } catch {
-        errors.learningSteps = 'Неверный формат (используйте числа через запятую)'
+        errors.learningSteps = 'Неверный формат (используйте числа через запятую)';
       }
     }
 
     return {
       isValid: Object.keys(errors).length === 0,
-      errors
-    }
-  })
+      errors,
+    };
+  });
 
   // Синхронизация с parent
   watch(
     localSettings,
-    newVal => {
-      emit('update:modelValue', newVal)
+    (newVal) => {
+      emit('update:modelValue', newVal);
     },
     { deep: true }
-  )
+  );
 
   watch(
     () => props.modelValue,
-    newVal => {
-      localSettings.value = { ...newVal }
+    (newVal) => {
+      localSettings.value = { ...newVal };
     },
     { deep: true }
-  )
+  );
 
   function handleSave() {
-    console.log('SettingsForm handleSave', localSettings.value)
-    if (validation.value.isValid) emit('save', localSettings.value)
+    console.log('SettingsForm handleSave', localSettings.value);
+    if (validation.value.isValid) emit('save', localSettings.value);
   }
 </script>
 
@@ -149,7 +149,9 @@
         min="1"
         max="12"
         :disabled="readonly" />
-      <p class="help-text">Новые карточки не будут показываться, если до конца дня осталось меньше указанного времени</p>
+      <p class="help-text">
+        Новые карточки не будут показываться, если до конца дня осталось меньше указанного времени
+      </p>
       <p
         v-if="validation.errors.minTime || validation.errors.minTimeValue"
         class="error-message">
@@ -177,7 +179,9 @@
           :disabled="readonly" />
         <span>Включить размытие интервалов (fuzz)</span>
       </label>
-      <p class="help-text">Добавляет случайную вариацию к интервалам повторения для более естественного распределения карточек</p>
+      <p class="help-text">
+        Добавляет случайную вариацию к интервалам повторения для более естественного распределения карточек
+      </p>
     </div>
 
     <!-- Learning Steps -->
@@ -224,7 +228,9 @@
       v-if="!isCourseSettings"
       class="form-section flex flex-col gap-[8px]">
       <h3>Лимиты курсов по умолчанию</h3>
-      <p class="section-desc text-sm text-gray-400 mb-2">Эти настройки применяются ко всем курсам, у которых нет индивидуальных лимитов</p>
+      <p class="section-desc text-sm text-gray-400 mb-2">
+        Эти настройки применяются ко всем курсам, у которых нет индивидуальных лимитов
+      </p>
 
       <label>Новых карточек в день (на курс)</label>
       <Input
@@ -268,7 +274,9 @@
         min="0"
         :disabled="readonly"
         placeholder="Наследуется от глобальных" />
-      <p class="help-text">Максимальное количество новых карточек для изучения в день в этом курсе (оставьте пустым для наследования)</p>
+      <p class="help-text">
+        Максимальное количество новых карточек для изучения в день в этом курсе (оставьте пустым для наследования)
+      </p>
 
       <label>Повторений в день</label>
       <Input

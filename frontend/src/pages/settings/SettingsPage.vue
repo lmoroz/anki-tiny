@@ -1,20 +1,20 @@
 <script setup>
-  import { ref, onMounted, computed } from 'vue'
-  import { useRouter } from 'vue-router'
-  import { toast } from 'vue3-toastify'
-  import { useSettingsStore } from '@/entities/settings/model/useSettingsStore.js'
-  import { useCourseStore } from '@/entities/course/model/useCourseStore.js'
+  import { ref, onMounted, computed } from 'vue';
+  import { useRouter } from 'vue-router';
+  import { toast } from 'vue3-toastify';
+  import { useSettingsStore } from '@/entities/settings/model/useSettingsStore.js';
+  import { useCourseStore } from '@/entities/course/model/useCourseStore.js';
 
-  const router = useRouter()
-  const settingsStore = useSettingsStore()
-  const courseStore = useCourseStore()
+  const router = useRouter();
+  const settingsStore = useSettingsStore();
+  const courseStore = useCourseStore();
 
-  const globalSettings = ref(null)
-  const loading = ref(true)
+  const globalSettings = ref(null);
+  const loading = ref(true);
 
   // Модальное окно настроек курса
-  const showCourseModal = ref(false)
-  const selectedCourseId = ref(null)
+  const showCourseModal = ref(false);
+  const selectedCourseId = ref(null);
 
   // Дефолтные значения настроек
   const DEFAULT_SETTINGS = {
@@ -22,53 +22,53 @@
     trainingEndTime: 1320, // 22:00 в минутах (22 * 60)
     minTimeBeforeEnd: 4,
     notificationsEnabled: true,
-    enableFuzz: true
-  }
+    enableFuzz: true,
+  };
 
   onMounted(async () => {
     try {
-      await Promise.all([settingsStore.fetchGlobalSettings(), courseStore.fetchCourses()])
+      await Promise.all([settingsStore.fetchGlobalSettings(), courseStore.fetchCourses()]);
       // Используем настройки из store или дефолтные значения
-      globalSettings.value = { ...(settingsStore.globalSettings || DEFAULT_SETTINGS) }
+      globalSettings.value = { ...(settingsStore.globalSettings || DEFAULT_SETTINGS) };
     } catch (error) {
-      console.error('Failed to load settings:', error)
+      console.error('Failed to load settings:', error);
       // При ошибке используем дефолтные значения
-      globalSettings.value = { ...DEFAULT_SETTINGS }
-      toast.error('Failed to load settings:' + error.message)
+      globalSettings.value = { ...DEFAULT_SETTINGS };
+      toast.error('Failed to load settings:' + error.message);
     } finally {
-      loading.value = false
+      loading.value = false;
     }
-  })
+  });
 
   function handleBack() {
-    router.push('/')
+    router.push('/');
   }
 
   async function handleSaveGlobal(settings) {
     try {
-      await settingsStore.updateGlobalSettings(settings)
-      toast.success('Глобальные настройки сохранены!')
+      await settingsStore.updateGlobalSettings(settings);
+      toast.success('Глобальные настройки сохранены!');
     } catch (error) {
-      toast.error('Ошибка сохранения: ' + error.message)
+      toast.error('Ошибка сохранения: ' + error.message);
     }
   }
 
   function openCourseSettings(courseId) {
-    selectedCourseId.value = courseId
-    showCourseModal.value = true
+    selectedCourseId.value = courseId;
+    showCourseModal.value = true;
   }
 
   function closeCourseModal() {
-    showCourseModal.value = false
-    selectedCourseId.value = null
+    showCourseModal.value = false;
+    selectedCourseId.value = null;
   }
 
-  const sortedCourses = computed(() => courseStore.sortedCourses)
+  const sortedCourses = computed(() => courseStore.sortedCourses);
 
   const selectedCourse = computed(() => {
-    if (!selectedCourseId.value) return null
-    return courseStore.getCourseById(selectedCourseId.value)
-  })
+    if (!selectedCourseId.value) return null;
+    return courseStore.getCourseById(selectedCourseId.value);
+  });
 </script>
 
 <template>
@@ -99,7 +99,9 @@
       <section class="settings-section">
         <Card>
           <h2>Глобальные настройки</h2>
-          <p class="section-description">Эти настройки применяются ко всем курсам по умолчанию. Вы можете переопределить их для отдельных курсов.</p>
+          <p class="section-description">
+            Эти настройки применяются ко всем курсам по умолчанию. Вы можете переопределить их для отдельных курсов.
+          </p>
           <SettingsForm
             v-if="globalSettings"
             v-model="globalSettings"

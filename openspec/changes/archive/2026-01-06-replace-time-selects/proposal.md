@@ -22,6 +22,7 @@
 ### Design System Alignment
 
 Стандартные `<select>` элементы не поддаются полной кастомизации:
+
 - Невозможно применить custom scrollbar styles во всех браузерах
 - Dropdown menu имеет разный вид в Chrome, Firefox, Safari
 - Нельзя полностью контролировать цвета, размеры, transitions
@@ -31,6 +32,7 @@ Scroll picker позволяет создать компонент, полнос
 ### Future-Proofing
 
 Приложение потенциально может быть портировано на:
+
 - **Tablet/Hybrid devices** — Windows планшеты и 2-in-1 устройства требуют touch-friendly интерфейсов
 - **Mobile version** — возможная PWA или mobile wrapper версия приложения
 
@@ -42,7 +44,7 @@ Scroll picker обеспечивает готовность к этим сцен
 
 ## Proposed Solution
 
-Заменить стандартные HTML `<select>` элементы на компонент `vue-scroll-picker` (https://www.npmjs.com/package/vue-scroll-picker), который предоставляет:
+Заменить стандартные HTML `<select>` элементы на компонент `vue-scroll-picker` (<https://www.npmjs.com/package/vue-scroll-picker>), который предоставляет:
 
 - Touch-friendly scroll-based интерфейс для выбора времени
 - Полную кастомизацию внешнего вида через CSS

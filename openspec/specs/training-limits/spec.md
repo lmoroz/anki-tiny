@@ -1,8 +1,11 @@
 # training-limits Specification
 
 ## Purpose
+
 TBD - created by archiving change add-training-limits. Update Purpose after archive.
+
 ## Requirements
+
 ### Requirement: Global Daily Limits SHALL Aggregate Across All Courses
 
 **Priority:** MUST  
@@ -142,8 +145,8 @@ TBD - created by archiving change add-training-limits. Update Purpose after arch
 
 1. Получить последний `updatedAt` из `dailyProgress` для курса
 2. Вычислить последний прошедший `trainingStartTime`:
-    - Если сейчас >= `trainingStartTime` сегодня → `trainingStartTime` сегодня
-    - Если сейчас < `trainingStartTime` сегодня → `trainingStartTime` вчера
+   - Если сейчас >= `trainingStartTime` сегодня → `trainingStartTime` сегодня
+   - Если сейчас < `trainingStartTime` сегодня → `trainingStartTime` вчера
 3. Если `updatedAt` < последний `trainingStartTime` → это новый день, сбросить лимиты
 4. Иначе → продолжение текущего дня, использовать существующий прогресс
 
@@ -218,11 +221,11 @@ TBD - created by archiving change add-training-limits. Update Purpose after arch
 **THEN** ДОЛЖНЫ быть поля:
 
 - **Дневные лимиты:**
-    - "Новых карточек в день" — nullable, placeholder показывает глобальное значение
-    - "Повторений в день" — nullable, placeholder показывает глобальное значение
+  - "Новых карточек в день" — nullable, placeholder показывает глобальное значение
+  - "Повторений в день" — nullable, placeholder показывает глобальное значение
 - **Сессионные лимиты:**
-    - "Новых карточек за сессию" — число, default 10
-    - "Повторений за сессию" — число, default 50
+  - "Новых карточек за сессию" — число, default 10
+  - "Повторений за сессию" — число, default 50
 
 ---
 
@@ -254,4 +257,3 @@ TBD - created by archiving change add-training-limits. Update Purpose after arch
 **AND** оба окна ДОЛЖНЫ видеть обновлённый прогресс после следующего запроса
 
 ---
-

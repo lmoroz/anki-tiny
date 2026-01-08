@@ -23,31 +23,31 @@
 
 ```typescript
 const scrollToCardWithBounce = (cardId: string) => {
-  const cardElement = scrollContainer.value?.querySelector(`[data-card-id="${cardId}"]`)
-  
+  const cardElement = scrollContainer.value?.querySelector(`[data-card-id="${cardId}"]`);
+
   if (!cardElement) {
-    console.warn(`Card with id ${cardId} not found in list`)
-    return
+    console.warn(`Card with id ${cardId} not found in list`);
+    return;
   }
-  
+
   // Прокручиваем к карточке
-  cardElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  
+  cardElement.scrollIntoView({ behavior: "smooth", block: "start" });
+
   // Добавляем класс анимации
   setTimeout(() => {
-    cardElement.classList.add('anim-bounce-in-bck')
-    
+    cardElement.classList.add("anim-bounce-in-bck");
+
     // Удаляем класс после завершения анимации
     setTimeout(() => {
-      cardElement.classList.remove('anim-bounce-in-bck')
-    }, 2000)
-  }, 500) // Задержка перед анимацией, чтобы прокрутка завершилась
-}
+      cardElement.classList.remove("anim-bounce-in-bck");
+    }, 2000);
+  }, 500); // Задержка перед анимацией, чтобы прокрутка завершилась
+};
 
 // Экспортируем метод через defineExpose
 defineExpose({
-  scrollToCardWithBounce
-})
+  scrollToCardWithBounce,
+});
 ```
 
 **Template изменения**:
@@ -87,7 +87,9 @@ defineExpose({
     animation-timing-function: ease-in;
     transform: scale(1.5);
   }
-  72%, 89%, to {
+  72%,
+  89%,
+  to {
     animation-timing-function: ease-out;
     transform: scale(1);
   }
@@ -115,7 +117,7 @@ defineExpose({
 **Новый ref**:
 
 ```typescript
-const cardListRef = ref(null)
+const cardListRef = ref(null);
 ```
 
 **Изменённые обработчики**:
@@ -127,27 +129,25 @@ const handleSaveCard = async (data) => {
   try {
     if (editingCard.value) {
       // Режим редактирования
-      await cardStore.updateCard(editingCard.value.id, { ...data, resetProgress: true })
-      const editedCardId = editingCard.value.id
-      
+      await cardStore.updateCard(editingCard.value.id, { ...data, resetProgress: true });
+      const editedCardId = editingCard.value.id;
+
       // Обновляем список карточек
-      await cardStore.fetchCardsByCourse(courseId)
-      
+      await cardStore.fetchCardsByCourse(courseId);
+
       // Прокручиваем к отредактированной карточке с анимацией
       nextTick(() => {
-        scrollToCardWithBounce(editedCardId)
-      })
-    }
-    else {
+        scrollToCardWithBounce(editedCardId);
+      });
+    } else {
       // Режим создания
-      await cardStore.createCard(courseId, data)
+      await cardStore.createCard(courseId, data);
     }
-    handleCloseModal()
+    handleCloseModal();
+  } catch (err) {
+    console.error("Failed to save card:", err);
   }
-  catch (err) {
-    console.error('Failed to save card:', err)
-  }
-}
+};
 ```
 
 #### handleQuickAdd (изменённый)
@@ -155,41 +155,34 @@ const handleSaveCard = async (data) => {
 ```typescript
 const handleQuickAdd = async (cardData: { front: string; back: string }) => {
   try {
-    const newCard = await cardStore.createCard(courseId, cardData)
-    
+    const newCard = await cardStore.createCard(courseId, cardData);
+
     // Прокручиваем к добавленной карточке с анимацией
     nextTick(() => {
-      scrollToCardWithBounce(newCard.id)
-    })
+      scrollToCardWithBounce(newCard.id);
+    });
+  } catch (err) {
+    console.error("Failed to create card:", err);
   }
-  catch (err) {
-    console.error('Failed to create card:', err)
-  }
-}
+};
 ```
 
 #### scrollToCardWithBounce (новый)
 
 ```typescript
 const scrollToCardWithBounce = (cardId: string) => {
-  const cardListComponent = cardListRef.value
+  const cardListComponent = cardListRef.value;
   if (cardListComponent) {
-    cardListComponent.scrollToCardWithBounce(cardId)
+    cardListComponent.scrollToCardWithBounce(cardId);
   }
-}
+};
 ```
 
 **Template изменения**:
 
 ```vue
 <!-- Desktop cards list -->
-<CardList
-  ref="cardListRef"
-  :cards="cards"
-  :loading="cardsLoading"
-  @edit="handleEditCard"
-  @delete="handleDeleteCard"
-/>
+<CardList ref="cardListRef" :cards="cards" :loading="cardsLoading" @edit="handleEditCard" @delete="handleDeleteCard" />
 
 <!-- Mobile cards list (inside panel) -->
 <CardList
@@ -219,9 +212,9 @@ const scrollToCardWithBounce = (cardId: string) => {
 
 ```typescript
 interface UpdateCardRequest {
-  front: string
-  back: string
-  resetProgress?: boolean // Флаг сброса прогресса
+  front: string;
+  back: string;
+  resetProgress?: boolean; // Флаг сброса прогресса
 }
 ```
 
@@ -241,12 +234,12 @@ interface UpdateCardRequest {
 Файл: `backend/src/routes/cards.ts`
 
 ```typescript
-router.put('/courses/:courseId/cards/:cardId', async (req, res) => {
-  const { courseId, cardId } = req.params
-  const { front, back, resetProgress } = req.body
-  
-  const updates: Partial<Card> = { front, back }
-  
+router.put("/courses/:courseId/cards/:cardId", async (req, res) => {
+  const { courseId, cardId } = req.params;
+  const { front, back, resetProgress } = req.body;
+
+  const updates: Partial<Card> = { front, back };
+
   if (resetProgress) {
     Object.assign(updates, {
       state: CardState.New,
@@ -257,12 +250,12 @@ router.put('/courses/:courseId/cards/:cardId', async (req, res) => {
       lastReview: null,
       due: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
       interval: null,
-    })
+    });
   }
-  
-  const updatedCard = await cardRepository.updateCard(cardId, updates)
-  res.json(updatedCard)
-})
+
+  const updatedCard = await cardRepository.updateCard(cardId, updates);
+  res.json(updatedCard);
+});
 ```
 
 ---
@@ -284,16 +277,16 @@ sequenceDiagram
     User->>CardItem: Нажимает "Редактировать"
     CardItem->>CoursePage: emit('edit', card)
     CoursePage->>CardEditorModal: показать модалку с данными карточки
-    
+
     User->>CardEditorModal: Редактирует поля
     User->>CardEditorModal: Нажимает "Сохранить"
     CardEditorModal->>CoursePage: emit('save', cardData)
-    
+
     CoursePage->>CardStore: updateCard(cardId, { ...data, resetProgress: true })
     CardStore->>Backend: PUT /api/courses/:id/cards/:id
     Backend->>Backend: Обновить карточку + сброс прогресса
     Backend-->>CardStore: Success
-    
+
     CoursePage->>CardStore: fetchCardsByCourse(courseId)
     CoursePage->>CoursePage: nextTick()
     CoursePage->>CardList: scrollToCardWithBounce(cardId)
@@ -318,7 +311,7 @@ sequenceDiagram
     CardStore->>Backend: POST /api/courses/:id/cards
     Backend-->>CardStore: newCard
     CardStore-->>CoursePage: newCard
-    
+
     CoursePage->>CoursePage: nextTick()
     CoursePage->>CardList: scrollToCardWithBounce(newCard.id)
     CardList->>CardList: Прокрутка + анимация

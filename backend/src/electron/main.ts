@@ -12,7 +12,9 @@ let mainWindow: electron.BrowserWindow | null;
 async function createWindow() {
   // Определяем режим работы и пути
   const isDev = !app.isPackaged;
-  const DIST_PATH = isDev ? path.join(__dirname, '../../../frontend/dist') : path.join(__dirname, '../../frontend-dist');
+  const DIST_PATH = isDev
+    ? path.join(__dirname, '../../../frontend/dist')
+    : path.join(__dirname, '../../frontend-dist');
 
   // В режиме разработки используем Vite dev server
   const VITE_DEV_SERVER_URL = 'http://localhost:5173';

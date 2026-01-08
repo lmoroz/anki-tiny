@@ -1,83 +1,83 @@
 <script setup>
-  import { onMounted, computed, onUnmounted } from 'vue'
-  import { useRoute, useRouter } from 'vue-router'
-  import { storeToRefs } from 'pinia'
-  import { useTrainingStore } from '@/entities/training/model/useTrainingStore'
-  import { useStatsStore } from '@/entities/stats/model/useStatsStore'
-  import { toast } from 'vue3-toastify'
+  import { onMounted, computed, onUnmounted } from 'vue';
+  import { useRoute, useRouter } from 'vue-router';
+  import { storeToRefs } from 'pinia';
+  import { useTrainingStore } from '@/entities/training/model/useTrainingStore';
+  import { useStatsStore } from '@/entities/stats/model/useStatsStore';
+  import { toast } from 'vue3-toastify';
 
-  const route = useRoute()
-  const router = useRouter()
-  const courseId = parseInt(route.params.id)
+  const route = useRoute();
+  const router = useRouter();
+  const courseId = parseInt(route.params.id);
 
-  const trainingStore = useTrainingStore()
-  const statsStore = useStatsStore()
-  const { currentCard, isSessionComplete, loading, sessionLimits, progress } = storeToRefs(trainingStore)
+  const trainingStore = useTrainingStore();
+  const statsStore = useStatsStore();
+  const { currentCard, isSessionComplete, loading, sessionLimits, progress } = storeToRefs(trainingStore);
 
   // Состояние переворота карточки (локальное для UI)
-  import { ref } from 'vue'
+  import { ref } from 'vue';
 
-  const isFlipped = ref(false)
+  const isFlipped = ref(false);
 
   onMounted(async () => {
     try {
-      await trainingStore.startSession(courseId)
+      await trainingStore.startSession(courseId);
     } catch (error) {
-      toast.error('Не удалось запустить тренировку')
-      router.push(`/course/${courseId}`)
+      toast.error('Не удалось запустить тренировку');
+      router.push(`/course/${courseId}`);
     }
-  })
+  });
 
   onUnmounted(() => {
-    trainingStore.resetSession()
-  })
+    trainingStore.resetSession();
+  });
 
   const handleFlip = () => {
-    isFlipped.value = !isFlipped.value
-  }
+    isFlipped.value = !isFlipped.value;
+  };
 
-  const handleAnswer = async ratingCode => {
+  const handleAnswer = async (ratingCode) => {
     const ratingMap = {
       again: 1,
       hard: 2,
       good: 3,
-      easy: 4
-    }
+      easy: 4,
+    };
 
-    const rating = ratingMap[ratingCode]
-    if (!rating) return
+    const rating = ratingMap[ratingCode];
+    if (!rating) return;
 
     try {
-      await trainingStore.submitReview(rating)
-      isFlipped.value = false
+      await trainingStore.submitReview(rating);
+      isFlipped.value = false;
 
       // Обновляем глобальную статистику
-      statsStore.fetchGlobalStats()
+      statsStore.fetchGlobalStats();
 
       if (isSessionComplete.value) {
-        toast.success('Сессия завершена!')
+        toast.success('Сессия завершена!');
       }
     } catch (error) {
-      toast.error('Ошибка сохранения ответа')
+      toast.error('Ошибка сохранения ответа');
     }
-  }
+  };
 
   const handleBack = () => {
-    router.push(`/course/${courseId}`)
-  }
+    router.push(`/course/${courseId}`);
+  };
 
   const handleContinue = async () => {
     // Попробовать получить еще карточки (новая сессия)
     try {
-      await trainingStore.startSession(courseId)
+      await trainingStore.startSession(courseId);
       if (trainingStore.sessionCards.length === 0) {
-        toast.info('На сегодня карточек больше нет')
-        router.push(`/course/${courseId}`)
+        toast.info('На сегодня карточек больше нет');
+        router.push(`/course/${courseId}`);
       }
     } catch (error) {
-      toast.error('Ошибка продолжения тренировки')
+      toast.error('Ошибка продолжения тренировки');
     }
-  }
+  };
 </script>
 
 <template>

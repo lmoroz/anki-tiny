@@ -2,17 +2,17 @@
   defineProps({
     icon: {
       type: String,
-      required: true
+      required: true,
     },
     label: {
       type: String,
-      required: true
+      required: true,
     },
     value: {
       type: Number,
-      required: true
-    }
-  })
+      required: true,
+    },
+  });
 </script>
 
 <template>
