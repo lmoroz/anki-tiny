@@ -17,11 +17,13 @@ export const trainingApi = {
    * Отправить результат повторения
    * @param {number} cardId
    * @param {number} rating
+   * @param {string} timezone
    */
-  async submitReview(cardId, rating) {
+  async submitReview(cardId, rating, timezone = 'UTC') {
     const response = await api.post('/training/review', {
       cardId,
       rating,
+      timezone,
     });
     return response.data;
   },

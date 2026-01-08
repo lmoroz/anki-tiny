@@ -56,7 +56,10 @@ export const useTrainingStore = defineStore('training', () => {
     if (!currentCard.value) return;
 
     try {
-      await trainingApi.submitReview(currentCard.value.id, rating);
+      // Определяем часовой пояс пользователя
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      await trainingApi.submitReview(currentCard.value.id, rating, timezone);
 
       // Обновляем локальные счетчики лимитов если они есть
       if (sessionLimits.value) {
@@ -64,14 +67,16 @@ export const useTrainingStore = defineStore('training', () => {
           // New card
           sessionLimits.value.newCardsRemaining = Math.max(0, sessionLimits.value.newCardsRemaining - 1);
           sessionLimits.value.globalNewRemaining = Math.max(0, sessionLimits.value.globalNewRemaining - 1);
-        } else {
+        }
+        else {
           sessionLimits.value.reviewsRemaining = Math.max(0, sessionLimits.value.reviewsRemaining - 1);
           sessionLimits.value.globalReviewsRemaining = Math.max(0, sessionLimits.value.globalReviewsRemaining - 1);
         }
       }
 
       currentCardIndex.value++;
-    } catch (err) {
+    }
+    catch (err) {
       console.error('[Training Store] Failed to submit review:', err);
       throw err;
     }

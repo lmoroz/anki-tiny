@@ -22,6 +22,7 @@ export const ReviewCardSchema = z.object({
     .positive()
     .min(1, 'Rating must be 1 (Again), 2 (Hard), 3 (Good), or 4 (Easy)')
     .max(4, 'Rating must be 1 (Again), 2 (Hard), 3 (Good), or 4 (Easy)'),
+  timezone: z.string().optional(),
 });
 
 // Схема для массового удаления карточек

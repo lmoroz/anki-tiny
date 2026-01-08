@@ -142,25 +142,25 @@ export async function calculateAvailableCards(courseId: number, sessionMode: boo
 
 /**
  * Обновить прогресс после повторения карточки
+ * @param cardId - ID карточки
+ * @param wasNew - была ли карточка новой
+ * @param timezone - IANA timezone для определения "сегодня"
  */
-export async function updateProgressAfterReview(cardId: number, wasNew: boolean): Promise<void> {
+export async function updateProgressAfterReview(cardId: number, wasNew: boolean, timezone = 'UTC'): Promise<void> {
   // 1. Получаем карточку для определения курса
   const card = await cardRepository.getCardById(cardId);
   if (!card) return;
 
-  // 2. Форматируем дату
-  const today = formatDate(new Date());
+  // 2. Форматируем дату с учетом timezone
+  const today = formatDate(new Date(), timezone);
 
   // 3. Обновляем или создаём запись прогресса
   const progress = await progressRepository.getProgress(today, card.courseId);
 
   if (progress) {
     // Инкрементируем счётчик
-    if (wasNew) {
-      await progressRepository.increment(progress.id, 'newCardsStudied');
-    } else {
-      await progressRepository.increment(progress.id, 'reviewsCompleted');
-    }
+    if (wasNew) await progressRepository.increment(progress.id, 'newCardsStudied');
+    else await progressRepository.increment(progress.id, 'reviewsCompleted');
   } else {
     // Создаём новую запись
     await progressRepository.create({

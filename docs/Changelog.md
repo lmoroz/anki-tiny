@@ -5,6 +5,48 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.6.1] - 2026-01-09 01:25
+
+### Fixed
+
+#### Daily Progress Timezone-Aware Tracking
+
+Fixed timezone mismatch causing daily training statistics to show zero progress after completing training sessions.
+
+**Problem**: Daily progress records were saved using UTC dates, but frontend queried statistics using user's local timezone (Asia/Shanghai UTC+8), resulting in date mismatch and zero displayed progress.
+
+**Solution**: Implemented timezone-aware progress tracking throughout the training flow.
+
+- **Backend Changes**:
+  - **ReviewCardSchema** (`backend/src/schemas/card.ts`): Added optional `timezone` field to review payload
+  - **Review Endpoint** (`backend/src/routes/training.ts`): Extracts `timezone` from request body (fallback to UTC)
+  - **limitService** (`backend/src/services/limitService.ts`): Updated `updateProgressAfterReview()` function:
+    - Now accepts `timezone` parameter (default: 'UTC')
+    - Uses `formatDate(new Date(), timezone)` for correct daily progress date calculation
+    - Ensures progress records saved with user's local date instead of UTC date
+
+- **Frontend Changes**:
+  - **trainingApi** (`frontend/src/shared/api/training.js`): Added `timezone` parameter to `submitReview()` method
+  - **useTrainingStore** (`frontend/src/entities/training/model/useTrainingStore.js`): Auto-detects user timezone:
+    - Uses `Intl.DateTimeFormat().resolvedOptions().timeZone` to get user's timezone
+    - Passes timezone to API with every card review submission
+
+- **Data Migration**:
+  - Created script to analyze and split mixed progress data by `lastReview` timestamps
+  - Found 30 cards reviewed today after midnight UTC+8 (2026-01-08T16:00:00Z = 2026-01-09 00:00 Asia/Shanghai)
+  - Updated yesterday's record: 60→50 new cards, 20→0 reviews
+  - Created today's record: 10 new cards, 20 reviews
+
+**Result**: Statistics now correctly display daily progress in user's local timezone. Future training sessions will automatically save progress with correct dates.
+
+**Files Modified**: 5
+
+- `backend/src/schemas/card.ts`
+- `backend/src/routes/training.ts`
+- `backend/src/services/limitService.ts`
+- `frontend/src/shared/api/training.js`
+- `frontend/src/entities/training/model/useTrainingStore.js`
+
 ## [0.6.0] - 2026-01-09 00:58
 
 ### Changed
