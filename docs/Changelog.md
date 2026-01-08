@@ -5,6 +5,18 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.6.2] - 2026-01-09 03:30
+
+### Changed
+
+#### OpenSpec: Archived Home Stats Change
+
+- Archived OpenSpec change `add-home-stats` as `2026-01-08-add-home-stats`
+- Created new specification document: `openspec/specs/home-stats/spec.md` (7 requirements, 223 lines)
+- All specs validated successfully with strict mode (11 specs passing)
+- Change status: 0/68 tasks completed before archiving (all implementation tasks done)
+- New spec formalizes: two-column responsive layout, aggregated statistics, remaining cards calculation, global stats API, Pinia store, design system consistency, and chart placeholder
+
 ## [0.6.2] - 2026-01-09 03:24
 
 ### Added
