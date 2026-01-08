@@ -32,13 +32,7 @@ Execute the following actions strictly in order:
 
 1. **Code quality** Сheck the code for compliance with **JavaScript/TypeScript code formatting rules**.
 2. **Code Linting:** Run the standard linting script (`npm run lint` / `yarn lint`) for frontend and backend.
-3. **Markdown Verification:**
-   - **Formatting:** Ensure all `.md` files (especially in `./docs/`) are properly formatted. If `prettier` is
-     available, run it on markdown files.
-   - **Structure:** Check for malformed tables, unclosed code blocks, or broken reference links in `Task.md` and
-     `Walkthrough.md`.
-   - **Fix:** Correct any markdown syntax errors immediately.
-4. **Auto-fix & Resolution:** Apply automatic fixes. If there are TS errors or lint issues that auto-fix cannot resolve,
+3. **Auto-fix & Resolution:** Apply automatic fixes. If there are TS errors or lint issues that auto-fix cannot resolve,
    **fix them manually**. Do not ignore warnings. Do not proceed to commit with broken types or malformed docs.
 
 ### Phase D: Version Control Maintenance

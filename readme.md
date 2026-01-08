@@ -465,3 +465,19 @@ Ready installer will appear in `dist` folder.
   npm run <script> --workspace=frontend
   npm run <script> --workspace=backend
   ```
+
+### Pre-commit hooks
+
+The project uses **husky** and **lint-staged** to automatically check and format code before committing:
+
+- **ESLint** runs on staged `.js`, `.ts`, `.vue` files
+- **Markdownlint** runs on staged `.md` files
+- **Prettier** formats staged `.json`, `.css`, `.scss`, `.md` files
+
+These checks run automatically on `git commit`. If errors are found, the commit will be rejected.
+
+To bypass pre-commit hooks (not recommended):
+
+```bash
+git commit --no-verify -m "message"
+```
