@@ -142,22 +142,19 @@
       <Card
         padding="lg"
         class="training-card"
+        :class="{ flipped: isFlipped }"
         @click="handleFlip">
-        <div class="card-content">
-          <div
-            v-if="!isFlipped"
-            class="card-front">
+        <div class="training-card__content flex-1">
+          <div class="card-front">
             <div class="card-label">ВОПРОС</div>
             <div class="card-text">{{ currentCard.front }}</div>
           </div>
-          <div
-            v-else
-            class="card-back">
+          <div class="card-back">
             <div class="card-label">ОТВЕТ</div>
             <div class="card-text">{{ currentCard.back }}</div>
           </div>
         </div>
-        <div class="flip-hint">
+        <div class="flip-hint mt-auto">
           <i class="bi bi-arrow-repeat" />
           Нажмите, чтобы {{ isFlipped ? 'вернуть' : 'перевернуть' }}
         </div>
@@ -204,6 +201,7 @@
 <style scoped>
   .page-container {
     max-width: 800px;
+    width: 90%;
     margin: 0 auto;
     padding: 24px;
   }
@@ -281,7 +279,7 @@
 
   .success-icon {
     font-size: 48px;
-    color: #10b981;
+    color: var(--color-success);
   }
 
   .action-buttons {
@@ -297,13 +295,20 @@
   }
 
   .training-card {
+    perspective: 1000px;
     cursor: pointer;
     min-height: 400px;
-    display: flex;
-    flex-direction: column;
+    transition:
+      transform 0.6s,
+      opacity 0.2s ease;
+    transform-style: preserve-3d;
   }
 
-  .card-content {
+  .training-card.flipped {
+    transform: rotateY(180deg);
+  }
+
+  .training-card__content {
     flex: 1;
     display: flex;
     align-items: center;
@@ -317,18 +322,35 @@
     width: 100%;
   }
 
+  .card-back {
+    transform: rotateY(180deg);
+    display: none;
+  }
+
+  .training-card.flipped .card-front {
+    display: none;
+  }
+
+  .training-card.flipped .card-back {
+    display: block;
+  }
+
+  .training-card.flipped .flip-hint {
+    transform: rotateY(180deg);
+  }
+
   .card-label {
-    font-size: 12px;
+    font-size: var(--text-body-sm-size);
     font-weight: 600;
-    color: #64748b;
+    color: var(--color-text-placeholder);
     letter-spacing: 1px;
     margin-bottom: 20px;
   }
 
   .card-text {
-    font-size: 24px;
+    font-size: var(--text-hero-size);
     font-weight: 500;
-    color: #f1f5f9;
+    color: var(--color-text-hilight);
     line-height: 1.5;
   }
 
@@ -340,7 +362,7 @@
     padding-top: 20px;
     border-top: 1px solid rgba(148, 163, 184, 0.1);
     font-size: 13px;
-    color: #64748b;
+    color: var(--color-text-hint);
   }
 
   .flip-hint i {

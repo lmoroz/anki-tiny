@@ -588,8 +588,15 @@
 <style scoped>
   .page-container {
     max-width: 1440px;
+    width: 90%;
     margin: 0 auto;
     padding: 32px 24px;
+  }
+
+  @media (max-width: 768px) {
+    .page-container {
+      width: 97%;
+    }
   }
 
   .loading-state {

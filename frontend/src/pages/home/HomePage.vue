@@ -138,6 +138,7 @@
 <style scoped>
   .page-container {
     max-width: 1200px;
+    width: 90%;
     margin: 0 auto;
     padding: 40px 32px;
   }

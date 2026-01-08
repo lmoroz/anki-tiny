@@ -1,15 +1,32 @@
 import { Router, Request, Response } from 'express';
 import { courseRepository } from '../services/repositories/courseRepository';
+import { cardRepository } from '../services/repositories/cardRepository';
 import { createCourseSchema, updateCourseSchema } from '../schemas/course';
 import { ZodError } from 'zod';
 
 const router = Router();
 
-// GET /api/courses - получить все курсы
+// GET /api/courses - получить все курсы со статистикой
 router.get('/', async (req: Request, res: Response) => {
   try {
     const courses = await courseRepository.findAll();
-    res.json(courses);
+    const statsMap = await cardRepository.getAllCoursesStats();
+
+    // Добавляем статистику к каждому курсу
+    const coursesWithStats = courses.map((course) => {
+      const stats = statsMap.get(course.id) || {
+        total: 0,
+        newCards: 0,
+        lastTraining: null,
+      };
+
+      return {
+        ...course,
+        stats,
+      };
+    });
+
+    res.json(coursesWithStats);
   } catch (error) {
     console.error('Error fetching courses:', error);
     res.status(500).json({ error: 'Failed to fetch courses' });

@@ -5,6 +5,68 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.4.10] - 2026-01-08 21:22
+
+### Added
+
+#### Feature: Course Statistics on Home Page
+
+Добавлена минимизированная статистика в подвал карточек курсов на главной странице приложения для быстрого
+обзора состояния обучения.
+
+- **Backend Implementation**:
+    - **cardRepository.ts** — новый метод `getAllCoursesStats()`:
+        - Возвращает `Map<courseId, {total, newCards, lastTraining}>`
+        - Одним запросом получает все карточки и группирует статистику по курсам
+        - Эффективное вычисление даты последней тренировки (max `lastReview` по курсу)
+    - **courses.ts** — расширен эндпоинт `GET /api/courses`:
+        - Теперь возвращает курсы вместе со статистикой: `{...course, stats: {total, newCards, lastTraining}}`
+        - Автоматически добавляет пустую статистику для курсов без карточек
+
+- **Frontend Implementation**:
+    - **CourseCard.vue** — обновлен footer карточки курса:
+        - Показывает количество карточек с правильным склонением (`карточка/карточки/карточек`)
+        - Показывает количество новых карточек (если есть) с иконкой `bi-plus-circle`
+        - Показывает дату последней тренировки в формате:
+            - "сегодня" / "вчера" для недавних тренировок
+            - "N дней назад" для прошедшей недели
+            - "дд мес" для более старых дат
+        - Fallback: если статистики нет, показывает дату обновления курса (как раньше)
+    - **Стилизация**:
+        - Новая секция `.course-stats` с flexbox-лейаутом
+        - Элементы `.stat-item` с иконками Bootstrap Icons
+        - Специальное выделение для новых карточек (`.stat-new`) цветом `--color-primary`
+        - Адаптивная сетка с `flex-wrap` и gap 12px
+
+### Changed
+
+- **API Contract**: `GET /api/courses` теперь всегда возвращает объект `stats` для каждого курса
+- **CourseCard.vue**: footer теперь отображает статистику вместо или вместе с датой обновления
+
+### Technical Details
+
+- **Files Modified**: 3
+    - Backend (2): `cardRepository.ts`, `courses.ts`
+    - Frontend (1): `CourseCard.vue`
+
+- **Data Flow**:
+
+    ```text
+    Frontend (HomePage) → GET /api/courses → Backend:
+      ├→ courseRepository.findAll()
+      ├→ cardRepository.getAllCoursesStats()
+      └→ merge courses + stats
+    ```
+
+- **Performance**: Одним запросом получаем всю статистику для всех курсов (оптимально)
+
+- **User Experience**:
+    - ✅ Быстрый обзор состояния каждого курса без перехода на страницу курса
+    - ✅ Визуальное выделение новых карточек для привлечения внимания
+    - ✅ Понятная информация о последней тренировке ("сегодня", "вчера", "3 дня назад")
+    - ✅ Правильное склонение русских слов ("карточка", "карточки", "карточек")
+
+
 ## [0.4.9] - 2026-01-08 15:50
 
 ### Changed

@@ -19,6 +19,36 @@
     }).format(date)
   })
 
+  const formattedLastTraining = computed(() => {
+    if (!props.course.stats?.lastTraining) return null
+
+    const date = new Date(props.course.stats.lastTraining)
+    const now = new Date()
+    const diffMs = now - date
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+
+    if (diffDays === 0) return 'сегодня'
+    if (diffDays === 1) return 'вчера'
+    if (diffDays < 7) return `${diffDays} ${getDaysWord(diffDays)} назад`
+
+    return new Intl.DateTimeFormat('ru-RU', {
+      day: 'numeric',
+      month: 'short'
+    }).format(date)
+  })
+
+  const getDaysWord = days => {
+    if (days % 10 === 1 && days % 100 !== 11) return 'день'
+    if (days % 10 >= 2 && days % 10 <= 4 && (days % 100 < 10 || days % 100 >= 20)) return 'дня'
+    return 'дней'
+  }
+
+  const getCardsWord = count => {
+    if (count % 10 === 1 && count % 100 !== 11) return 'карточка'
+    if (count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 10 || count % 100 >= 20)) return 'карточки'
+    return 'карточек'
+  }
+
   const handleEdit = event => {
     event.stopPropagation()
     emit('edit', props.course)
@@ -57,6 +87,26 @@
     </p>
 
     <div class="course-footer mt-auto">
+      <div
+        v-if="course.stats"
+        class="course-stats">
+        <div class="stat-item">
+          <i class="bi bi-stack" />
+          <span>{{ course.stats.total }} {{ getCardsWord(course.stats.total) }}</span>
+        </div>
+        <div
+          v-if="course.stats.newCards > 0"
+          class="stat-item stat-new">
+          <i class="bi bi-plus-circle" />
+          <span>{{ course.stats.newCards }} новых</span>
+        </div>
+        <div
+          v-if="formattedLastTraining"
+          class="stat-item">
+          <i class="bi bi-clock-history" />
+          <span>{{ formattedLastTraining }}</span>
+        </div>
+      </div>
       <div class="course-meta">
         <i class="bi bi-clock" />
         <span>Обновлено {{ formattedDate }}</span>
@@ -156,5 +206,32 @@
 
   .course-meta i {
     font-size: 12px;
+  }
+
+  .course-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--text-body-sm-size);
+    color: var(--color-text-secondary);
+  }
+
+  .stat-item i {
+    font-size: 14px;
+    color: var(--color-text-tertiary);
+  }
+
+  .stat-item.stat-new {
+    color: var(--color-primary);
+  }
+
+  .stat-item.stat-new i {
+    color: var(--color-primary);
   }
 </style>

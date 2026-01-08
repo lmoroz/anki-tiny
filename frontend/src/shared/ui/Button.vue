@@ -5,7 +5,7 @@
     variant: {
       type: String,
       default: 'primary',
-      validator: value => ['primary', 'secondary', 'danger', 'ghost'].includes(value)
+      validator: value => ['primary', 'success', 'secondary', 'danger', 'ghost'].includes(value)
     },
     size: {
       type: String,

@@ -33,15 +33,14 @@
 
 <template>
   <div
+    class="card flex flex-col relative z-20 w-full overflow-hidden border border-white/10 transition-all duration-500"
     :class="[
-      'card',
       `rounded-${rounded}`,
       paddingMap[padding],
       { 'card-hoverable': hoverable },
       { 'card-highlighted': highlight },
       { 'shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)]': !noShadow }
-    ]"
-    class="relative z-20 w-full overflow-hidden border border-white/10 transition-all duration-500">
+    ]">
     <!-- Card Background Layers -->
     <!-- 1. Base dark tint -->
     <div
@@ -59,7 +58,7 @@
       v-if="highlight"
       class="absolute -top-[20%] -right-[20%] w-[80%] h-[80%] bg-[radial-gradient(circle,rgba(255,255,255,0.7)_0%,transparent_50%)] blur-2xl pointer-events-none" />
     <!-- Content Container -->
-    <div class="card-content relative z-10 flex flex-col gap-10 md:gap-8 sm:gap-6 h-full">
+    <div class="card-content relative z-10 flex flex-col flex-1 gap-10 md:gap-8 sm:gap-6 h-full inset-0">
       <slot />
     </div>
   </div>

@@ -42,6 +42,7 @@
     --color-text-primary: #e9ecef;
     --color-text-secondary: #e9ecefcc;
     --color-text-tertiary: #e9ecefcc;
+    --color-text-hint: #e9ecef88;
     --color-text-muted: #e9ecef88;
     --color-text-placeholder: #80868b;
 
@@ -86,6 +87,7 @@
     --btn-danger-shadow-hover: rgba(217, 48, 37, 0.6);
 
     /* Typography sizes */
+    --text-hero-size: 48px;
     --text-page-title-size: 32px;
     --text-section-title-size: 20px;
     --text-body-lg-size: 16px;
@@ -96,6 +98,7 @@
     --text-label-size: 11px;
 
     @media (max-width: 768px) {
+        --text-hero-size: 32px;
         --text-page-title-size: 24px;
         --text-section-title-size: 14px;
         --text-body-lg-size: 13px;

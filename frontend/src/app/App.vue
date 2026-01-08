@@ -8,7 +8,7 @@
     <div class="absolute top-[-10%] right-[-20%] w-[60%] h-[60%] bg-blue-500/50 blur-[100px] rounded-full pointer-events-none mix-blend-screen" />
     <div class="absolute bottom-[-20%] left-[10%] right-[10%] h-[60%] bg-blue-600/50 blur-[130px] rounded-full pointer-events-none mix-blend-screen" />
     <TitleBar />
-    <main class="app-content flex-1 overflow-y-auto overflow-x-hidden">
+    <main class="app-content flex-1 flex flex-col overflow-y-auto overflow-x-hidden">
       <router-view v-slot="{ Component }">
         <transition
           name="fade"

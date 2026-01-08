@@ -128,6 +128,56 @@ export class CardRepository {
       dueToday: allCards.filter((c) => c.due <= now).length,
     };
   }
+
+  /**
+   * Получить статистику по всем курсам
+   */
+  async getAllCoursesStats(): Promise<
+    Map<
+      number,
+      {
+        total: number;
+        newCards: number;
+        lastTraining: string | null;
+      }
+    >
+  > {
+    const allCards = await db.selectFrom('cards').selectAll().execute();
+
+    const statsMap = new Map<
+      number,
+      {
+        total: number;
+        newCards: number;
+        lastTraining: string | null;
+      }
+    >();
+
+    // Группируем карточки по курсам
+    for (const card of allCards) {
+      if (!statsMap.has(card.courseId)) {
+        statsMap.set(card.courseId, {
+          total: 0,
+          newCards: 0,
+          lastTraining: null,
+        });
+      }
+
+      const stats = statsMap.get(card.courseId)!;
+      stats.total++;
+
+      if (card.state === 0) stats.newCards++;
+
+      // Обновляем lastTraining, если есть lastReview и он позже текущего
+      if (card.lastReview) {
+        if (!stats.lastTraining || card.lastReview > stats.lastTraining) {
+          stats.lastTraining = card.lastReview;
+        }
+      }
+    }
+
+    return statsMap;
+  }
 }
 
 // Singleton instance
