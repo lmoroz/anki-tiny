@@ -42,11 +42,8 @@ router.post('/courses/:courseId/cards', async (req: Request, res: Response) => {
     // Валидация
     const validatedData = CreateCardSchema.parse(req.body);
 
-    // Получаем настройки курса для инициализации FSRS
-    const settings = await settingsRepository.getEffectiveSettings(courseId);
-
     // Создаем карточку с FSRS значениями
-    const card = await cardRepository.createCard(validatedData.front, validatedData.back, courseId, settings);
+    const card = await cardRepository.createCard(validatedData.front, validatedData.back, courseId);
 
     res.status(201).json({ card });
   } catch (error) {
@@ -119,7 +116,6 @@ router.put('/cards/:id', async (req: Request, res: Response) => {
         lapses: 0,
         lastReview: null,
         due: new Date(Date.now() + firstStepMinutes * 60 * 1000).toISOString(),
-        elapsedDays: 0,
         scheduledDays: 0,
         stepIndex: 0,
       });

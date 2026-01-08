@@ -68,6 +68,8 @@ router.get('/courses/:courseId/due-cards', async (req: Request, res: Response) =
  */
 router.post('/training/review', async (req: Request, res: Response) => {
   let card: Card | null = null;
+  let updates: any | null = null;
+  let wasNew: boolean = false;
   try {
     // Валидация
     const validatedData = ReviewCardSchema.parse(req.body);
@@ -82,14 +84,14 @@ router.post('/training/review', async (req: Request, res: Response) => {
     }
 
     // Запоминаем, была ли карточка новой (до обновления)
-    const wasNew = isNewCard(card.state);
+    wasNew = isNewCard(card.state);
 
     // Получаем настройки
     const settings = await settingsRepository.getEffectiveSettings(card.courseId);
 
     // Рассчитываем следующий интервал
     const now = new Date();
-    const updates = calculateNextReview(card, rating, settings, now);
+    updates = calculateNextReview(card, rating, settings, now);
 
     // Обновляем карточку
     const updatedCard = await cardRepository.updateCard(cardId, updates);
@@ -105,7 +107,7 @@ router.post('/training/review', async (req: Request, res: Response) => {
     if (error instanceof ZodError) {
       return res.status(400).json({ error: 'Validation error', details: error.issues });
     }
-    console.error('Error submitting review:', error);
+    console.error('Error submitting review:', wasNew, card, updates, error);
     res.status(500).json({ error: 'Failed to submit review', card });
   }
 });

@@ -1,7 +1,7 @@
 {
   "name": "repetitio-frontend",
   "private": true,
-  "version": "0.4.8",
+  "version": "0.4.9",
   "description": "Frontend for Repetitio",
   "author": "Morozhnikova Larisa",
   "type": "module",

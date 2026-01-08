@@ -10,7 +10,7 @@
     size: {
       type: String,
       default: 'md',
-      validator: value => ['sm', 'md', 'lg'].includes(value)
+      validator: value => ['xs', 'sm', 'md', 'lg'].includes(value)
     },
     rounded: {
       type: String,
@@ -120,19 +120,24 @@
   }
 
   /* Sizes */
+  .btn-xs {
+    padding: 4px 8px;
+    font-size: var(--text-body-xs-size);
+  }
+
   .btn-sm {
     padding: 6px 14px;
-    font-size: 13px;
+    font-size: var(--text-body-sm-size);
   }
 
   .btn-md {
     padding: 10px 20px;
-    font-size: 14px;
+    font-size: var(--text-body-md-size);
   }
 
   .btn-lg {
     padding: 12px 28px;
-    font-size: 16px;
+    font-size: var(--text-body-lg-size);
   }
 
   .btn:hover {
@@ -154,15 +159,42 @@
     box-shadow: 0 1px 3px var(--btn-secondary-shadow-hover);
   }
 
+  .btn-secondary.ghost {
+    background: transparent;
+    color: var(--color-text-secondary);
+    border: 0.5px solid var(--action-btn-bg);
+    box-shadow: 0 10px 20px -5px var(--btn-secondary-shadow);
+  }
+
+  .btn-secondary.ghost:hover {
+    background: var(--action-btn-bg-hover);
+    color: var(--action-btn-text-hover);
+    border-color: var(--color-border);
+    box-shadow: 0 10px 20px -5px var(--btn-secondary-shadow-hover);
+  }
+
+  .btn-success {
+    background: var(--color-success);
+    color: var(--color-text-primary);
+    box-shadow: 0 10px 20px -5px var(--btn-success-shadow);
+  }
+
+  .btn-success:hover {
+    background: var(--btn-success-bg-hover);
+    color: var(--color-text-hilight);
+    box-shadow: 0 10px 20px -5px var(--btn-success-shadow-hover);
+  }
+
   .btn-danger {
     background: var(--color-danger);
-    color: #fff;
-    box-shadow: 0 1px 3px var(--btn-danger-shadow);
+    color: var(--color-text-primary);
+    box-shadow: 0 10px 20px -5px var(--btn-danger-shadow);
   }
 
   .btn-danger:hover {
     background: var(--btn-danger-bg-hover);
-    box-shadow: 0 2px 8px var(--btn-danger-shadow-hover);
+    color: var(--color-text-hilight);
+    box-shadow: 0 10px 20px -5px var(--btn-danger-shadow-hover);
   }
 
   .btn-danger.ghost {

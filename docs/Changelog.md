@@ -5,6 +5,63 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.4.9] - 2026-01-08 15:50
+
+### Changed
+
+#### UI: Training Page Complete Redesign (Manual Changes)
+
+- **TrainingPage.vue — Полная переработка интерфейса тренировок**
+  - Реализован новый дизайн карточек с анимациями переворота
+  - Добавлены кнопки оценки ответа: "Снова" (danger), "Сложно" (secondary), "Хорошо" (primary), "Легко" (success)
+  - Добавлены state-индикаторы: loading, session complete, empty state
+  - Добавлен счетчик лимитов сессии (badge-стили для new/review карточек)
+  - Улучшена структура компонента: card-content, card-front/back, flip-hint
+  - Добавлена кнопка возврата к курсу при завершении сессии
+  - Styling: CSS variables integration, smooth transitions, responsive design
+
+#### UI: Button Component Extensions
+
+- **Button.vue — Расширение функциональности**
+  - Добавлен размер `xs` (4px/8px padding, text-body-xs-size)
+  - Добавлен вариант `success` (green theme с тенями)
+  - Добавлен вариант `ghost` для вторичных кнопок (прозрачный фон, border)
+  - Улучшены тени для всех вариантов: `box-shadow: 0 10px 20px -5px` (более глубокие)
+  - Все размеры теперь используют CSS-переменные (`--text-body-*-size`)
+
+#### Backend: Data Model Simplification
+
+- **Removed `elapsedDays` field from Card schema**
+  - `backend/src/services/database/schema.ts` — удалено поле из таблицы `cards`
+  - `backend/src/services/fsrs/index.ts` — удалено из FSRS-логики
+  - `backend/src/services/repositories/cardRepository.ts` — удалено из репозитория
+  - `backend/src/routes/cards.ts` — удалено из API-маршрутов
+  - `backend/src/routes/training.ts` — удалено из training API
+  
+- **Frontend Card Type Updated**
+  - `frontend/src/shared/types/card.ts` — удалено `elapsedDays` из интерфейса `Card`
+  - Упрощена типизация, убран избыточный параметр FSRS
+
+### Added
+
+- **Global Styles for Training UI**
+  - `.badge` styles (new/review с цветами)
+  - `.empty-state`, `.loading-state`, `.complete-state`
+  - `.answer-buttons`, `.flip-hint`, `.card-label`, `.card-text`
+  - Spinner animation (`@keyframes spin`)
+
+### Technical Details
+
+- **Files Modified**: 10
+  - Backend (5): `cards.ts`, `training.ts`, `schema.ts`, `fsrs/index.ts`, `cardRepository.ts`  
+  - Frontend (5): `styles.css`, `SettingsPage.vue`, `TrainingPage.vue`, `card.ts`, `Button.vue`
+
+- **User Experience**:
+  - ✅ Полностью переработанный UI тренировок с карточками
+  - ✅ Визуальная обратная связь (flip hint, card states)
+  - ✅ Расширенные варианты кнопок для разных контекстов
+  - ✅ Упрощенная модель данных (меньше избыточных полей)
+
 ## [0.4.8] - 2026-01-08 03:57
 
 ### Added

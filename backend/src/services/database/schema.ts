@@ -25,7 +25,6 @@ export interface CardsTable {
   due: string; // ISO timestamp
   stability: number;
   difficulty: number;
-  elapsedDays: number;
   scheduledDays: number;
   reps: number;
   lapses: number;

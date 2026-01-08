@@ -1,6 +1,6 @@
 import { db } from '../database';
 import { Card, CardUpdate } from '../database/schema';
-import { FSRSSettings, initializeNewCard } from '../fsrs';
+import { initializeNewCard } from '../fsrs';
 
 /**
  * Repository для работы с карточками
@@ -24,9 +24,9 @@ export class CardRepository {
   /**
    * Создать новую карточку
    */
-  async createCard(front: string, back: string, courseId: number, settings: FSRSSettings): Promise<Card> {
+  async createCard(front: string, back: string, courseId: number): Promise<Card> {
     // Инициализируем карточку с FSRS значениями
-    const newCardData = initializeNewCard(front, back, courseId, settings);
+    const newCardData = initializeNewCard(front, back, courseId);
 
     const result = await db
       .insertInto('cards')
@@ -37,7 +37,6 @@ export class CardRepository {
         due: newCardData.due,
         stability: newCardData.stability,
         difficulty: newCardData.difficulty,
-        elapsedDays: newCardData.elapsedDays,
         scheduledDays: newCardData.scheduledDays,
         reps: newCardData.reps,
         lapses: newCardData.lapses,

@@ -1,4 +1,4 @@
-import { Card as FSRSCard, FSRS, Rating, State, generatorParameters, Grade } from 'ts-fsrs';
+import { Card as FSRSCard, FSRS, Rating, State, generatorParameters, Grade, createEmptyCard } from 'ts-fsrs';
 import { Card } from '../database/schema';
 
 /**
@@ -47,13 +47,13 @@ function toFSRSCard(card: Card): FSRSCard {
     due: new Date(card.due),
     stability: card.stability,
     difficulty: card.difficulty,
-    elapsed_days: card.elapsedDays,
     scheduled_days: card.scheduledDays,
     learning_steps: card.stepIndex,
     reps: card.reps,
     lapses: card.lapses,
     state: card.state as State,
     last_review: card.lastReview ? new Date(card.lastReview) : undefined,
+    elapsed_days: 0,
   };
 }
 
@@ -65,7 +65,6 @@ function fromFSRSCard(fsrsCard: FSRSCard, _originalCard: Card): Partial<Card> {
     due: fsrsCard.due.toISOString(),
     stability: fsrsCard.stability,
     difficulty: fsrsCard.difficulty,
-    elapsedDays: fsrsCard.elapsed_days,
     scheduledDays: fsrsCard.scheduled_days,
     stepIndex: fsrsCard.learning_steps,
     reps: fsrsCard.reps,
@@ -83,6 +82,7 @@ function initializeFSRS(settings: FSRSSettings): FSRS {
   const steps = parseLearningSteps(settings.learningSteps);
 
   const params = generatorParameters({
+    request_retention: 0.9,
     enable_fuzz: settings.enableFuzz,
     enable_short_term: true,
     learning_steps: steps.map((m) => `${m}m` as `${number}m`),
@@ -93,104 +93,14 @@ function initializeFSRS(settings: FSRSSettings): FSRS {
 }
 
 /**
- * Обработка Learning Steps для NEW и LEARNING карточек
- */
-function handleLearningSteps(card: Card, rating: Rating, settings: FSRSSettings, now: Date): Partial<Card> {
-  const steps = parseLearningSteps(settings.learningSteps);
-  const currentStep = card.stepIndex;
-
-  if (rating === Rating.Again) {
-    // Возврат к первому шагу
-    const nextDue = new Date(now.getTime() + steps[0] * 60 * 1000);
-    return {
-      stepIndex: 0,
-      due: nextDue.toISOString(),
-      state: CardState.LEARNING,
-      lapses: card.lapses + 1,
-      reps: card.reps + 1,
-      lastReview: now.toISOString(),
-      updatedAt: now.toISOString(),
-    };
-  }
-
-  if (rating === Rating.Good || rating === Rating.Easy) {
-    const nextStepIndex = currentStep + 1;
-
-    if (nextStepIndex >= steps.length) {
-      // Завершили все шаги обучения - переводим в REVIEW
-      // Передаём карточку FSRS как NEW, чтобы он рассчитал первый интервал REVIEW
-      const fsrs = initializeFSRS(settings);
-
-      // Создаём карточку в состоянии NEW для корректного расчёта первого интервала
-      const fsrsCard = toFSRSCard({
-        ...card,
-        state: CardState.NEW,
-        reps: 0, // Делаем вид, что это первое повторение
-        stepIndex: 0,
-        stability: 0,
-        difficulty: card.difficulty || 5.0,
-        elapsedDays: 0,
-        scheduledDays: 0,
-        due: now.toISOString(),
-        lastReview: null,
-      });
-
-      const scheduledCard = fsrs.next(fsrsCard, now, Rating.Good as Grade);
-
-      // Сохраняем реальное количество повторений из исходной карточки
-      return {
-        ...fromFSRSCard(scheduledCard.card, card),
-        reps: card.reps + 1, // Увеличиваем счётчик
-      };
-    }
-
-    // Переход к следующему шагу
-    const nextDue = new Date(now.getTime() + steps[nextStepIndex] * 60 * 1000);
-    return {
-      stepIndex: nextStepIndex,
-      due: nextDue.toISOString(),
-      state: CardState.LEARNING,
-      reps: card.reps + 1,
-      lastReview: now.toISOString(),
-      updatedAt: now.toISOString(),
-    };
-  }
-
-  if (rating === Rating.Hard) {
-    // Hard - повторяем текущий шаг
-    const nextDue = new Date(now.getTime() + steps[currentStep] * 60 * 1000);
-    return {
-      due: nextDue.toISOString(),
-      reps: card.reps + 1,
-      lastReview: now.toISOString(),
-      updatedAt: now.toISOString(),
-    };
-  }
-
-  // Fallback (не должно происходить)
-  return {};
-}
-
-/**
  * Расчет следующего интервала повторения после ответа пользователя
  */
 export function calculateNextReview(card: Card, rating: Rating, settings: FSRSSettings, now: Date): Partial<Card> {
-  // Для NEW и LEARNING карточек используем кастомные learning steps
-  if (card.state === CardState.NEW || card.state === CardState.LEARNING) {
-    return handleLearningSteps(card, rating, settings, now);
-  }
+  const fsrs = initializeFSRS(settings);
+  const fsrsCard = toFSRSCard(card);
+  const scheduledCard = fsrs.next(fsrsCard, now, rating as Grade);
 
-  // Для REVIEW и RELEARNING используем FSRS
-  if (card.state === CardState.REVIEW || card.state === CardState.RELEARNING) {
-    const fsrs = initializeFSRS(settings);
-    const fsrsCard = toFSRSCard(card);
-    const scheduledCard = fsrs.next(fsrsCard, now, rating as Grade);
-
-    return fromFSRSCard(scheduledCard.card, card);
-  }
-
-  // Fallback
-  return {};
+  return fromFSRSCard(scheduledCard.card, card);
 }
 
 /**
@@ -213,25 +123,22 @@ export function canShowNewCards(settings: FSRSSettings, now: Date): boolean {
 /**
  * Инициализация новой карточки с дефолтными FSRS значениями
  */
-export function initializeNewCard(front: string, back: string, courseId: number, settings: FSRSSettings): Card {
+export function initializeNewCard(front: string, back: string, courseId: number): Card {
   const now = new Date();
-  const steps = parseLearningSteps(settings.learningSteps);
-
-  // Первая карточка сразу готова к изучению
-  const firstStepDue = new Date(now.getTime() + steps[0] * 60 * 1000);
+  // const fsrs = initializeFSRS(settings);
+  const card: FSRSCard = createEmptyCard(new Date());
 
   return {
     id: 0, // Will be set by database
     courseId,
     front,
     back,
-    due: firstStepDue.toISOString(),
-    stability: 0.0,
-    difficulty: 5.0,
-    elapsedDays: 0,
-    scheduledDays: 0,
-    reps: 0,
-    lapses: 0,
+    due: card.due.toISOString(),
+    stability: card.stability,
+    difficulty: card.difficulty,
+    scheduledDays: card.scheduled_days,
+    reps: card.reps,
+    lapses: card.lapses,
     state: CardState.NEW,
     lastReview: null,
     stepIndex: 0,

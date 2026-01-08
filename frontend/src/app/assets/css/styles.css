@@ -25,7 +25,7 @@
     --color-primary-hover: #1557b0;
     --color-primary-light: #e8f0fe;
 
-    --color-success: #0f9d58;
+    --color-success: #379d0f;
     --color-danger: #d93025;
     --color-warning: #f9ab00;
 
@@ -38,6 +38,7 @@
     --input-bg-option: #1f2937;
 
     /* Text colors */
+    --color-text-hilight: #ffffff;
     --color-text-primary: #e9ecef;
     --color-text-secondary: #e9ecefcc;
     --color-text-tertiary: #e9ecefcc;
@@ -45,7 +46,7 @@
     --color-text-placeholder: #80868b;
 
     /* Border colors */
-    --color-border: #dee2e6;
+    --color-border: #dee2e688;
     --color-border-light: #e9ecef;
     --color-border-focus: #1a73e8;
     --color-border-error: #d93025;
@@ -73,19 +74,24 @@
     --btn-primary-shadow: rgba(37, 99, 235, 0.6);
     --btn-primary-inner-shadow: rgba(255, 255, 255, 0.3);
 
-    --btn-secondary-shadow: rgba(0, 0, 0, 0.05);
-    --btn-secondary-shadow-hover: rgba(0, 0, 0, 0.1);
+    --btn-secondary-shadow: rgba(0, 0, 0, 0.5);
+    --btn-secondary-shadow-hover: rgba(0, 0, 0, 0.3);
+
+    --btn-success-bg-hover: #12da26;
+    --btn-success-shadow: rgba(49, 217, 37, 0.6);
+    --btn-success-shadow-hover: rgba(37, 217, 61, 0.6);
 
     --btn-danger-bg-hover: #b31412;
-    --btn-danger-shadow: rgba(217, 48, 37, 0.3);
-    --btn-danger-shadow-hover: rgba(217, 48, 37, 0.4);
+    --btn-danger-shadow: rgba(217, 48, 37, 0.6);
+    --btn-danger-shadow-hover: rgba(217, 48, 37, 0.6);
 
     /* Typography sizes */
     --text-page-title-size: 32px;
     --text-section-title-size: 20px;
-    --text-body-lg-size: 15px;
+    --text-body-lg-size: 16px;
     --text-body-md-size: 14px;
     --text-body-sm-size: 13px;
+    --text-body-xs-size: 12px;
     --text-caption-size: 12px;
     --text-label-size: 11px;
 

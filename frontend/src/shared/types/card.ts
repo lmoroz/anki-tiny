@@ -14,7 +14,6 @@ export interface Card {
   due: string // ISO timestamp
   stability: number
   difficulty: number
-  elapsedDays: number
   scheduledDays: number
   reps: number
   lapses: number

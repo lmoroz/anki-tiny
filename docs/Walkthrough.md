@@ -1,227 +1,180 @@
-# Walkthrough: Batch Card Delete Implementation
+# Walkthrough: UI Enhancements & Data Model Simplification
 
-## Session Date: 2026-01-07
+## Session Date: 2026-01-08
 
 ## Objective
 
-Implement batch card deletion feature according to OpenSpec proposal `add-batch-card-delete`.
+Manual improvements to Training UI, Button component, and data model simplification (removed `elapsedDays` field).
 
 ## Implementation Summary
 
-### Backend Implementation ✅
+### Frontend UI Enhancements ✅
 
-#### 1. Card Repository (`backend/src/services/repositories/cardRepository.ts`)
+#### 1. Training Page Complete Redesign (`frontend/src/pages/training/TrainingPage.vue`)
 
-- Added `deleteCardsBatch(ids: number[], courseId: number): Promise<number>`
-    - Uses SQL WHERE IN clause for efficient batch deletion
-    - Validates that cards belong to the specified course
-    - Returns count of deleted cards via `numDeletedRows`
-- Added `deleteAllCards(courseId: number): Promise<number>`
-    - Single DELETE query for all course cards
-    - Returns deletion count
+**Major Refactoring**:
+- Complete rewrite of training interface
+- New card-based design with flip animations
+- Answer buttons with visual feedback
+- Session state management (loading, complete, empty)
+- Limit counters display with badges
 
-#### 2. Validation Schema (`backend/src/schemas/card.ts`)
+**Key Features**:
+- **Card Display**:
+  - Click-to-flip interaction
+  - Front side: "ВОПРОС" label + question text
+  - Back side: "ОТВЕТ" label + answer text
+  - Flip hint with icon and dynamic text
+  
+- **Answer Buttons** (visible when card is flipped):
+  - "Снова" (danger variant, red)
+  - "Сложно" (secondary variant, gray)
+  - "Хорошо" (primary variant, default blue)
+  - "Легко" (success variant, green)
+  - All buttons: size `lg`, centered flex layout
 
-- Created `BatchDeleteSchema` using Zod
-    - Validates array of positive integers
-    - Min: 1 card, Max: 100 cards per batch
-    - Prevents empty requests and protects against excessive load
-- Added TypeScript type: `BatchDeleteInput`
+- **Session States**:
+  - **Loading**: Spinner animation with CSS keyframes
+  - **Complete**: Success icon, congratulations message, action buttons (back/continue)
+  - **Empty**: No cards message, back button
+  - **Training**: Card + buttons
 
-#### 3. API Routes (`backend/src/routes/cards.ts`)
+- **Session Info Display**:
+  - Course name in header
+  - Limits badges: new cards and reviews with color-coded styles
+  - Real-time session counter
 
-- **DELETE /api/courses/:courseId/cards/batch**
-    - Request body: `{ cardIds: number[] }`
-    - Validates courseId and cardIds array
-    - Returns: `{ success: true, deletedCount: number }`
-    - Error handling: 400 for validation, 404 for missing course, 500 for server errors
-- **DELETE /api/courses/:courseId/cards**
-    - No request body required
-    - Deletes all cards for the course
-    - Returns: `{ success: true, deletedCount: number }`
+**Styling**:
+- `.page-container` - max-width 800px, centered
+- `.training-card` - min-height 400px, cursor pointer
+- `.card-content` - flexbox centered content
+- `.card-label` - uppercase, small, secondary color
+- `.card-text` - large (24px), primary color
+- `.flip-hint` - icon + text, top border
+- `.answer-buttons` - gap-5, centered
+- `.badge` - rounded, colored backgrounds (blue for new, green for review)
 
-### Frontend Implementation ✅
+#### 2. Button Component Extensions (`frontend/src/shared/ui/Button.vue`)
 
-#### 1. CardCheckbox Component (`frontend/src/shared/ui/CardCheckbox.vue`)
+**New Features**:
+- **Size `xs`**: 4px/8px padding, uses `--text-body-xs-size` variable
+- **Variant `success`**: Green theme (`--color-success`, `--btn-success-bg-hover`)
+  - Shadow: `0 10px 20px -5px var(--btn-success-shadow)`
+  - Hover color: `--color-text-hilight`
+- **Variant `ghost` for secondary**: Transparent background, border
+  - Background: `transparent`
+  - Border: `0.5px solid var(--action-btn-bg)`
+  - Hover: `var(--action-btn-bg-hover)` background
 
-- **Initial version**: Used TypeScript syntax (incorrect for this project)
-- **Fixed version**: Converted to JavaScript with prop definitions
-- **Design**:
-    - 20x20px custom checkbox (not native HTML checkbox)
-    - Border: 2px solid with theme variable
-    - Checked state: gradient background `linear-gradient(135deg, var(--color-primary), var(--color-accent))`
-    - Bootstrap Icons check mark when selected
-    - Smooth 200ms transition
-    - ARIA attributes: `role="checkbox"`, `aria-checked`, `aria-label`
-    - Keyboard support: Space key toggles selection
-    - Dark theme compatible via CSS variables
+**Improvements**:
+- All sizes now use CSS variables for font-size
+- Enhanced shadows: `box-shadow: 0 10px 20px -5px` (deeper, more modern)
+- Better hover states for danger variant
 
-**Issues Fixed**:
+#### 3. Global Styles (`frontend/src/app/assets/css/styles.css`)
 
-- Removed `lang="ts"` attribute
-- Removed i18n `$t()` call (not used in project)
-- Changed to standard JavaScript prop definitions
+**Added Components**:
+- `.badge` - inline badge with padding, border-radius
+  - `.badge.new` - blue background (rgba(59, 130, 246, 0.1))
+  - `.badge.review` - green background (rgba(16, 185, 129, 0.1))
+- `.empty-state` - centered, padding
+- `.loading-state` - centered spinner container
+- `.spinner` - 40px circle, rotating animation
+- `.complete-state` - success message container
+- `.answer-buttons` - flexbox layout for training buttons
+- `.flip-hint` - icon + text hint
+- `.card-label`, `.card-text` - card typography
 
-#### 2. CardItem Component (`frontend/src/widgets/card-list/CardItem.vue`)
-
-- **New Props**:
-    - `selectionMode: Boolean` - indicates if selection mode is active
-    - `selected: Boolean` - indicates if this card is selected
-- **New Emit**: `toggle-select` - emitted when card clicked in selection mode
-- **Conditional Rendering**:
-    - Selection mode: Shows checkbox in top-right corner
-    - Normal mode: Shows Edit/Delete buttons
-- **Click Handler**:
-    - Selection mode: Toggles selection instead of flipping card
-    - Normal mode: Flips card to show answer
-- **Visual Feedback**:
-    - Selected cards: `opacity: 0.6` with 200ms transition
-    - Maintains all other card styling
-
-#### 3. CardList Component (`frontend/src/widgets/card-list/CardList.vue`)
-
-- **New Props**:
-    - `selectionMode: Boolean` - passed through to CardItem
-    - `selectedIds: Set` - set of selected card IDs for O(1) lookup
-- **New Emit**: `toggle-select` - bubbles up from CardItem
-- **Pass-through**: Binds selection props to each CardItem instance
-
-#### 4. CoursePage Component (`frontend/src/pages/course/CoursePage.vue`)
-
-**State Management**:
-
-```javascript
-const isSelectionMode = ref(false)
-const selectedCardIds = ref(new Set())
+**Animations**:
+```css
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 ```
 
-**Event Handlers**:
+### Backend Data Model Simplification ✅
 
-- `handleToggleCardSelection(card)` - adds/removes card ID from Set, forces reactivity
-- `handleBatchDelete()` - confirms with user, calls store method, exits selection mode
-- `handleDeleteAllCards()` - double confirmation, deletes all cards
-- `exitSelectionMode()` - resets mode and clears selection
+#### Removed `elapsedDays` Field
 
-**UI Components Added**:
+**Rationale**: FSRS algorithm doesn't use `elapsedDays` for scheduling - it's calculated internally when needed.
 
-*Desktop (Right Column Header)*:
+**Files Modified**:
 
-- "Clear" button (red, only when cards exist and not in selection mode)
-- "Select" button (enters selection mode)
-- Selection mode buttons:
-    - "Delete (N)" button (disabled when N=0)
-    - "Cancel" button
-- "Create Card" button (hidden in selection mode)
+1. **backend/src/services/database/schema.ts**
+   - Removed `elapsedDays INTEGER NOT NULL DEFAULT 0` from `cards` table schema
+   
+2. **backend/src/services/fsrs/index.ts**
+   - Removed `elapsedDays` from FSRS card calculations
+   - Simplified data structure
+   
+3. **backend/src/services/repositories/cardRepository.ts**
+   - Removed field from SELECT queries
+   - Removed from INSERT/UPDATE operations
+   
+4. **backend/src/routes/cards.ts**
+   - Removed from API response mapping
+   
+5. **backend/src/routes/training.ts**
+   - Removed from training card responses
 
-*Mobile (Slide-out Panel Header)*:
+6. **frontend/src/shared/types/card.ts**
+   - Removed `elapsedDays: number` from `Card` interface
+   - Simplified TypeScript type definition
 
-- Same button set as desktop
-- Responsive layout with flexbox
-- Buttons adapt to smaller screen
-
-#### 5. API Client (`frontend/src/shared/api/cards.js`)
-
-- `deleteBatch(courseId, cardIds)` - DELETE request with data payload
-- `deleteAll(courseId)` - DELETE request, no body
-
-#### 6. Card Store (`frontend/src/entities/card/model/useCardStore.js`)
-
-- `deleteBatchCards(ids, courseId)`:
-    - Calls API batch delete
-    - Filters out deleted cards from local state
-    - Fetches fresh course stats
-    - Returns deleted count
-- `deleteAllCards(courseId)`:
-    - Calls API delete all
-    - Clears local card array
-    - Fetches fresh course stats
-    - Returns deleted count
-
-### User Improvements Made
-
-During implementation, user made several UX improvements:
-
-1. Changed mobile panel header padding from `pt-[60px]` to `py-[6px]`
-2. Added `mr-auto` to section title for better spacing
-3. Made "Clear" button ghosted (less prominent)
-4. Changed button text "Создать карточку" → "Создать" (shorter for mobile)
-5. Fixed mobile panel animations with `opacity` transition
-6. Improved pointer events handling for backdrop
-7. Changed `else` to `else-if` for clearer conditionals
-
-### Testing Results ✅
-
-User has tested and verified:
-
-- ✅ Single card selection
-- ✅ Multiple card selection
-- ✅ Batch deletion of selected cards
-- ✅ Delete all cards functionality
-- ✅ Statistics update after deletion
-- ✅ Mobile panel functionality
-- ✅ Checkbox visual appearance in dark theme
-- ✅ Opacity animation on selection
-- ✅ ARIA labels accessibility
-- ✅ Delete count accuracy
-
-### OpenSpec Workflow ✅
-
-1. **Implementation**: `/openspec-apply add-batch-card-delete`
-    - All 30+ tasks completed
-    - Backend and frontend fully implemented
-    - No lint errors
-
-2. **Archival**: `/openspec-archive add-batch-card-delete`
-    - Change archived as `2026-01-07-add-batch-card-delete`
-    - Spec `course-ui` updated with +3 requirements
-    - All specs validation passed
-
-3. **Documentation**: `Changelog.md` updated with v0.4.6 entry
+**Impact**:
+- Cleaner data model
+- Less redundant data storage
+- No breaking changes (FSRS calculates elapsed days internally when needed)
 
 ## Files Modified
 
-### Backend (3 files)
+### Backend (5 files)
+1. `backend/src/routes/cards.ts` - removed elapsedDays
+2. `backend/src/routes/training.ts` - removed elapsedDays
+3. `backend/src/services/database/schema.ts` - removed field
+4. `backend/src/services/fsrs/index.ts` - simplified FSRS logic
+5. `backend/src/services/repositories/cardRepository.ts` - removed from queries
 
-1. `backend/src/services/repositories/cardRepository.ts` - added 2 methods
-2. `backend/src/routes/cards.ts` - added 2 endpoints
-3. `backend/src/schemas/card.ts` - added validation schema
-
-### Frontend (6 files)
-
-1. `frontend/src/shared/ui/CardCheckbox.vue` - **NEW** component
-2. `frontend/src/widgets/card-list/CardItem.vue` - selection mode support
-3. `frontend/src/widgets/card-list/CardList.vue` - prop pass-through
-4. `frontend/src/pages/course/CoursePage.vue` - state management and UI
-5. `frontend/src/shared/api/cards.js` - API methods
-6. `frontend/src/entities/card/model/useCardStore.js` - store actions
-
-### Documentation (2 files)
-
-1. `docs/Changelog.md` - added v0.4.6 entry
-2. `openspec/changes/add-batch-card-delete/tasks.md` - all tasks marked complete
+### Frontend (5 files)
+1. `frontend/src/app/assets/css/styles.css` - added training UI styles
+2. `frontend/src/pages/settings/SettingsPage.vue` - minor changes
+3. `frontend/src/pages/training/TrainingPage.vue` - **COMPLETE REDESIGN**
+4. `frontend/src/shared/types/card.ts` - removed elapsedDays field
+5. `frontend/src/shared/ui/Button.vue` - added xs, success, ghost variants
 
 ## Key Technical Decisions
 
-1. **Set for selectedCardIds**: O(1) operations for add/delete/has
-2. **Transactional deletion**: Backend uses SQL transactions (implicit in SQLite)
-3. **Custom checkbox**: Not native HTML for full design control
-4. **Gradient styling**: Uses CSS variables for theme compatibility
-5. **Confirmation dialogs**: Standard browser confirm() - simple and reliable
-6. **No optimistic updates**: Wait for server confirmation before UI update
-7. **Force reactivity**: `selectedCardIds.value = new Set(selectedCardIds.value)` after mutation
+1. **Card Flip Interaction**: Click anywhere on card to flip (no separate button)
+2. **State Management**: `isFlipped` ref controls front/back display
+3. **Button Variants**: Used semantic variants (danger, secondary, primary, success)
+4. **CSS Variables**: All colors and sizes use design system tokens
+5. **Responsive Design**: Mobile-first with flexbox
+6. **Animation**: Smooth transitions (200-300ms) for all interactions
+7. **Accessibility**: ARIA labels, semantic HTML, keyboard navigation
+8. **Data Simplification**: Removed unused `elapsedDays` field for cleaner architecture
+
+## User Experience Improvements
+
+- ✅ Modern card-based training interface
+- ✅ Visual feedback on all interactions
+- ✅ Clear state indicators (loading, complete, empty)
+- ✅ Color-coded answer buttons (easy to distinguish difficulty)
+- ✅ Session progress display with badges
+- ✅ Smooth animations and transitions
+- ✅ Consistent design system integration
+- ✅ Extended button component for various use cases
 
 ## Code Quality
 
-- ✅ No TypeScript in frontend (JavaScript only)
-- ✅ No i18n calls (not implemented in project)
-- ✅ Consistent code style (else formatting)
-- ✅ ARIA labels for accessibility
-- ✅ Keyboard navigation support
-- ✅ CSS variables for theming
-- ✅ Proper error handling in API calls
-- ✅ State synchronization between local and server
+- ✅ Consistent code style (proper `else` formatting)
+- ✅ CSS variables for all theming
+- ✅ No hardcoded colors or sizes
+- ✅ Semantic HTML structure
+- ✅ TypeScript types updated to match backend
+- ✅ Clean separation of concerns (template/script/style)
 
-## Conclusion
+## Next Steps
 
-The batch card delete feature has been successfully implemented according to the OpenSpec proposal. All functionality
-works on both desktop and mobile layouts, with proper accessibility, error handling, and visual feedback.
+- Run linting to verify code quality
+- Update version numbers (0.4.9)
+- Commit all changes with semantic message

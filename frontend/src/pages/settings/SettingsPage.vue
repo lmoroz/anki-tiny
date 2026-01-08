@@ -113,29 +113,38 @@
           <h2>Настройки курсов</h2>
           <p class="section-description">Настройте индивидуальные параметры для конкретных курсов</p>
 
-          <div class="courses-list">
+          <div class="courses-list flex flex-col gap-4">
             <div
               v-for="course in sortedCourses"
               :key="course.id"
-              class="course-settings-item">
+              class="course-settings-item flex items-start justify-between gap-2 p-2">
               <div class="course-info">
                 <h3>{{ course.name }}</h3>
-                <span
-                  v-if="settingsStore.hasCustomSettings(course.id)"
-                  class="badge custom">
-                  Индивидуальные
-                </span>
-                <span
-                  v-else
-                  class="badge inherited">
-                  Глобальные
-                </span>
               </div>
-              <button
-                class="btn-secondary"
+              <span
+                v-if="settingsStore.hasCustomSettings(course.id)"
+                class="badge custom ml-auto inline-flex">
+                Индивид
+                <span>уальные</span>
+              </span>
+              <span
+                v-else
+                class="badge inherited ml-auto inline-flex">
+                Глоб
+                <span>альные</span>
+              </span>
+              <Button
+                class="course-settings-button"
+                variant="secondary"
+                ghost
+                size="xs"
+                rounded="sm"
                 @click="openCourseSettings(course.id)">
-                Настроить
-              </button>
+                <i
+                  data-v-8da49e22=""
+                  class="bi bi-gear" />
+                <span>Настроить</span>
+              </Button>
             </div>
           </div>
         </Card>
@@ -203,23 +212,11 @@
   }
 
   .section-description {
-    color: #94a3b8;
-    margin-bottom: 16px;
-    font-size: 14px;
-  }
-
-  .courses-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 16px;
+    color: var(--color-text-muted);
+    font-size: var(--text-body-md-size);
   }
 
   .course-settings-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px;
     background: rgba(148, 163, 184, 0.1);
     border-radius: 8px;
   }
@@ -254,19 +251,10 @@
     color: #cbd5e1;
   }
 
-  .btn-secondary {
-    padding: 8px 16px;
-    background: rgba(148, 163, 184, 0.15);
-    color: #e2e8f0;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .btn-secondary:hover {
-    background: rgba(148, 163, 184, 0.25);
+  @media (max-width: 1023px) {
+    .course-settings-button span,
+    .badge span {
+      display: none;
+    }
   }
 </style>
