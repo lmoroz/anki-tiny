@@ -33,6 +33,9 @@
       type: Boolean,
       default: false,
     },
+    to: {
+      type: [String, Object],
+    },
   });
 
   const emit = defineEmits(['click']);
@@ -94,7 +97,15 @@
     </template>
 
     <!-- Main Surface (Top - Bright Gradient) -->
+    <router-link
+      v-if="to"
+      :to
+      :class="innerClasses"
+      class="text-white !select-none">
+      <slot />
+    </router-link>
     <div
+      v-else
       :class="innerClasses"
       class="text-white !select-none">
       <slot />

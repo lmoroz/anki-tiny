@@ -1,31 +1,54 @@
 <script setup>
-  import { onMounted, computed, onUnmounted } from 'vue';
+  import { ref, onMounted, computed, onUnmounted } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import { storeToRefs } from 'pinia';
   import { useTrainingStore } from '@/entities/training/model/useTrainingStore';
   import { useStatsStore } from '@/entities/stats/model/useStatsStore';
+  import { useCourseStore } from '@/entities/course/model/useCourseStore';
   import { toast } from 'vue3-toastify';
 
   const route = useRoute();
   const router = useRouter();
-  const courseId = parseInt(route.params.id);
+  const isGlobalMode = route.params.id === 'global';
+  const courseId = isGlobalMode ? null : parseInt(route.params.id);
 
   const trainingStore = useTrainingStore();
+  const courseStore = useCourseStore();
   const statsStore = useStatsStore();
-  const { currentCard, isSessionComplete, loading, sessionLimits, progress } = storeToRefs(trainingStore);
+  const { currentCard, isSessionComplete, loading, sessionLimits, progress, isGlobalSession } =
+    storeToRefs(trainingStore);
 
   // Состояние переворота карточки (локальное для UI)
-  import { ref } from 'vue';
-
   const isFlipped = ref(false);
 
+  // Получить название курса для текущей карточки
+  const currentCourseName = computed(() => {
+    if (!currentCard.value || !isGlobalSession.value) return null;
+    const course = courseStore.courses.find((c) => c.id === currentCard.value.courseId);
+    return course?.name || 'Неизвестный курс';
+  });
+
+  // Подсчитать оставшиеся карточки в сессии (новые и повторы)
+  const sessionRemaining = computed(() => {
+    const remainingCards = trainingStore.sessionCards.slice(trainingStore.currentCardIndex);
+    const newCards = remainingCards.filter((c) => c.state === 0).length;
+    const reviews = remainingCards.filter((c) => c.state !== 0).length;
+    return { newCards, reviews };
+  });
+
   onMounted(async () => {
-    try {
+    //try {
+    if (isGlobalMode) {
+      await courseStore.fetchCourses();
+      await trainingStore.startGlobalSession();
+    } else {
       await trainingStore.startSession(courseId);
-    } catch (error) {
-      toast.error('Не удалось запустить тренировку');
-      router.push(`/course/${courseId}`);
     }
+    //} catch (error) {
+    //  toast.error('Не удалось запустить тренировку');
+    //  if (isGlobalMode) router.push('/');
+    //  else router.push(`/course/${courseId}`);
+    //}
   });
 
   onUnmounted(() => {
@@ -63,16 +86,21 @@
   };
 
   const handleBack = () => {
-    router.push(`/course/${courseId}`);
+    if (isGlobalMode) router.push('/');
+    else router.push(`/course/${courseId}`);
   };
 
   const handleContinue = async () => {
     // Попробовать получить еще карточки (новая сессия)
     try {
-      await trainingStore.startSession(courseId);
+      if (isGlobalMode) {
+        await trainingStore.startGlobalSession();
+      } else {
+        await trainingStore.startSession(courseId);
+      }
       if (trainingStore.sessionCards.length === 0) {
         toast.info('На сегодня карточек больше нет');
-        router.push(`/course/${courseId}`);
+        handleBack();
       }
     } catch (error) {
       toast.error('Ошибка продолжения тренировки');
@@ -93,20 +121,20 @@
 
       <!-- Информация о сессии -->
       <div
-        v-if="!loading && sessionLimits && !isSessionComplete"
+        v-if="!loading && !isSessionComplete"
         class="session-info">
         <div class="progress-text">Карточка {{ progress.current }} / {{ progress.total }}</div>
         <div class="limits-text">
           Осталось:
           <span
             class="badge new"
-            v-if="sessionLimits.newCardsRemaining > 0">
-            {{ sessionLimits.newCardsRemaining }} новых
+            v-if="sessionRemaining.newCards > 0">
+            {{ sessionRemaining.newCards }} новых
           </span>
           <span
             class="badge review"
-            v-if="sessionLimits.reviewsRemaining > 0">
-            {{ sessionLimits.reviewsRemaining }} повтор.
+            v-if="sessionRemaining.reviews > 0">
+            {{ sessionRemaining.reviews }} повтор.
           </span>
         </div>
       </div>
@@ -135,7 +163,7 @@
           <Button
             @click="handleBack"
             variant="secondary">
-            Вернуться к курсу
+            {{ isGlobalMode ? 'Вернуться на главную' : 'Вернуться к курсу' }}
           </Button>
         </div>
       </div>
@@ -168,6 +196,13 @@
           Нажмите, чтобы {{ isFlipped ? 'вернуть' : 'перевернуть' }}
         </div>
       </Card>
+
+      <!-- Course Badge для глобального режима -->
+      <div
+        v-if="isGlobalSession"
+        class="course-badge-container">
+        <CourseBadge :course-name="currentCourseName" />
+      </div>
 
       <div
         v-if="isFlipped"
@@ -376,5 +411,11 @@
 
   .flip-hint i {
     font-size: 16px;
+  }
+
+  .course-badge-container {
+    display: flex;
+    justify-content: center;
+    margin-top: -12px;
   }
 </style>

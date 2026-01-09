@@ -115,6 +115,22 @@ export class CardRepository {
   }
 
   /**
+   * Получить все due карточки из всех курсов для глобальной тренировки
+   * @param now - текущее время
+   * @param limit - максимальное количество карточек (для производительности)
+   * @returns карточки, отсортированные по приоритету (overdue сначала)
+   */
+  async getAllDueCards(now: Date, limit = 1000): Promise<Card[]> {
+    return db
+      .selectFrom('cards')
+      .where('due', '<=', now.toISOString())
+      .orderBy('due', 'asc')
+      .limit(limit)
+      .selectAll()
+      .execute();
+  }
+
+  /**
    * Получить статистику по курсу
    */
   async getCourseStats(courseId: number): Promise<{
@@ -161,10 +177,12 @@ export class CardRepository {
         newCards: number;
         lastTraining: string | null;
         lastCardAdded: string | null;
+        dueToday: number;
       }
     >
   > {
     const allCards = await db.selectFrom('cards').selectAll().execute();
+    const now = new Date().toISOString();
 
     const statsMap = new Map<
       number,
@@ -173,6 +191,7 @@ export class CardRepository {
         newCards: number;
         lastTraining: string | null;
         lastCardAdded: string | null;
+        dueToday: number;
       }
     >();
 
@@ -184,6 +203,7 @@ export class CardRepository {
           newCards: 0,
           lastTraining: null,
           lastCardAdded: null,
+          dueToday: 0,
         });
       }
 
@@ -191,6 +211,9 @@ export class CardRepository {
       stats.total++;
 
       if (card.state === 0) stats.newCards++;
+
+      // Подсчитываем due карточки
+      if (card.due <= now) stats.dueToday++;
 
       // Обновляем lastTraining, если есть lastReview и он позже текущего
       if (card.lastReview) {

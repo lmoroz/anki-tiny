@@ -1,9 +1,9 @@
 {
-  "name": "repetitio-backend",
-  "version": "0.6.2",
-  "description": "Backend for Repetitio",
-  "author": "Morozhnikova Larisa",
-  "main": "dist/electron/main.js",
+  "name": "backend",
+  "version": "0.8.0",
+  "description": "Backend for Repetitio - Spaced Repetition App",
+  "main": "src/server.ts",
+  "type": "module",
   "scripts": {
     "rebuild:electron": "electron-builder install-app-deps",
     "rebuild:node": "npm rebuild better-sqlite3",

@@ -14,7 +14,7 @@ const routes = [
     meta: { title: 'Курс' },
   },
   {
-    path: '/training/:id',
+    path: '/training/:id?',
     name: 'training',
     component: () => import('@/pages/training/TrainingPage.vue'),
     meta: { title: 'Тренировка' },

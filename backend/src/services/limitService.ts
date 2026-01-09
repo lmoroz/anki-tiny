@@ -216,3 +216,126 @@ export async function getDailyStats(timezone = 'UTC'): Promise<DailyStats> {
     },
   };
 }
+
+/**
+ * Результат расчёта доступных карточек для глобальной тренировки
+ */
+export interface GlobalAvailableCardsResult {
+  cards: Card[];
+  limits: {
+    globalNewRemaining: number;
+    globalReviewsRemaining: number;
+    newCardsRemaining: number;
+    reviewsRemaining: number;
+  };
+}
+
+/**
+ * Рассчитать доступные карточки для глобальной тренировки
+ * Собирает карточки из всех курсов, применяет глобальные и курсовые лимиты,
+ * перемешивает результат для interleaved practice
+ */
+export async function calculateGlobalAvailableCards(timezone = 'UTC'): Promise<GlobalAvailableCardsResult> {
+  // 1. Получаем настройки и прогресс
+  const globalSettings = await settingsRepository.getGlobalSettings();
+  const today = formatDate(new Date(), timezone);
+  const globalProgress = await progressRepository.getGlobalProgress(today);
+
+  // 2. Вычисляем оставшиеся глобальные лимиты
+  const globalNewRemaining = Math.max(0, globalSettings.globalNewCardsPerDay - globalProgress.newCardsStudied);
+  const globalReviewsRemaining = Math.max(0, globalSettings.globalMaxReviewsPerDay - globalProgress.reviewsCompleted);
+
+  // 3. Получаем все курсы
+  const courses = await db.selectFrom('courses').selectAll().execute();
+
+  // 4. Для каждого курса получаем лимиты и прогресс
+  const courseLimits = new Map<
+    number,
+    {
+      newRemaining: number;
+      reviewsRemaining: number;
+    }
+  >();
+
+  for (const course of courses) {
+    const courseSettings = await settingsRepository.getCourseSettings(course.id);
+    const courseProgress = await progressRepository.getProgress(today, course.id);
+
+    const newCardsPerDay = courseSettings?.newCardsPerDay ?? globalSettings.defaultNewCardsPerDay ?? 20;
+    const maxReviewsPerDay = courseSettings?.maxReviewsPerDay ?? globalSettings.defaultMaxReviewsPerDay ?? 200;
+
+    courseLimits.set(course.id, {
+      newRemaining: Math.max(0, newCardsPerDay - (courseProgress?.newCardsStudied ?? 0)),
+      reviewsRemaining: Math.max(0, maxReviewsPerDay - (courseProgress?.reviewsCompleted ?? 0)),
+    });
+  }
+
+  // 5. Получаем все due карточки
+  const now = new Date();
+  const allDueCards = await cardRepository.getAllDueCards(now, 1000);
+
+  // 6. Фильтруем карточки с учётом лимитов
+  const result: Card[] = [];
+  let globalNewUsed = 0;
+  let globalReviewsUsed = 0;
+
+  // Счётчики использованных карточек по курсам
+  const courseUsage = new Map<number, { newUsed: number; reviewsUsed: number }>();
+  for (const course of courses) {
+    courseUsage.set(course.id, { newUsed: 0, reviewsUsed: 0 });
+  }
+
+  for (const card of allDueCards) {
+    const limits = courseLimits.get(card.courseId);
+    if (!limits) continue;
+
+    const usage = courseUsage.get(card.courseId)!;
+    const isNew = isNewCard(card.state);
+
+    // Проверяем, можем ли добавить эту карточку
+    if (isNew) {
+      const canAdd = globalNewUsed < globalNewRemaining && usage.newUsed < limits.newRemaining;
+
+      if (canAdd) {
+        result.push(card);
+        globalNewUsed++;
+        usage.newUsed++;
+      }
+    } else {
+      const canAdd = globalReviewsUsed < globalReviewsRemaining && usage.reviewsUsed < limits.reviewsRemaining;
+
+      if (canAdd) {
+        result.push(card);
+        globalReviewsUsed++;
+        usage.reviewsUsed++;
+      }
+    }
+
+    // Прерываем, если достигли глобальных лимитов
+    if (globalNewUsed >= globalNewRemaining && globalReviewsUsed >= globalReviewsRemaining) break;
+  }
+
+  // 7. Перемешиваем карточки для interleaving
+  shuffleArray(result);
+
+  return {
+    cards: result,
+    limits: {
+      globalNewRemaining: globalNewRemaining - globalNewUsed,
+      globalReviewsRemaining: globalReviewsRemaining - globalReviewsUsed,
+      // Для совместимости с UI дублируем значения
+      newCardsRemaining: globalNewRemaining - globalNewUsed,
+      reviewsRemaining: globalReviewsRemaining - globalReviewsUsed,
+    },
+  };
+}
+
+/**
+ * Перемешать массив (Fisher-Yates shuffle)
+ */
+function shuffleArray<T>(array: T[]): void {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}

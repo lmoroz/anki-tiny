@@ -10,6 +10,7 @@ export const useTrainingStore = defineStore('training', () => {
   const loading = ref(false);
   const error = ref(null);
   const dailyStats = ref(null);
+  const isGlobalSession = ref(false);
 
   // Getters
   const currentCard = computed(() => {
@@ -37,6 +38,7 @@ export const useTrainingStore = defineStore('training', () => {
     sessionCards.value = [];
     currentCardIndex.value = 0;
     sessionLimits.value = null;
+    isGlobalSession.value = false;
 
     try {
       const data = await trainingApi.getDueCards(courseId, true);
@@ -46,6 +48,29 @@ export const useTrainingStore = defineStore('training', () => {
     } catch (err) {
       error.value = err.response?.data?.error || 'Ошибка запуска тренировки';
       console.error('[Training Store] Failed to start session:', err);
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  async function startGlobalSession() {
+    loading.value = true;
+    error.value = null;
+    sessionCards.value = [];
+    currentCardIndex.value = 0;
+    sessionLimits.value = null;
+    isGlobalSession.value = true;
+
+    try {
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const data = await trainingApi.getGlobalDueCards(timezone);
+      sessionCards.value = data.cards;
+      sessionLimits.value = data.limits;
+      return data;
+    } catch (err) {
+      error.value = err.response?.data?.error || 'Ошибка запуска глобальной тренировки';
+      console.error('[Training Store] Failed to start global session:', err);
       throw err;
     } finally {
       loading.value = false;
@@ -97,6 +122,7 @@ export const useTrainingStore = defineStore('training', () => {
     sessionLimits.value = null;
     currentCardIndex.value = 0;
     error.value = null;
+    isGlobalSession.value = false;
   }
 
   return {
@@ -106,10 +132,12 @@ export const useTrainingStore = defineStore('training', () => {
     loading,
     error,
     dailyStats,
+    isGlobalSession,
     currentCard,
     isSessionComplete,
     progress,
     startSession,
+    startGlobalSession,
     submitReview,
     fetchDailyStats,
     resetSession,

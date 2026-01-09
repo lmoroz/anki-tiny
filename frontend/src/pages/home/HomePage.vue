@@ -14,6 +14,11 @@
   const isLoading = computed(() => courseStore.loading);
   const courses = computed(() => courseStore.sortedCourses);
 
+  // Подсчет общего количества due карточек
+  const totalDueCards = computed(() => {
+    return courses.value.reduce((acc, course) => acc + (course.stats?.dueToday || 0), 0);
+  });
+
   onMounted(async () => {
     try {
       await courseStore.fetchCourses();
@@ -80,16 +85,28 @@
   <div class="page-container">
     <div class="page-header">
       <div>
-        <h1 class="page-title">Мои курсы</h1>
+        <div class="flex gap-8">
+          <h1 class="page-title">Мои курсы</h1>
+          <Button
+            variant="secondary"
+            size="sm"
+            gnost
+            @click="handleCreateCourse">
+            <i class="bi bi-plus-lg" />
+            Создать курс
+          </Button>
+        </div>
         <p class="page-subtitle">Управление курсами и карточками для обучения</p>
       </div>
+      <!-- Global Training Button -->
       <Button
-        @click="handleCreateCourse"
-        stacked>
-        <span class="text-xl font-semibold text-white drop-shadow-md tracking-wide">
-          <i class="bi bi-plus-lg" />
-          Создать курс
-        </span>
+        v-if="totalDueCards > 0"
+        stacked
+        to="/training/global"
+        class="global-training-btn">
+        <i class="bi bi-lightning-fill" />
+        Тренировать всё
+        <span class="due-badge">{{ totalDueCards }}</span>
       </Button>
     </div>
 
@@ -250,5 +267,14 @@
     max-width: 400px;
     margin-bottom: 28px;
     line-height: 1.6;
+  }
+
+  .due-badge {
+    margin-left: auto;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
   }
 </style>

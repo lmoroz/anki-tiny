@@ -5,6 +5,121 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.8.0] - 2026-01-09 16:30
+
+### Added
+
+#### Feature: Global Interleaved Training (Archived as 2026-01-09-add-global-training)
+
+Implemented global training mode that allows learning cards from all courses in a single unified session with intelligent interleaving for improved retention.
+
+- **Backend Implementation**:
+  - **cardRepository.ts** — New method `getAllDueCards(now, limit)`:
+    - Fetches due cards from all courses sorted by priority (overdue first)
+    - SQL query with `due <= now` filter and `ORDER BY due ASC`
+    - Limit parameter (default 1000) for performance
+  - **limitService.ts** — New function `calculateGlobalAvailableCards(timezone)`:
+    - Applies dual-level limits: global AND course-specific
+    - Filters cards: `globalNewUsed < globalNewRemaining && courseNewUsed < courseNewRemaining`
+    - Implements Fisher-Yates shuffle for interleaved practice
+    - Returns `{ cards: Card[], limits: {...} }`
+  - **training.ts** — New endpoint `GET /api/training/global/due-cards?timezone=...`:
+    - Calls `calculateGlobalAvailableCards(timezone)`
+    - Returns mixed queue with remaining limits
+
+- **Frontend Implementation**:
+  - **useTrainingStore.js** — New action `startGlobalSession()`:
+    - Detects user timezone via `Intl.DateTimeFormat().resolvedOptions().timeZone`
+    - Calls `GET /api/training/global/due-cards`
+    - Sets `isGlobalSession = true` flag
+  - **TrainingPage.vue** — Global mode adaptations:
+    - Conditional navigation: "Back to Home" instead of "Back to Course"
+    - Displays `CourseBadge` component above each card
+    - Session remaining counter shows cards left in current session (not daily limits)
+    - Computed property `sessionRemaining` calculates remaining new/review cards
+  - **CourseBadge.vue** (NEW) — `frontend/src/shared/ui/CourseBadge.vue`:
+    - Compact badge component (24px height, rounded, 12px text)
+    - Props: `courseName`, `courseColor` (optional)
+    - Shows course name during global training
+  - **HomePage.vue** — "Train All" button:
+    - Button with lightning icon (bi-lightning-fill)
+    - Counter badge showing total due cards across all courses
+    - Disabled when `totalDueCards === 0`
+    - Navigates to `/training/global` on click
+  - **Router** — New route: `/training/global` → `TrainingPage`
+
+- **Key Features**:
+  - **Interleaved Practice**: Cards from different courses are shuffled together (not studied in blocks)
+  - **Hierarchical Limits**: Enforces both global (e.g., 200 new/day) AND course (e.g., 20 new/day) limits simultaneously
+  - **Dynamic Due Counter**: Home page button shows real-time count of cards ready for review
+  - **Course Indicator**: Badge on each card shows which course it belongs to during global session
+  - **Session Remaining Display**: "Осталось" section shows cards left in current session, updating after each review
+
+### Fixed
+
+- **Course Limits Fallback**: Fixed hardcoded fallback values (20 new, 200 reviews) in `calculateGlobalAvailableCards()`
+  - Now uses `globalSettings.defaultNewCardsPerDay` and `defaultMaxReviewsPerDay`
+  - Resolves issue where global training was limited to 22 cards instead of 51 due to incorrect defaults
+- **Stats Display**: Added `dueToday` field to course stats in `GET /api/courses`
+  - Backend `getAllCoursesStats()` now calculates due cards count (`card.due <= now`)
+  - Home page "Train All" button now displays correct counter
+- **Session Limits**: Fixed "Осталось" display to show remaining cards in session, not daily limits
+  - Changed from `sessionLimits.newCardsRemaining` to `sessionRemaining.newCards`
+  - UI now displays actual progress through current training session
+
+### Technical Details
+
+- **Files Created**: 2
+  - `frontend/src/shared/ui/CourseBadge.vue`
+  - `openspec/specs/global-training/spec.md` (archived spec)
+
+- **Files Modified**: 9
+  - Backend (4): `cardRepository.ts`, `limitService.ts`, `training.ts`, `courses.ts`
+  - Frontend (5): `useTrainingStore.js`, `trainingApi.js`, `TrainingPage.vue`, `HomePage.vue`, `router/index.js`
+
+- **OpenSpec Status**:
+  - ✅ All **82 tasks** completed (5 phases: Backend, State, UI, Verification, Documentation)
+  - ✅ Archived as `2026-01-09-add-global-training`
+  - ✅ Spec `global-training` created with 4 requirements
+  - ✅ Validation passed with strict mode (11 specs total)
+
+- **Architecture**:
+  ```text
+  HomePage: "Train All" (51 cards) → router.push('/training/global')
+    ↓
+  TrainingPage: isGlobalMode = true
+    ↓
+  useTrainingStore.startGlobalSession()
+    ↓
+  GET /api/training/global/due-cards?timezone=Asia/Shanghai
+    ↓
+  calculateGlobalAvailableCards():
+    - Calculate budgets (global + per-course)
+    - Fetch all due cards (sorted by due ASC)
+    - Filter with dual limits (global AND course)
+    - Shuffle result (Fisher-Yates)
+    ↓
+  Returns: { cards: [29 new + 22 reviews], limits: {...} }
+    ↓
+  TrainingPage: Shows cards with CourseBadge, "28 новых + 21 повтор." remaining
+  ```
+
+### User Experience
+
+- ✅ **One-Button Global Training**: Click "Тренировать всё" to review all due cards in one session
+- ✅ **Interleaved Practice**: Cards from multiple courses are mixed together for better retention
+- ✅ **Intelligent Limit Enforcement**: Respects both global and per-course limits automatically
+- ✅ **Visual Course Indicator**: Each card shows which course it belongs to
+- ✅ **Session Progress Tracking**: "Осталось: X новых + Y повтор." updates in real-time
+- ✅ **Smart Navigation**: Back button returns to home page (not individual course)
+- ✅ **Dynamic Counter**: Home page button shows exact number of cards ready for review
+
+### Next Steps
+
+- Future enhancement: Real-time stat updates via SSE (planned for next OpenSpec proposal)
+- Consider adding session time tracking
+- Potential optimization: lazy loading for very large card sets (>1000 cards)
+
 ## [0.6.2] - 2026-01-09 03:44
 
 ### Changed

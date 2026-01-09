@@ -14,6 +14,17 @@ export const trainingApi = {
   },
 
   /**
+   * Получить карточки для глобальной тренировки из всех курсов
+   * @param {string} timezone
+   */
+  async getGlobalDueCards(timezone = 'UTC') {
+    const response = await api.get('/training/global/due-cards', {
+      params: { timezone },
+    });
+    return response.data;
+  },
+
+  /**
    * Отправить результат повторения
    * @param {number} cardId
    * @param {number} rating

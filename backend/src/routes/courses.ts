@@ -18,6 +18,7 @@ router.get('/', async (req: Request, res: Response) => {
         total: 0,
         newCards: 0,
         lastTraining: null,
+        dueToday: 0,
       };
 
       return {

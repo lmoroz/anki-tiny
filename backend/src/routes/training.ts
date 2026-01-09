@@ -2,7 +2,13 @@ import { Router, Request, Response } from 'express';
 import { cardRepository } from '../services/repositories/cardRepository';
 import { settingsRepository } from '../services/repositories/settingsRepository';
 import { calculateNextReview, canShowNewCards } from '../services/fsrs';
-import { calculateAvailableCards, updateProgressAfterReview, getDailyStats, isNewCard } from '../services/limitService';
+import {
+  calculateAvailableCards,
+  updateProgressAfterReview,
+  getDailyStats,
+  isNewCard,
+  calculateGlobalAvailableCards,
+} from '../services/limitService';
 import { ReviewCardSchema } from '../schemas/card';
 import { Rating } from 'ts-fsrs';
 import { ZodError } from 'zod';
@@ -59,6 +65,28 @@ router.get('/courses/:courseId/due-cards', async (req: Request, res: Response) =
   } catch (error) {
     console.error('Error fetching due cards:', error);
     res.status(500).json({ error: 'Failed to fetch due cards' });
+  }
+});
+
+/**
+ * GET /api/training/global/due-cards
+ * Получить карточки для глобальной тренировки из всех курсов
+ * Параметры: ?timezone=UTC
+ */
+router.get('/training/global/due-cards', async (req: Request, res: Response) => {
+  try {
+    const timezone = (req.query.timezone as string) || 'UTC';
+
+    // Получаем mixed queue из всех курсов
+    const result = await calculateGlobalAvailableCards(timezone);
+
+    res.json({
+      cards: result.cards,
+      limits: result.limits,
+    });
+  } catch (error) {
+    console.error('Error fetching global due cards:', error);
+    res.status(500).json({ error: 'Failed to fetch global due cards' });
   }
 });
 
