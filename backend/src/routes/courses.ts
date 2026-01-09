@@ -3,6 +3,7 @@ import { courseRepository } from '../services/repositories/courseRepository';
 import { cardRepository } from '../services/repositories/cardRepository';
 import { createCourseSchema, updateCourseSchema } from '../schemas/course';
 import { ZodError } from 'zod';
+import { statsScheduler } from '../services/statsScheduler';
 
 const router = Router();
 
@@ -59,6 +60,10 @@ router.post('/', async (req: Request, res: Response) => {
   try {
     const validatedData = createCourseSchema.parse(req.body);
     const course = await courseRepository.create(validatedData);
+
+    // Broadcast обновлённую статистику
+    await statsScheduler.broadcastStats();
+
     res.status(201).json(course);
   } catch (error) {
     if (error instanceof ZodError) {
@@ -84,6 +89,9 @@ router.put('/:id', async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Course not found' });
     }
 
+    // Broadcast обновлённую статистику
+    await statsScheduler.broadcastStats();
+
     res.json(course);
   } catch (error) {
     if (error instanceof ZodError) {
@@ -106,6 +114,9 @@ router.delete('/:id', async (req: Request, res: Response) => {
     if (!deleted) {
       return res.status(404).json({ error: 'Course not found' });
     }
+
+    // Broadcast обновлённую статистику
+    await statsScheduler.broadcastStats();
 
     res.json({ message: 'Course deleted successfully' });
   } catch (error) {

@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { cardRepository } from '../services/repositories/cardRepository';
 import { settingsRepository } from '../services/repositories/settingsRepository';
 import { calculateNextReview, canShowNewCards } from '../services/fsrs';
+import { statsScheduler } from '../services/statsScheduler';
 import {
   calculateAvailableCards,
   updateProgressAfterReview,
@@ -127,6 +128,9 @@ router.post('/training/review', async (req: Request, res: Response) => {
     // Обновляем прогресс за день (с учетом timezone)
     const timezone = validatedData.timezone || 'UTC';
     await updateProgressAfterReview(cardId, wasNew, timezone);
+
+    // Broadcast обновлённую статистику всем SSE клиентам
+    await statsScheduler.broadcastStats();
 
     res.json({
       card: updatedCard,

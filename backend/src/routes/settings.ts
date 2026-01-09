@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { settingsRepository } from '../services/repositories/settingsRepository';
 import { GlobalSettingsSchema, CourseSettingsSchema } from '../schemas/settings';
 import { ZodError } from 'zod';
+import { statsScheduler } from '../services/statsScheduler';
 
 const router = Router();
 
@@ -53,6 +54,9 @@ router.put('/settings', async (req: Request, res: Response) => {
       notificationsEnabled: settings.notificationsEnabled === 1,
       enableFuzz: settings.enableFuzz === 1,
     };
+
+    // Broadcast обновлённую статистику
+    await statsScheduler.broadcastStats();
 
     res.json(result);
   } catch (error) {
@@ -122,6 +126,9 @@ router.put('/courses/:courseId/settings', async (req: Request, res: Response) =>
     };
 
     const settings = await settingsRepository.updateCourseSettings(courseId, updateData);
+
+    // Broadcast обновлённую статистику
+    await statsScheduler.broadcastStats();
 
     res.json({ settings });
   } catch (error) {

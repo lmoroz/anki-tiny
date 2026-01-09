@@ -44,6 +44,27 @@ export const useStatsStore = defineStore('stats', () => {
     }
   }
 
+  /**
+   * Обновить статистику из SSE данных (без HTTP запроса, без loading)
+   */
+  function updateFromSSE(globalStats) {
+    if (!globalStats) return;
+
+    totalNewCards.value = globalStats.totalNewCards || 0;
+    studiedToday.value =
+      (globalStats.global?.newCardsStudied || 0) + (globalStats.global?.reviewsCompleted || 0);
+    trainingsToday.value = studiedToday.value;
+
+    if (globalStats.global?.limits) {
+      remainingToday.value =
+        globalStats.global.limits.globalNewCardsPerDay -
+        (globalStats.global.newCardsStudied || 0) +
+        (globalStats.global.limits.globalMaxReviewsPerDay - (globalStats.global.reviewsCompleted || 0));
+
+      dailyNewLimit.value = globalStats.global.limits.globalNewCardsPerDay;
+    }
+  }
+
   return {
     totalNewCards,
     studiedToday,
@@ -53,5 +74,6 @@ export const useStatsStore = defineStore('stats', () => {
     loading,
     error,
     fetchGlobalStats,
+    updateFromSSE,
   };
 });

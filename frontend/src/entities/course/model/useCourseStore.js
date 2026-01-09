@@ -87,6 +87,19 @@ export const useCourseStore = defineStore('course', () => {
     }
   }
 
+  /**
+   * Обновить статистику курсов из SSE данных
+   * @param {Array} statsData - массив { courseId, stats }
+   */
+  function updateCoursesStats(statsData) {
+    if (!Array.isArray(statsData)) return;
+
+    for (const { courseId, stats } of statsData) {
+      const course = courses.value.find((c) => c.id === courseId);
+      if (course) course.stats = stats;
+    }
+  }
+
   return {
     // State
     courses,
@@ -100,5 +113,6 @@ export const useCourseStore = defineStore('course', () => {
     createCourse,
     updateCourse,
     deleteCourse,
+    updateCoursesStats,
   };
 });

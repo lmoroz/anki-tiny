@@ -4,9 +4,12 @@
   import { toast } from 'vue3-toastify';
   import { useConfirm } from '@/shared/lib/useConfirm';
   import { useCourseStore } from '@/entities/course/model/useCourseStore';
+  import { useStatsStore } from '@/entities/stats/model/useStatsStore';
+  import { useStatsStream } from '@/shared/lib/useStatsStream';
 
   const router = useRouter();
   const courseStore = useCourseStore();
+  const statsStore = useStatsStore();
 
   const showEditorModal = ref(false);
   const editingCourse = ref(null);
@@ -19,18 +22,21 @@
     return courses.value.reduce((acc, course) => acc + (course.stats?.dueToday || 0), 0);
   });
 
-  const update = async () => {
+  // Подписка на SSE поток статистики
+  const { isConnected } = useStatsStream((data) => {
+    // Обновляем статистику курсов
+    if (data.courses) courseStore.updateCoursesStats(data.courses);
+    // Обновляем глобальную статистику
+    if (data.globalStats) statsStore.updateFromSSE(data.globalStats);
+  });
+
+  onMounted(async () => {
     try {
       await courseStore.fetchCourses();
-      window.setTimeout(update, 5000);
     } catch (error) {
       console.error('[HomePage] Failed to load courses:', error);
       toast.error('Ошибка при загрузке курсов. Попробуйте еще раз.');
     }
-  };
-
-  onMounted(async () => {
-    await update();
   });
 
   const handleCreateCourse = () => {
@@ -168,6 +174,15 @@
       :course="editingCourse"
       @save="handleSaveCourse"
       @close="handleCloseModal" />
+
+    <!-- SSE Connection Status Indicator -->
+    <div
+      v-if="courses.length > 0"
+      class="connection-indicator"
+      :class="{ connected: isConnected }">
+      <i :class="isConnected ? 'bi bi-wifi' : 'bi bi-wifi-off'" />
+      <span>{{ isConnected ? 'Подключено' : 'Отключено' }}</span>
+    </div>
   </div>
 </template>
 
@@ -281,5 +296,32 @@
     border-radius: 12px;
     font-size: 14px;
     font-weight: 700;
+  }
+
+  .connection-indicator {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-error);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--color-error);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    z-index: 100;
+  }
+
+  .connection-indicator.connected {
+    border-color: var(--color-success);
+    color: var(--color-success);
+  }
+
+  .connection-indicator i {
+    font-size: 16px;
   }
 </style>

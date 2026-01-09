@@ -7,6 +7,7 @@ import apiRoutes from './routes';
 import { PerformanceTimer } from './utils/performance';
 import { logger, requestLogger } from './utils/logger';
 import { initializeDatabase, closeDatabase } from './services/database';
+import { statsScheduler } from './services/statsScheduler';
 import http from 'http';
 
 const __dirname = import.meta.dirname;
@@ -71,6 +72,9 @@ async function shutdown(signal: string) {
       logger.info('🔌 HTTP server closed.');
     });
   }
+
+  // Shutdown StatsScheduler перед закрытием БД
+  statsScheduler.shutdown();
 
   try {
     await closeDatabase();

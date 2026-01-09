@@ -167,6 +167,22 @@ export class CardRepository {
   }
 
   /**
+   * Получить следующую due карточку (ближайшая в будущем)
+   * @returns карточка с ближайшим due в будущем или null
+   */
+  async getNextDueCard(): Promise<{ due: string } | null> {
+    const card = await db
+      .selectFrom('cards')
+      .select('due')
+      .where('due', '>', new Date().toISOString())
+      .orderBy('due', 'asc')
+      .limit(1)
+      .executeTakeFirst();
+
+    return card || null;
+  }
+
+  /**
    * Получить статистику по всем курсам
    */
   async getAllCoursesStats(): Promise<

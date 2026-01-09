@@ -4,6 +4,7 @@ import { settingsRepository } from '../services/repositories/settingsRepository'
 import { CreateCardSchema, UpdateCardSchema, BatchDeleteSchema } from '../schemas/card';
 import { Card } from '../services/database/schema';
 import { ZodError } from 'zod';
+import { statsScheduler } from '../services/statsScheduler';
 
 const router = Router();
 
@@ -44,6 +45,9 @@ router.post('/courses/:courseId/cards', async (req: Request, res: Response) => {
 
     // Создаем карточку с FSRS значениями
     const card = await cardRepository.createCard(validatedData.front, validatedData.back, courseId);
+
+    // Broadcast обновлённую статистику
+    await statsScheduler.broadcastStats();
 
     res.status(201).json({ card });
   } catch (error) {
@@ -124,6 +128,9 @@ router.put('/cards/:id', async (req: Request, res: Response) => {
     // Обновляем
     const card = await cardRepository.updateCard(id, updates);
 
+    // Broadcast обновлённую статистику
+    await statsScheduler.broadcastStats();
+
     res.json({ card });
   } catch (error) {
     if (error instanceof ZodError) {
@@ -154,6 +161,9 @@ router.delete('/cards/:id', async (req: Request, res: Response) => {
 
     await cardRepository.deleteCard(id);
 
+    // Broadcast обновлённую статистику
+    await statsScheduler.broadcastStats();
+
     res.json({ success: true });
   } catch (error) {
     console.error('Error deleting card:', error);
@@ -174,6 +184,9 @@ router.delete('/courses/:courseId/cards/batch', async (req: Request, res: Respon
     const validatedData = BatchDeleteSchema.parse(req.body);
 
     const deletedCount = await cardRepository.deleteCardsBatch(validatedData.cardIds, courseId);
+
+    // Broadcast обновлённую статистику
+    await statsScheduler.broadcastStats();
 
     res.json({ success: true, deletedCount });
   } catch (error) {
@@ -196,6 +209,9 @@ router.delete('/courses/:courseId/cards', async (req: Request, res: Response) =>
     if (isNaN(courseId)) return res.status(400).json({ error: 'Invalid course ID' });
 
     const deletedCount = await cardRepository.deleteAllCards(courseId);
+
+    // Broadcast обновлённую статистику
+    await statsScheduler.broadcastStats();
 
     res.json({ success: true, deletedCount });
   } catch (error) {
