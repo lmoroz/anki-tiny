@@ -1,6 +1,8 @@
 import dotenv from 'dotenv';
 import path from 'path';
 
+const __dirname = import.meta.dirname;
+
 dotenv.config({ quiet: true });
 
 export const config = {

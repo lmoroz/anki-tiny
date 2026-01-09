@@ -9,6 +9,8 @@ import { logger, requestLogger } from './utils/logger';
 import { initializeDatabase, closeDatabase } from './services/database';
 import http from 'http';
 
+const __dirname = import.meta.dirname;
+
 const app = express();
 
 app.use(cors());
@@ -83,6 +85,8 @@ async function shutdown(signal: string) {
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
 
-if (require.main === module) startServer(config.PORT);
+import { fileURLToPath } from 'url';
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) startServer(config.PORT);
 
 export { app, startServer };

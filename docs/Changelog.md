@@ -5,6 +5,67 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.8.1] - 2026-01-09 17:59
+
+### Changed
+
+#### Backend: ES Modules (ESM) Migration
+
+Migrated backend codebase from CommonJS to ES Modules for better compatibility with modern Node.js ecosystem.
+
+- **TypeScript Configuration** (`backend/tsconfig.json`):
+  - Changed `module` from `CommonJS` to `ESNext`
+  - Changed `target` from `ES2020` to `ESNext`
+  - Set `moduleResolution` to `Bundler`
+
+- **Development Tooling**:
+  - Replaced `ts-node` with `tsx` in `package.json` for better ESM support
+  - Created `backend/nodemon.json` with TypeScript watch configuration
+  - Updated `dev` script to use `tsx` with type-checking before execution
+  - Added `dev:only` script for faster development without rebuild
+
+- **Code Updates**:
+  - Added `import.meta.dirname` polyfill to files requiring `__dirname`:
+    - `backend/build-installer.js`
+    - `backend/src/config/index.ts`
+    - `backend/src/electron/main.ts`
+    - `backend/src/server.ts`
+  - Updated entry point detection in `server.ts`:
+    - Changed from `require.main === module` (CommonJS)
+    - To `process.argv[1] === fileURLToPath(import.meta.url)` (ESM)
+
+**Benefits**:
+
+- Better compatibility with modern npm packages (many are ESM-only)
+- Faster development builds with `tsx`
+- Native `import`/`export` syntax without transpilation quirks
+- Consistent module system across frontend and backend
+
+#### Frontend: HomePage Auto-Refresh
+
+Added automatic course list refresh every 5 seconds on the home page.
+
+- **Implementation** (`frontend/src/pages/home/HomePage.vue`):
+  - Extracted course fetching logic into `update()` function
+  - Added `window.setTimeout(update, 5000)` for periodic refresh
+  - Ensures UI always displays up-to-date course statistics and due cards count
+
+**Benefits**:
+
+- Real-time updates when cards become due or training is completed in another window
+- Improved UX: no need to manually refresh the page
+- Minimal performance impact (5-second interval is conservative)
+
+### Technical Details
+
+- **Files Modified**: 8
+  - Backend (6): `build-installer.js`, `package.json`, `tsconfig.json`, `src/config/index.ts`, `src/electron/main.ts`, `src/server.ts`
+  - Frontend (1): `src/pages/home/HomePage.vue`
+  - Root (1): `package-lock.json`
+
+- **Files Created**: 1
+  - `backend/nodemon.json`
+
 ## [0.8.0] - 2026-01-09 16:30
 
 ### Added

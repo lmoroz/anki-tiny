@@ -1,5 +1,6 @@
 const fs = require('fs-extra');
 const path = require('path');
+const __dirname = import.meta.dirname;
 const { execSync } = require('child_process');
 
 async function build() {

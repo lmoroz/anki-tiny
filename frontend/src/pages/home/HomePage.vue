@@ -19,13 +19,18 @@
     return courses.value.reduce((acc, course) => acc + (course.stats?.dueToday || 0), 0);
   });
 
-  onMounted(async () => {
+  const update = async () => {
     try {
       await courseStore.fetchCourses();
+      window.setTimeout(update, 5000);
     } catch (error) {
       console.error('[HomePage] Failed to load courses:', error);
       toast.error('Ошибка при загрузке курсов. Попробуйте еще раз.');
     }
+  };
+
+  onMounted(async () => {
+    await update();
   });
 
   const handleCreateCourse = () => {

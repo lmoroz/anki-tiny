@@ -1,13 +1,14 @@
 {
   "name": "backend",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Backend for Repetitio - Spaced Repetition App",
   "main": "src/server.ts",
   "type": "module",
   "scripts": {
     "rebuild:electron": "electron-builder install-app-deps",
     "rebuild:node": "npm rebuild better-sqlite3",
-    "dev": "npm run rebuild:node && nodemon --watch src --ext ts,json --exec \"npx ts-node\" src/server.ts",
+    "dev:only": "nodemon src/server.ts",
+    "dev": "npm run rebuild:node && nodemon src/server.ts",
     "start": "npm run dev",
     "electron:dev": "npm run rebuild:electron && cross-env NODE_ENV=development tsc && electron .",
     "app:dev": "npm run rebuild:electron && concurrently \"npm run dev --prefix ../frontend\" \"cross-env NODE_ENV=development tsc && electron .\" -n \"frontend,backend\" -c \"blue,green\"",
@@ -69,7 +70,7 @@
     "nodemon": "^3.1.11",
     "prettier": "^3.7.4",
     "tree-cli": "^0.6.7",
-    "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.49.0",
     "vitest": "^4.0.15"

@@ -3,6 +3,8 @@ import path from 'path';
 import { pathToFileURL } from 'url';
 import { existsSync } from 'fs';
 
+const __dirname = import.meta.dirname;
+
 import { startServer } from '../server';
 
 const { app, protocol, net, ipcMain, shell, BrowserWindow } = electron;
