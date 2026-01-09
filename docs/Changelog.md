@@ -5,6 +5,133 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.8.1] - 2026-01-09 18:34
+
+### Added
+
+#### OpenSpec: Real-Time Statistics Updates via SSE Proposal
+
+Created comprehensive OpenSpec proposal for replacing polling-based statistics updates with Server-Sent Events (SSE) for real-time, efficient data synchronization.
+
+- **OpenSpec Change Created**: `add-sse-stats-updates`
+  - Proposal to replace `setTimeout` polling (every 5 seconds) with intelligent SSE-based push updates
+  - Motivation: Current polling creates unnecessary load (12 requests/minute), delays updates, and cannot predict when cards become due
+  - Solution: SSE with smart scheduling based on next card's due time, instant broadcasts on data changes
+
+- **Proposal Structure** (`openspec/changes/add-sse-stats-updates/`)
+  - **proposal.md** (3.1 KB)
+    - Why: Inefficient polling wastes resources, delays updates, lacks predictability
+    - Problem: 4 key issues (redundant requests, update delay, resource waste, no due-time awareness)
+    - Solution: SSE + StatsScheduler that plans updates for exact due times
+    - Benefits: Zero latency (<100ms), minimal traffic, predictable updates, scalability
+    - Alternatives considered: WebSocket (overcomplicated), Long Polling (same problems), keeping setTimeout (inefficient)
+  - **design.md** (11.9 KB)
+    - Architecture: SSE Endpoint + StatsScheduler Service + EventSource composable
+    - Components:
+      - Backend: `GET /api/stats/stream`, `StatsScheduler` class, `cardRepository.getNextDueCard()`
+      - Frontend: `useStatsStream` composable, HomePage integration with auto-reconnect
+    - Data Flow: 3 scenarios documented (training completion, next due timer, initial app load)
+    - Performance: O(1) scheduling, O(log N) next due query, O(M) broadcast (M = clients, typically 1)
+    - Edge Cases: no due cards (fallback 1hr), large delays (max 1hr), multiple clients (broadcast to all)
+  - **tasks.md** (15.0 KB, 4 phases, **85 tasks**, ~10.5 hours)
+    - **Phase 1**: Backend Infrastructure (5 tasks, 33 subtasks)
+      - Task 1.1: `getNextDueCard()` in cardRepository
+      - Task 1.2: Create StatsScheduler Service (clients set, timer, scheduleNextUpdate, broadcastStats)
+      - Task 1.3: SSE endpoint `GET /api/stats/stream`
+      - Task 1.4: Integrate broadcast triggers (training, cards, courses, settings routes)
+      - Task 1.5: Gracefulsurrender for scheduler shutdown
+    - **Phase 2**: Frontend Integration (3 tasks, 22 subtasks)
+      - Task 2.1: `useStatsStream` composable with EventSource
+      - Task 2.2: Integrate SSE in HomePage, remove setTimeout polling
+      - Task 2.3: Connection status indicator (optional)
+    - **Phase 3**: Testing & Validation (2 tasks, 15 subtasks)
+      - Task 3.1: Manual functional testing (7 scenarios)
+      - Task 3.2: Performance & resource checks (memory leaks, network requests, logs)
+    - **Phase 4**: Documentation & Cleanup (3 tasks, 15 subtasks)
+      - Task 4.1: Update Walkthrough with SSE architecture
+      - Task 4.2: Update Changelog
+      - Task 4.3: Code quality check (ESLint, Prettier, code style)
+  - **specs/sse-stats-streaming/spec.md** (NEW spec, 6.9 KB)
+    - 7 requirements with SHALL/MUST keywords:
+      - SSE Endpoint for Statistics (2 scenarios: connection, disconnect)
+      - Stats Scheduler Service (4 scenarios: first/last client, scheduled update, no due cards)
+      - Next Due Card Query (2 scenarios: future due cards, no due cards)
+      - Broadcast on Data Mutation (3 scenarios: training, card add, settings change)
+      - Frontend SSE Integration (3 scenarios: HomePage subscription, event reception, connection error)
+      - Remove Polling Mechanism (1 scenario: no setTimeout usage)
+      - SSE Message Format (1 scenario: valid message structure)
+
+- **Key Features Documented**
+  - **Intelligent Scheduling**:
+    - Queries next due card: `SELECT MIN(due) FROM cards WHERE due > NOW()`
+    - Sets timer for exact due time (no wasted polls)
+    - Fallback to 1-hour check if no cards due soon
+  - **Broadcast Triggers** (instant updates):
+    - After training review completion
+    - After card CRUD operations (add, edit, delete, batch)
+    - After course/settings updates
+    - Only broadcasts AFTER successful operation, BEFORE response
+  - **SSE Message Format**:
+    ```text
+    event: stats-update
+    data: {"courses":[{"courseId":1,"stats":{...}}]}
+    ```
+  - **Frontend Architecture**:
+    - EventSource connects to `/api/stats/stream`
+    - Auto-reconnect on errors (browser built-in, 3s delay)
+    - `useStatsStream(onUpdate)` composable for easy integration
+  - **Backend Architecture**:
+    ```typescript
+    class StatsScheduler {
+      clients: Set<Response>
+      nextDueTimer: NodeJS.Timeout | null
+      addClient(), removeClient()
+      scheduleNextUpdate(), broadcastStats()
+      shutdown()
+    }
+    ```
+  - **Benefits**:
+    - ✅ Instant updates (<100ms vs up to 5s delay)
+    - ✅ Reduced traffic (only when data changes vs 720 requests/hour)
+    - ✅ Precise timing (updates exactly when cards become due)
+    - ✅ Graceful shutdown (clean timer/connection cleanup)
+
+### Technical Details
+
+- **OpenSpec Validation**: ✅ Passed `npx @fission-ai/openspec validate --all` (12/12 specs)
+- **Markdown Linting**: ✅ 0 errors across all proposal files
+- **Change Status**: 0/85 tasks (proposal stage, ready for implementation)
+- **Files Created**: 4
+  - `openspec/changes/add-sse-stats-updates/proposal.md`
+  - `openspec/changes/add-sse-stats-updates/design.md`
+  - `openspec/changes/add-sse-stats-updates/tasks.md`
+  - `openspec/changes/add-sse-stats-updates/specs/sse-stats-streaming/spec.md` (NEW spec)
+- **No Code Changes**: Pure planning/proposal phase
+
+### Architecture Highlights
+
+```text
+Current (Polling):
+  HomePage → setTimeout(5s) → GET /api/courses (stats included)
+  Problems: 720 requests/hour, up to 5s delay, unpredictable
+
+Proposed (SSE):
+  HomePage → EventSource → GET /api/stats/stream (SSE)
+    ↓ (persistent connection)
+  StatsScheduler:
+    ├→ Timer set for next due card (e.g., 18:45:00)
+    ├→ Broadcast on user actions (training, CRUD)
+    └→ Clients receive: event stream with stats
+  Benefits: <100ms latency, minimal traffic, exact timing
+```
+
+### Next Steps
+
+- User review and approval of the proposal
+- Implementation via `/openspec-apply add-sse-stats-updates` after approval
+- New spec `sse-stats-streaming` will be formalized upon archiving
+- After implementation: Elimination of polling, real-time statistics, better resource efficiency
+
 ## [0.8.1] - 2026-01-09 17:59
 
 ### Changed
