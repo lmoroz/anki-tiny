@@ -2,15 +2,13 @@ import express, { type Request, type Response, type NextFunction } from 'express
 import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
-import { config } from './config/index.ts';
-import apiRoutes from './routes/index.ts';
-import { PerformanceTimer } from './utils/performance.ts';
-import { logger, requestLogger } from './utils/logger.ts';
-import { initializeDatabase, closeDatabase } from './services/database/index.ts';
-import { statsScheduler } from './services/statsScheduler.ts';
+import { config } from './config';
+import apiRoutes from './routes/index.js';
+import { PerformanceTimer } from './utils/performance.js';
+import { logger, requestLogger } from './utils/logger.js';
+import { initializeDatabase, closeDatabase } from './services/database';
+import { statsScheduler } from './services/statsScheduler.js';
 import http from 'http';
-
-const __dirname = import.meta.dirname;
 
 const app = express();
 
@@ -46,8 +44,12 @@ let server: http.Server;
 
 async function startServer(port: number = 0): Promise<number> {
   // Инициализировать БД перед запуском сервера
+  console.log('[Server] Initializing database...');
+  console.log('[Server] APP_USER_DATA:', process.env.APP_USER_DATA);
+  console.log('[Server] DATA_ROOT:', config.DATA_ROOT);
+  console.log('[Server] DATABASE_PATH:', config.DATABASE_PATH);
   await initializeDatabase();
-  logger.info('✅  Database initialized');
+  logger.info('[Server] ✅  Database initialized');
 
   return new Promise((resolve, reject) => {
     server = app.listen(port, () => {
@@ -89,8 +91,6 @@ async function shutdown(signal: string) {
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
 
-import { fileURLToPath } from 'url';
-
-if (process.argv[1] === fileURLToPath(import.meta.url)) startServer(config.PORT);
+if (require.main === module) startServer(config.PORT);
 
 export { app, startServer };

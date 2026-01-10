@@ -1,5 +1,5 @@
-import { getDatabase } from '../database/index.ts';
-import type { Course, NewCourse, CourseUpdate } from '../database/schema.ts';
+import { getDatabase } from '../database';
+import type { Course, NewCourse, CourseUpdate } from '../database/schema.js';
 import { sql } from 'kysely';
 
 export const courseRepository = {

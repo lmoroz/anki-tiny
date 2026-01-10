@@ -1,8 +1,8 @@
 import { Router, type Request, type Response } from 'express';
-import { settingsRepository } from '../services/repositories/settingsRepository.ts';
-import { GlobalSettingsSchema, CourseSettingsSchema } from '../schemas/settings.ts';
+import { settingsRepository } from '../services/repositories/settingsRepository.js';
+import { GlobalSettingsSchema, CourseSettingsSchema } from '../schemas/settings.js';
 import { ZodError } from 'zod';
-import { statsScheduler } from '../services/statsScheduler.ts';
+import { statsScheduler } from '../services/statsScheduler.js';
 
 const router = Router();
 
@@ -74,7 +74,7 @@ router.put('/settings', async (req: Request, res: Response) => {
  */
 router.get('/courses/:courseId/settings', async (req: Request, res: Response) => {
   try {
-    const courseId = parseInt(req.params.courseId, 10);
+    const courseId = parseInt(<string>req.params.courseId, 10);
 
     if (isNaN(courseId)) {
       return res.status(400).json({ error: 'Invalid course ID' });
@@ -107,7 +107,7 @@ router.put('/courses/:courseId/settings', async (req: Request, res: Response) =>
   let validatedData: Record<string, unknown> = {};
   let updateData: Record<string, unknown> = {};
   try {
-    const courseId = parseInt(req.params.courseId, 10);
+    const courseId = parseInt(<string>req.params.courseId, 10);
 
     if (isNaN(courseId)) {
       return res.status(400).json({ error: 'Invalid course ID' });
@@ -146,7 +146,7 @@ router.put('/courses/:courseId/settings', async (req: Request, res: Response) =>
  */
 router.delete('/courses/:courseId/settings', async (req: Request, res: Response) => {
   try {
-    const courseId = parseInt(req.params.courseId, 10);
+    const courseId = parseInt(<string>req.params.courseId, 10);
 
     if (isNaN(courseId)) {
       return res.status(400).json({ error: 'Invalid course ID' });

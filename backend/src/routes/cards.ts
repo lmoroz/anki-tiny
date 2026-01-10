@@ -1,10 +1,10 @@
 import { Router, type Request, type Response } from 'express';
-import { cardRepository } from '../services/repositories/cardRepository.ts';
-import { settingsRepository } from '../services/repositories/settingsRepository.ts';
-import { CreateCardSchema, UpdateCardSchema, BatchDeleteSchema } from '../schemas/card.ts';
-import type { Card } from '../services/database/schema.ts';
+import { cardRepository } from '../services/repositories/cardRepository.js';
+import { settingsRepository } from '../services/repositories/settingsRepository.js';
+import { CreateCardSchema, UpdateCardSchema, BatchDeleteSchema } from '../schemas/card.js';
+import type { Card } from '../services/database/schema.js';
 import { ZodError } from 'zod';
-import { statsScheduler } from '../services/statsScheduler.ts';
+import { statsScheduler } from '../services/statsScheduler.js';
 
 const router = Router();
 
@@ -14,7 +14,7 @@ const router = Router();
  */
 router.get('/courses/:courseId/cards', async (req: Request, res: Response) => {
   try {
-    const courseId = parseInt(req.params.courseId, 10);
+    const courseId = parseInt(<string>req.params.courseId, 10);
 
     if (isNaN(courseId)) {
       return res.status(400).json({ error: 'Invalid course ID' });
@@ -34,7 +34,7 @@ router.get('/courses/:courseId/cards', async (req: Request, res: Response) => {
  */
 router.post('/courses/:courseId/cards', async (req: Request, res: Response) => {
   try {
-    const courseId = parseInt(req.params.courseId, 10);
+    const courseId = parseInt(<string>req.params.courseId, 10);
 
     if (isNaN(courseId)) {
       return res.status(400).json({ error: 'Invalid course ID' });
@@ -65,7 +65,7 @@ router.post('/courses/:courseId/cards', async (req: Request, res: Response) => {
  */
 router.get('/cards/:id', async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id, 10);
+    const id = parseInt(<string>req.params.id, 10);
 
     if (isNaN(id)) {
       return res.status(400).json({ error: 'Invalid card ID' });
@@ -90,7 +90,7 @@ router.get('/cards/:id', async (req: Request, res: Response) => {
  */
 router.put('/cards/:id', async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id, 10);
+    const id = parseInt(<string>req.params.id, 10);
 
     if (isNaN(id)) return res.status(400).json({ error: 'Invalid card ID' });
 
@@ -147,7 +147,7 @@ router.put('/cards/:id', async (req: Request, res: Response) => {
  */
 router.delete('/cards/:id', async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id, 10);
+    const id = parseInt(<string>req.params.id, 10);
 
     if (isNaN(id)) {
       return res.status(400).json({ error: 'Invalid card ID' });
@@ -177,7 +177,7 @@ router.delete('/cards/:id', async (req: Request, res: Response) => {
  */
 router.delete('/courses/:courseId/cards/batch', async (req: Request, res: Response) => {
   try {
-    const courseId = parseInt(req.params.courseId, 10);
+    const courseId = parseInt(<string>req.params.courseId, 10);
 
     if (isNaN(courseId)) return res.status(400).json({ error: 'Invalid course ID' });
 
@@ -204,7 +204,7 @@ router.delete('/courses/:courseId/cards/batch', async (req: Request, res: Respon
  */
 router.delete('/courses/:courseId/cards', async (req: Request, res: Response) => {
   try {
-    const courseId = parseInt(req.params.courseId, 10);
+    const courseId = parseInt(<string>req.params.courseId, 10);
 
     if (isNaN(courseId)) return res.status(400).json({ error: 'Invalid course ID' });
 
@@ -226,7 +226,7 @@ router.delete('/courses/:courseId/cards', async (req: Request, res: Response) =>
  */
 router.get('/courses/:courseId/stats', async (req: Request, res: Response) => {
   try {
-    const courseId = parseInt(req.params.courseId, 10);
+    const courseId = parseInt(<string>req.params.courseId, 10);
 
     if (isNaN(courseId)) {
       return res.status(400).json({ error: 'Invalid course ID' });

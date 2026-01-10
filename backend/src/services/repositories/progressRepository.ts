@@ -1,5 +1,5 @@
-import { db } from '../database/index.ts';
-import type { DailyProgress, NewDailyProgress } from '../database/schema.ts';
+import { db } from '../database/index.js';
+import type { DailyProgress, NewDailyProgress } from '../database/schema.js';
 
 /**
  * Repository для работы с дневным прогрессом

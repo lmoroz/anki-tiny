@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import coursesRouter from './courses.ts';
-import cardsRouter from './cards.ts';
-import trainingRouter from './training.ts';
-import settingsRouter from './settings.ts';
-import statsRouter from './stats.ts';
+import coursesRouter from './courses.js';
+import cardsRouter from './cards.js';
+import trainingRouter from './training.js';
+import settingsRouter from './settings.js';
+import statsRouter from './stats.js';
 
 const router = Router();
 

@@ -3,28 +3,24 @@
   "version": "0.10.0",
   "description": "Repetitio - Desktop application for spaced repetition learning",
   "author": "Morozhnikova Larisa",
-  "private": true,
-  "workspaces": [
-    "frontend",
-    "backend"
-  ],
   "scripts": {
-    "app:dev": "npm run app:dev --workspace=backend",
-    "dev": "concurrently \"npm run dev --workspace=frontend\" \"npm run dev --workspace=backend\" -n \"frontend,backend\" -c \"blue,green\"",
-    "bundle": "npm run build --workspace=frontend && npm run build --workspace=backend && cd backend && node build-installer.cjs",
-    "lint": "npm run lint --workspaces --if-present && npm run lint:md",
+    "install:all": "pnpm install -r",
+    "app:dev": "concurrently \"pnpm --filter backend run electron:dev\" \"pnpm --filter frontend run dev\" -n \"backend,frontend\" -c \"green,blue\"",
+    "dev": "concurrently \"pnpm --filter frontend run dev\" \"pnpm --filter backend run dev\" -n \"frontend,backend\" -c \"blue,green\"",
+    "bundle": "pnpm --filter frontend run build && pnpm --filter backend run dist",
+    "lint": "pnpm -r --if-present run lint && npm run lint:md",
     "lint:md": "markdownlint-cli2 \"**/*.md\"",
     "lint:md:fix": "markdownlint-cli2 --fix \"**/*.md\"",
-    "format": "npm run format --workspaces --if-present && npm run format:md",
+    "format": "pnpm -r --if-present run format && npm run format:md",
     "format:md": "prettier --write \"./**/*.md\"",
     "prepare": "husky"
   },
   "lint-staged": {
     "frontend/**/*.{js,jsx,ts,tsx,vue}": [
-      "npm run lint --workspace=frontend"
+      "pnpm --filter frontend run lint"
     ],
     "backend/**/*.{js,ts}": [
-      "npm run lint --workspace=backend"
+      "pnpm --filter backend run lint"
     ],
     "**/*.{json,css,scss}": [
       "prettier --write"

@@ -1,7 +1,7 @@
 import { type Response } from 'express';
-import { cardRepository } from './repositories/cardRepository.ts';
-import { getDailyStats } from './limitService.ts';
-import { logger } from '../utils/logger.ts';
+import { cardRepository } from './repositories/cardRepository.js';
+import { getDailyStats } from './limitService.js';
+import { logger } from '../utils/logger.js';
 
 /**
  * Сервис для управления планированием и отправкой статистики через SSE

@@ -1,5 +1,5 @@
 import { Kysely, sql } from 'kysely';
-import type { Database } from './schema.ts';
+import type { Database } from './schema.js';
 
 /**
  * Интерфейс для миграции

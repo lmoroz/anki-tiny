@@ -1,5 +1,5 @@
 import { type Card as FSRSCard, FSRS, Rating, State, generatorParameters, type Grade, createEmptyCard } from 'ts-fsrs';
-import type { Card } from '../database/schema.ts';
+import type { Card } from '../database/schema.js';
 
 /**
  * Enum для состояний карточки (синхронизирован с FSRS)

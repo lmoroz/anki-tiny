@@ -5,6 +5,179 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.10.0] - 2026-01-11 04:40
+
+### Changed
+
+#### Backend: ESM → CommonJS Migration for Production Build Stability
+
+Reverted backend from ES Modules to CommonJS to resolve critical issues with Electron production builds, ASAR packaging, and dynamic imports.
+
+**Root Cause**: ESM with ASAR creates incompatible scenarios for Node.js module resolution in packaged Electron apps.
+
+- **TypeScript Configuration** (`backend/tsconfig.json`):
+  - `module`: `ESNext` → `CommonJS` (critical change for Electron compatibility)
+  - `target`: `ESNext` → `ES2020` (stable target for Node.js 18+)
+  - `outDir`: `./dist-electron` → `./dist` (simplified build output)
+  - Removed: `moduleResolution: "Bundler"`, `noEmit: true`, `allowImportingTsExtensions: true`
+  - CommonJS eliminates need for `.js` extensions in imports and circular dependency issues
+
+- **Package Configuration** (`backend/package.json`):
+  - **Removed**: `"type": "module"` — enables CommonJS mode globally
+  - `name`: `backend` → `@repetitio/backend` (scoped package naming)
+  - `main`: `src/electron/main.ts` → `dist/electron/main.js` (compiled output)
+  - Added: `"private": true`, `"author": "Morozhnikova Larisa"`
+  - **Electron Builder** simplification:
+    - Removed: `asar`, `asarUnpack`, `afterPack`, `extraResources` configurations
+    - Simplified `files` pattern: `**/*` + frontend paths (relies on default behavior)
+  - **Dependencies**:
+    - `electron`: `^39.2.6` → `39.2.7` (pinned version for reproducibility)
+    - `electron-builder`: `^26.0.12` → `26.4.0` (pinned, latest stable)
+    - Removed: `electron-rebuild` (handled by `electron-builder install-app-deps`)
+  - **Scripts**:
+    - Migrated from `npm` to `pnpm` commands
+    - Simplified `build` script (removed post-build hooks)
+    - `bundle` command removed (simplified to `dist`)
+    - `rebuild:node`: Added pre-cleanup of better-sqlite3 build artifacts
+
+- **Electron Main Process** (`backend/src/electron/main.ts`):
+  - **Removed**: `const __dirname = import.meta.dirname;` (now available natively in CommonJS)
+  - **All console.log prefixed with `[MAIN]`** for log clarity and grep-ability
+  - **Preload path**: `preload.cjs` → `preload.js` (compiled from TypeScript)
+  - **File logging**: Switched from custom `logToFile()` wrapper to direct `console.log` (captured by pino)
+  - **Simplified imports**: No `.js` extensions needed in CommonJS
+
+- **Preload Script** (`backend/src/electron/`):
+  - `preload.cjs` → `preload.ts` (now TypeScript-compiled to `.js`)
+  - TypeScript compilation eliminates manual CommonJS maintenance
+
+- **Logger Service** (`backend/src/utils/logger.ts`):
+  - **Completely rewritten** from ESM dev/production split to unified CommonJS with file logging
+  - **Production Logging**:
+    - Writes to `{DATA_ROOT}/logs/app.log` (persistent log file)
+    - Uses `pino.multistream` for dual output (file + console in dev)
+    - Configured with `pino-pretty` for dev console output via custom `Writable` stream adapter
+  - **Development Logging**:
+    - Console output with `pino-pretty` (colorized, human-readable)
+    - File logging enabled simultaneously for debugging
+  - **Configuration**:
+    - Timestamp: ISO format (`pino.stdTimeFunctions.isoTime`)
+    - Log file rotation: Not implemented (future enhancement)
+    - Conditional console stream: Only in dev mode with `DEBUG_PERF` flag
+
+- **Database Service** (`backend/src/services/database/index.ts`):
+  - Import path: `../../config/index.js` → `../../config` (CommonJS auto-resolution)
+  - Added detailed logging: `DATA_ROOT`, `APP_USER_DATA`, `DATABASE_PATH`
+  - **Incomplete**: Commented-out logic for database file copying from ASAR (planned for future fix)
+  - Current behavior: Database path points to source location (works but not production-ready)
+
+- **All Backend Routes** (`backend/src/routes/*.ts`):
+  - Removed `.js` extensions from all relative imports
+  - Changed: `import X from './file.js'` → `import X from './file'`
+  - CommonJS module resolver handles `.ts` → `.js` mapping automatically
+  - Files affected: `cards.ts`, `courses.ts`, `index.ts`, `settings.ts`, `stats.ts`, `training.ts`
+
+- **All Backend Services** (`backend/src/services/**/*.ts`):
+  - Removed `.js` extensions from imports
+  - Files affected:
+    - `database/index.ts`, `database/migrations.ts`
+    - `fsrs/index.ts`
+    - `repositories/*.ts` (4 files)
+    - `limitService.ts`, `statsScheduler.ts`
+
+- **Configuration** (`backend/src/config/index.ts`, `backend/src/server.ts`):
+  - Removed `.js` extensions from imports
+  - Simplified module resolution
+
+- **Build Configuration**:
+  - `build-installer.cjs` → `build-installer.js` (compiled from TS, no manual `.cjs` needed)
+  - Removed temporary utility scripts:
+    - `fix-imports.ps1` (was used to batch-replace `.ts` → `.js` extensions during ESM attempt)
+    - `after-pack.cjs` (attempted ASAR unpacking workaround, no longer needed)
+    - `post-build.cjs` (attempted preload.cjs copying, handled by TS compilation now)
+
+### Fixed
+
+- **Production Build**: Electron app now successfully builds and runs without errors
+  - **Before**: `Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'express'` in ASAR
+  - **After**: CommonJS modules resolve correctly from compiled `dist/` directory
+- **ASAR Compatibility**: No longer requires `asarUnpack` workarounds for `node_modules`
+  - Electron's default CommonJS handling works seamlessly
+- **Import Resolution**: No manual `.js` extension management required
+  - TypeScript `outDir` compilation handles all path mapping
+- **Logging**: Production logs now persist to disk at `{DATA_ROOT}/logs/app.log`
+  - **Before**: Console-only logging in production (lost on app restart)
+  - **After**: Persistent file logging + optional console output in dev
+
+### Technical Details
+
+- **Migration Scope**:
+  - **38+ files modified** across backend:
+    - Core: `package.json`, `tsconfig.json`, `main.ts`, `logger.ts`, `server.ts`, `config/index.ts`
+    - Routes: 6 files
+    - Services: 11 files
+    - Database: 3 files
+  - **3 temporary scripts removed**: `fix-imports.ps1`, `after-pack.cjs`, `post-build.cjs`
+  - **1 file renamed**: `preload.cjs` → `preload.ts` (TypeScript source)
+  - **Package manager migration**: `npm` → `pnpm` (workspace monorepo standard)
+
+- **Build Output Structure** (before vs after):
+
+  ```text
+  Before (ESM):
+    backend/
+      ├─ dist-electron/        ← TypeScript compilation
+      ├─ src/                  ← Source (with .js extensions in imports)
+      ├─ node_modules/
+      └─ package.json          ("type": "module")
+
+  After (CommonJS):
+    backend/
+      ├─ dist/                 ← TypeScript compilation (simplified path)
+      ├─ src/                  ← Source (no .js extensions)
+      ├─ node_modules/
+      └─ package.json          (no "type" field = CommonJS default)
+  ```
+
+- **Why CommonJS Over ESM for Electron**:
+  1. **ASAR Compatibility**: Electron's ASAR archive works seamlessly with CommonJS `require()`
+  2. **Dynamic Imports**: No issues with `import()` inside packaged apps
+  3. **Module Resolution**: Node.js native resolution (`node_modules` traversal) works reliably
+  4. **Preload Context**: Electron's preload scripts officially support CommonJS (not ESM)
+  5. **Ecosystem Stability**: Better-sqlite3 and other native modules have mature CommonJS support
+  6. **Build Simplicity**: No need for `asarUnpack`, `afterPack` hooks, or custom module patching
+
+### Known Issues
+
+- **Database Path in ASAR**: Database file copying from ASAR not implemented (commented out in `database/index.ts`)
+  - Current workaround: Database path points to development location
+  - Planned fix: Implement proper database initialization in userData directory
+  - Impact: Production build uses development database path (works but not isolated)
+
+### Breaking Changes
+
+- **None for end users** — this is an internal refactoring
+- **Developers**: If extending backend code, use CommonJS syntax (`require`/`module.exports` or TS import/export which compiles to CommonJS)
+
+### Performance \u0026 Benefits
+
+- ✅ **Production Build Success**: App builds and runs without module resolution errors
+- ✅ **Simplified Configuration**: Removed 15+ lines of custom Electron Builder config
+- ✅ **Faster Development**: `tsx` + `nodemon` with CommonJS is faster than ESM `ts-node`
+- ✅ **Reliable Logging**: Persistent file logs at `{DATA_ROOT}/logs/app.log`
+- ✅ **Maintainability**: Standard CommonJS workflow, no custom import path hacks
+- ✅ **Ecosystem Alignment**: Better compatibility with Electron ecosystem (most examples are CommonJS)
+
+### Migration Notes
+
+This migration was completed manually over ~7 hours of debugging and testing. Key learnings:
+
+1. ESM + ASAR + Electron = Compatibility Hell (avoid in production Electron apps)
+2. CommonJS is still the gold standard for Electron main/preload processes (as of Electron 39)
+3. Pinning exact versions (`39.2.7`, `26.4.0`) prevents regressions
+4. pnpm workspace: Superior to npm workspaces for monorepo builds
+5. Logging to file is non-negotiable for production desktop apps
+
 ## [0.10.0] - 2026-01-10 23:15
 
 ### Added

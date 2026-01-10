@@ -1,8 +1,8 @@
-import { db } from './database/index.ts';
-import type { Card } from './database/schema.ts';
-import { cardRepository } from './repositories/cardRepository.ts';
-import { settingsRepository } from './repositories/settingsRepository.ts';
-import { progressRepository } from './repositories/progressRepository.ts';
+import { db } from './database';
+import type { Card } from './database/schema.js';
+import { cardRepository } from './repositories/cardRepository.js';
+import { settingsRepository } from './repositories/settingsRepository.js';
+import { progressRepository } from './repositories/progressRepository.js';
 
 /**
  * Форматировать дату в YYYY-MM-DD для конкретного часового пояса

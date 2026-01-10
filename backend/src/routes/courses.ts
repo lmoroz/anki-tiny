@@ -1,14 +1,14 @@
 import { Router, type Request, type Response } from 'express';
-import { courseRepository } from '../services/repositories/courseRepository.ts';
-import { cardRepository } from '../services/repositories/cardRepository.ts';
-import { createCourseSchema, updateCourseSchema } from '../schemas/course.ts';
+import { courseRepository } from '../services/repositories/courseRepository.js';
+import { cardRepository } from '../services/repositories/cardRepository.js';
+import { createCourseSchema, updateCourseSchema } from '../schemas/course.js';
 import { ZodError } from 'zod';
-import { statsScheduler } from '../services/statsScheduler.ts';
+import { statsScheduler } from '../services/statsScheduler.js';
 
 const router = Router();
 
 // GET /api/courses - получить все курсы со статистикой
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', async (_req: Request, res: Response) => {
   try {
     const courses = await courseRepository.findAll();
     const statsMap = await cardRepository.getAllCoursesStats();
@@ -38,7 +38,7 @@ router.get('/', async (req: Request, res: Response) => {
 // GET /api/courses/:id - получить курс по ID
 router.get('/:id', async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id, 10);
+    const id = parseInt(<string>req.params.id, 10);
     if (isNaN(id)) {
       return res.status(400).json({ error: 'Invalid course ID' });
     }
@@ -77,7 +77,7 @@ router.post('/', async (req: Request, res: Response) => {
 // PUT /api/courses/:id - обновить курс
 router.put('/:id', async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id, 10);
+    const id = parseInt(<string>req.params.id, 10);
     if (isNaN(id)) {
       return res.status(400).json({ error: 'Invalid course ID' });
     }
@@ -105,7 +105,7 @@ router.put('/:id', async (req: Request, res: Response) => {
 // DELETE /api/courses/:id - удалить курс
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id, 10);
+    const id = parseInt(<string>req.params.id, 10);
     if (isNaN(id)) {
       return res.status(400).json({ error: 'Invalid course ID' });
     }

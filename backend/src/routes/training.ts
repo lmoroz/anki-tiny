@@ -1,19 +1,19 @@
 import { Router, type Request, type Response } from 'express';
-import { cardRepository } from '../services/repositories/cardRepository.ts';
-import { settingsRepository } from '../services/repositories/settingsRepository.ts';
-import { calculateNextReview, canShowNewCards } from '../services/fsrs/index.ts';
-import { statsScheduler } from '../services/statsScheduler.ts';
+import { cardRepository } from '../services/repositories/cardRepository.js';
+import { settingsRepository } from '../services/repositories/settingsRepository.js';
+import { calculateNextReview, canShowNewCards } from '../services/fsrs';
+import { statsScheduler } from '../services/statsScheduler.js';
 import {
   calculateAvailableCards,
   updateProgressAfterReview,
   getDailyStats,
   isNewCard,
   calculateGlobalAvailableCards,
-} from '../services/limitService.ts';
-import { ReviewCardSchema } from '../schemas/card.ts';
+} from '../services/limitService.js';
+import { ReviewCardSchema } from '../schemas/card.js';
 import { Rating } from 'ts-fsrs';
 import { ZodError } from 'zod';
-import type { Card } from '../services/database/schema.ts';
+import type { Card } from '../services/database/schema.js';
 
 const router = Router();
 
@@ -23,7 +23,7 @@ const router = Router();
  */
 router.get('/courses/:courseId/due-cards', async (req: Request, res: Response) => {
   try {
-    const courseId = parseInt(req.params.courseId, 10);
+    const courseId = parseInt(<string>req.params.courseId, 10);
 
     if (isNaN(courseId)) {
       return res.status(400).json({ error: 'Invalid course ID' });
