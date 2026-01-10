@@ -1,6 +1,6 @@
 {
   "name": "backend",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "Backend for Repetitio - Spaced Repetition App",
   "main": "src/electron/main.ts",
   "type": "module",
@@ -15,8 +15,8 @@
     "app:dev": "npm run rebuild:electron && concurrently \"npm run dev --prefix ../frontend\" \"npm run electron:dev\" -n \"frontend,backend\" -c \"blue,green\"",
     "test": "vitest",
     "build": "npm run rebuild:electron && tsc",
-    "dist": "npm run rebuild:electron && npm run build && node build-installer.js",
-    "bundle": "cd ../frontend && npm run build && cd ../backend && npm run rebuild:electron && npm run build && node build-installer.js",
+    "dist": "npm run rebuild:electron && npm run build && node build-installer.cjs",
+    "bundle": "cd ../frontend && npm run build && cd ../backend && npm run rebuild:electron && npm run build && node build-installer.cjs",
     "lint": "eslint .",
     "format": "prettier --write \"./**/*.{js,ts,json,md}\"",
     "structure": "node utils/run-tree.js > STRUCTURE.md",

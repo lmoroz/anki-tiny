@@ -293,7 +293,7 @@ interface Settings {
 
 ## Project Status
 
-### Текущая версия: 0.6.2 (MVP Feature Complete + Retention Settings)
+### Текущая версия: 0.10.0 (MVP Feature Complete + System Tray Integration)
 
 ### Реализовано ✅
 
@@ -372,11 +372,24 @@ interface Settings {
 - `training-limits` — 4-уровневая система лимитов
 - `ui-notifications` — кастомные диалоги и уведомления
 
+**Desktop Integration**
+
+- Electron Tray API интеграция
+- Minimize to Tray поведение (окно скрывается вместо закрытия)
+- Tray Context Menu (Показать/Скрыть, Закрыть)
+- Window Toggle Logic (show, restore, focus)
+- Platform Support (Windows, macOS, Linux)
+- Lifecycle Management (cleanup on before-quit)
+
+**OpenSpec Specs (Обновлено)**
+
+- ... (предыдущие 7 specs)
+- `tray-integration` — интеграция с системным треем
+
 ### В работе 🔄
 
 **Desktop Integration (Priority 1 для v1.0)**
 
-- System Tray Integration — сворачивание в трей вместо закрытия
 - System Notifications — нативные уведомления ОС о готовых карточках
 - Deep Linking — открытие приложения в режиме тренировки из уведомления
 

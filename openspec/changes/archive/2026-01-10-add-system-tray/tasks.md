@@ -8,13 +8,13 @@
 
 **Dependencies**: None
 
-- [ ] Создать PNG иконку для трея размером 32x32 пикселя с прозрачностью
-- [ ] Сохранить файл как `backend/icon-tray.png`
-- [ ] Убедиться, что иконка визуально различима на светлом и тёмном фоне
-- [ ] Проверить размер файла (\<10KB для быстрой загрузки)
-- [ ] **Validation**: Файл `backend/icon-tray.png` существует
-- [ ] **Validation**: Иконка читаема в Preview/Просмотр фотографий
-- [ ] **Validation**: Прозрачность корректно отображается
+- [x] Создать PNG иконку для трея размером 32x32 пикселя с прозрачностью
+- [x] Сохранить файл как `backend/icon-tray.png`
+- [x] Убедиться, что иконка визуально различима на светлом и тёмном фоне
+- [x] Проверить размер файла (\<10KB для быстрой загрузки)
+- [x] **Validation**: Файл `backend/icon-tray.png` существует
+- [x] **Validation**: Иконка читаема в Preview/Просмотр фотографий
+- [x] **Validation**: Прозрачность корректно отображается
 
 ---
 
@@ -24,9 +24,9 @@
 
 **Dependencies**: Task 1.1
 
-- [ ] Добавить импорт `Tray` и `Menu` из `electron` в `backend/src/electron/main.ts`
-- [ ] Создать глобальную переменную `let tray: Tray | null = null;` в начале файла
-- [ ] Реализовать функцию `createTray()` с логикой:
+- [x] Добавить импорт `Tray` и `Menu` из `electron` в `backend/src/electron/main.ts`
+- [x] Создать глобальную переменную `let tray: Tray | null = null;` в начале файла
+- [x] Реализовать функцию `createTray()` с логикой:
   - Построить путь к иконке: `path.join(__dirname, '../../icon-tray.png')`
   - Проверить существование файла через `existsSync(iconPath)`
   - Если файл существует:
@@ -37,10 +37,10 @@
   - Если файл НЕ существует:
     - Логировать ошибку: `logger.error({ iconPath }, 'Tray icon not found!')`
     - Вернуться без создания tray
-- [ ] Добавить try/catch блок с логированием ошибок через `logger.error()`
-- [ ] **Validation**: Функция `createTray()` определена
-- [ ] **Validation**: При вызове `createTray()` с существующим файлом tray создаётся
-- [ ] **Validation**: При отсутствии файла логируется ошибка без краша приложения
+- [x] Добавить try/catch блок с логированием ошибок через `logger.error()`
+- [x] **Validation**: Функция `createTray()` определена
+- [x] **Validation**: При вызове `createTray()` с существующим файлом tray создаётся
+- [x] **Validation**: При отсутствии файла логируется ошибка без краша приложения
 
 ---
 
@@ -50,7 +50,7 @@
 
 **Dependencies**: Task 1.2
 
-- [ ] Реализовать функцию `createTrayMenu(): Menu`:
+- [x] Реализовать функцию `createTrayMenu(): Menu`:
   - Использовать `Menu.buildFromTemplate([...])`
   - Добавить пункты меню:
     1. **Показать/Скрыть Repetitio**:
@@ -60,12 +60,12 @@
     3. **Закрыть Repetitio**:
        - `label`: `'Закрыть Repetitio'`
        - `click`: вызов `app.quit()`
-- [ ] Реализовать функцию `updateTrayMenu()`:
+- [x] Реализовать функцию `updateTrayMenu()`:
   - Проверить наличие `tray` и `mainWindow`
   - Пересоздать контекстное меню через `tray.setContextMenu(createTrayMenu())`
-- [ ] **Validation**: Функции `createTrayMenu()` и `updateTrayMenu()` определены
-- [ ] **Validation**: Меню содержит корректные пункты
-- [ ] **Validation**: Динамический label обновляется в зависимости от состояния окна
+- [x] **Validation**: Функции `createTrayMenu()` и `updateTrayMenu()` определены
+- [x] **Validation**: Меню содержит корректные пункты
+- [x] **Validation**: Динамический label обновляется в зависимости от состояния окна
 
 ---
 
@@ -75,7 +75,7 @@
 
 **Dependencies**: None
 
-- [ ] Реализовать функцию `toggleWindow()`:
+- [x] Реализовать функцию `toggleWindow()`:
   - Проверить наличие `mainWindow` (early return если `null`)
   - Если окно НЕ видимо (`!mainWindow.isVisible()`):
     - Вызвать `mainWindow.show()`
@@ -84,10 +84,10 @@
     - Проверить, свёрнуто ли окно (`mainWindow.isMinimized()`)
     - Если свёрнуто: вызвать `mainWindow.restore()`
     - Вызвать `mainWindow.focus()`
-- [ ] **Validation**: Функция `toggleWindow()` определена
-- [ ] **Validation**: При скрытом окне вызов функции показывает окно
-- [ ] **Validation**: При свёрнутом окне вызов функции разворачивает окно
-- [ ] **Validation**: При видимом окне вызов фокусирует окно
+- [x] **Validation**: Функция `toggleWindow()` определена
+- [x] **Validation**: При скрытом окне вызов функции показывает окно
+- [x] **Validation**: При свёрнутом окне вызов функции разворачивает окно
+- [x] **Validation**: При видимом окне вызов фокусирует окно
 
 ---
 
@@ -99,13 +99,13 @@
 
 **Dependencies**: Task 1.2
 
-- [ ] Найти в `backend/src/electron/main.ts` место регистрации обработчиков событий окна
-- [ ] Добавить обработчик события `close` для `mainWindow`:
+- [x] Найти в `backend/src/electron/main.ts` место регистрации обработчиков событий окна
+- [x] Добавить обработчик события `close` для `mainWindow`:
   - Внутри обработчика вызвать `event.preventDefault()`
   - Вызвать `mainWindow.hide()`
-- [ ] **Validation**: Обработчик события `close` зарегистрирован
-- [ ] **Validation**: При закрытии окна через крестик окно скрывается, а не завершается процесс
-- [ ] **Validation**: Процесс Electron продолжает работать после закрытия окна
+- [x] **Validation**: Обработчик события `close` зарегистрирован
+- [x] **Validation**: При закрытии окна через крестик окно скрывается, а не завершается процесс
+- [x] **Validation**: Процесс Electron продолжает работать после закрытия окна
 
 ---
 
@@ -115,12 +115,12 @@
 
 **Dependencies**: Task 2.1
 
-- [ ] Найти функцию `registerIpcHandlers()` в `backend/src/electron/main.ts`
-- [ ] Обновить обработчик IPC `window-close`:
+- [x] Найти функцию `registerIpcHandlers()` в `backend/src/electron/main.ts`
+- [x] Обновить обработчик IPC `window-close`:
   - **Было**: `win?.close()`
   - **Стало**: `if (win) { win.hide(); }`
-- [ ] **Validation**: IPC handler `window-close` обновлён
-- [ ] **Validation**: При вызове IPC `window-close` из фронтенда окно скрывается
+- [x] **Validation**: IPC handler `window-close` обновлён
+- [x] **Validation**: При вызове IPC `window-close` из фронтенда окно скрывается
 
 ---
 
@@ -130,11 +130,11 @@
 
 **Dependencies**: Task 2.1
 
-- [ ] Найти обработчик `app.on('window-all-closed', ...)` в `backend/src/electron/main.ts`
-- [ ] Обновить логику:
+- [x] Найти обработчик `app.on('window-all-closed', ...)` в `backend/src/electron/main.ts`
+- [x] Обновить логику:
   - **Было**: `if (process.platform !== 'darwin') { app.quit(); }`
   - **Стало**: удалить вызов `app.quit()` для Windows/Linux (оставить только на macOS)
-- [ ] Код должен выглядеть так:
+- [x] Код должен выглядеть так:
   ```typescript
   app.on("window-all-closed", () => {
     if (process.platform === "darwin") {
@@ -143,8 +143,8 @@
     // На других платформах приложение продолжает работать
   });
   ```
-- [ ] **Validation**: На Windows/Linux приложение НЕ завершается при закрытии всех окон
-- [ ] **Validation**: На macOS приложение завершается (стандартное поведение)
+- [x] **Validation**: На Windows/Linux приложение НЕ завершается при закрытии всех окон
+- [x] **Validation**: На macOS приложение завершается (стандартное поведение)
 
 ---
 
@@ -156,10 +156,10 @@
 
 **Dependencies**: Task 1.2
 
-- [ ] Найти обработчик `app.on('ready', ...)` в `backend/src/electron/main.ts`
-- [ ] Добавить вызов `createTray()` после `createWindow()`
-- [ ] **Validation**: `createTray()` вызывается при запуске приложения
-- [ ] **Validation**: Tray иконка появляется в системном трее при запуске
+- [x] Найти обработчик `app.on('ready', ...)` в `backend/src/electron/main.ts`
+- [x] Добавить вызов `createTray()` после `createWindow()`
+- [x] **Validation**: `createTray()` вызывается при запуске приложения
+- [x] **Validation**: Tray иконка появляется в системном трее при запуске
 
 ---
 
@@ -169,14 +169,14 @@
 
 **Dependencies**: Task 1.2
 
-- [ ] Добавить обработчик `app.on('before-quit', ...)` в `backend/src/electron/main.ts`:
+- [x] Добавить обработчик `app.on('before-quit', ...)` в `backend/src/electron/main.ts`:
   - Проверить наличие `tray`
   - Если существует:
     - Вызвать `tray.destroy()`
     - Установить `tray = null`
-- [ ] **Validation**: Обработчик `before-quit` зарегистрирован
-- [ ] **Validation**: При полном завершении приложения tray удаляется
-- [ ] **Validation**: Иконка исчезает из системного трея после quit
+- [x] **Validation**: Обработчик `before-quit` зарегистрирован
+- [x] **Validation**: При полном завершении приложения tray удаляется
+- [x] **Validation**: Иконка исчезает из системного трея после quit
 
 ---
 
@@ -186,12 +186,12 @@
 
 **Dependencies**: Task 1.3, Task 1.4
 
-- [ ] Подписаться на события окна в функции `createWindow()`:
+- [x] Подписаться на события окна в функции `createWindow()`:
   - `mainWindow.on('show', updateTrayMenu)`
   - `mainWindow.on('hide', updateTrayMenu)`
-- [ ] **Validation**: Обработчики зарегистрированы
-- [ ] **Validation**: При показе окна label меню меняется на "Скрыть Repetitio"
-- [ ] **Validation**: При скрытии окна label меняется на "Показать Repetitio"
+- [x] **Validation**: Обработчики зарегистрированы
+- [x] **Validation**: При показе окна label меню меняется на "Скрыть Repetitio"
+- [x] **Validation**: При скрытии окна label меняется на "Показать Repetitio"
 
 ---
 
@@ -203,7 +203,7 @@
 
 **Dependencies**: Task 3.3
 
-- [ ] Провести ручное тестирование всех сценариев:
+- [x] Провести ручное тестирование всех сценариев:
   1. **Tray Creation**: запустить приложение → проверить наличие иконки в трее
   2. **Tooltip**: навести курсор на иконку → проверить tooltip "Repetitio"
   3. **Window Close**: нажать крестик → проверить, что окно скрылось (процесс работает)
@@ -214,9 +214,9 @@
   8. **Quit via Menu**: использовать пункт "Закрыть Repetitio" → проверить полное завершение
   9. **Minimize Restore**: свернуть окно → кликнуть на tray → проверить восстановление
   10. **Tray Cleanup**: завершить приложение → проверить исчезновение иконки из трея
-- [ ] **Validation**: Все сценарии работают корректно
-- [ ] **Validation**: Tray поведение соответствует ожиданиям UX
-- [ ] **Validation**: Нет краш-багов или memory leaks
+- [x] **Validation**: Все сценарии работают корректно
+- [x] **Validation**: Tray поведение соответствует ожиданиям UX
+- [x] **Validation**: Нет краш-багов или memory leaks
 
 ---
 
@@ -226,11 +226,11 @@
 
 **Dependencies**: Task 4.1
 
-- [ ] **Windows**: проверить tray в правом нижнем углу taskbar
-- [ ] **macOS** (если доступна): проверить иконку в menu bar сверху
-- [ ] **Linux** (опционально): проверить совместимость с GNOME/KDE
-- [ ] **Validation**: Tray работает на всех доступных платформах
-- [ ] **Validation**: Платформенные различия корректно обработаны
+- [x] **Windows**: проверить tray в правом нижнем углу taskbar
+- [x] **macOS** (если доступна): проверить иконку в menu bar сверху
+- [x] **Linux** (опционально): проверить совместимость с GNOME/KDE
+- [x] **Validation**: Tray работает на всех доступных платформах
+- [x] **Validation**: Платформенные различия корректно обработаны
 
 ---
 
@@ -242,13 +242,13 @@
 
 **Dependencies**: Task 4.1
 
-- [ ] Обновить `docs/Walkthrough.md`:
+- [x] Обновить `docs/Walkthrough.md`:
   - Добавить секцию "System Tray Integration"
   - Описать поведение кнопки закрытия окна (скрытие вместо завершения)
   - Объяснить, как полностью завершить приложение (через tray меню)
   - Документировать структуру tray контекстного меню
-- [ ] **Validation**: Документация актуальна и понятна
-- [ ] **Validation**: Описаны все ключевые сценарии
+- [x] **Validation**: Документация актуальна и понятна
+- [x] **Validation**: Описаны все ключевые сценарии
 
 ---
 
@@ -258,11 +258,11 @@
 
 **Dependencies**: Task 5.1
 
-- [ ] Обновить `docs/Changelog.md`:
+- [x] Обновить `docs/Changelog.md`:
   - Добавить запись о интеграции с системным треем
   - Указать изменение поведения кнопки закрытия окна
   - Перечислить функции tray меню
-- [ ] **Validation**: Changelog содержит полное описание изменений
+- [x] **Validation**: Changelog содержит полное описание изменений
 
 ---
 
@@ -272,14 +272,14 @@
 
 **Dependencies**: Task 5.2
 
-- [ ] Выполнить `npm run lint` в workspace `backend`
-- [ ] Исправить все linting ошибки (если есть)
-- [ ] Выполнить `npm run format` (если настроено)
-- [ ] Проверить отсутствие TODO/FIXME комментариев
-- [ ] Убедиться в соответствии code style правилам проекта
-- [ ] **Validation**: `npm run lint` проходит без ошибок
-- [ ] **Validation**: Код отформатирован согласно Prettier
-- [ ] **Validation**: Нет временных комментариев или debug логов
+- [x] Выполнить `npm run lint` в workspace `backend`
+- [x] Исправить все linting ошибки (если есть)
+- [x] Выполнить `npm run format` (если настроено)
+- [x] Проверить отсутствие TODO/FIXME комментариев
+- [x] Убедиться в соответствии code style правилам проекта
+- [x] **Validation**: `npm run lint` проходит без ошибок
+- [x] **Validation**: Код отформатирован согласно Prettier
+- [x] **Validation**: Нет временных комментариев или debug логов
 
 ---
 

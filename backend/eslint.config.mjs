@@ -23,7 +23,7 @@ export default [
   },
   eslintConfigPrettier,
   {
-    ignores: ['dist/**', 'frontend-dist/**', 'cache/**', 'logs/**', 'build-installer.js', 'utils/**', 'tests/**'],
+    ignores: ['dist/**', 'frontend-dist/**', 'cache/**', 'logs/**', 'build-installer.cjs', 'utils/**', 'tests/**'],
   },
 
   {

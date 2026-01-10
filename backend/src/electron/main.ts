@@ -8,9 +8,77 @@ const __dirname = import.meta.dirname;
 
 import { startServer } from '../server.ts';
 
-const { app, protocol, net, ipcMain, shell, BrowserWindow } = electron;
+const { app, protocol, net, ipcMain, shell, BrowserWindow, Tray, Menu } = electron;
 
 let mainWindow: electron.BrowserWindow | null;
+let tray: electron.Tray | null = null;
+
+/**
+ * Создание Tray иконки и подписка на события
+ */
+function createTray() {
+  try {
+    const iconPath = path.join(__dirname, '../../icon-tray.png');
+
+    if (!existsSync(iconPath)) {
+      logger.error({ iconPath }, 'Tray icon not found!');
+      return;
+    }
+
+    tray = new Tray(iconPath);
+    tray.setToolTip('Repetitio');
+    tray.setContextMenu(createTrayMenu());
+
+    tray.on('click', () => {
+      toggleWindow();
+    });
+
+    logger.info('Tray created successfully');
+  } catch (error) {
+    logger.error({ error }, 'Failed to create tray');
+  }
+}
+
+/**
+ * Создание контекстного меню трея
+ */
+function createTrayMenu(): electron.Menu {
+  return Menu.buildFromTemplate([
+    {
+      label: mainWindow?.isVisible() ? 'Скрыть Repetitio' : 'Показать Repetitio',
+      click: () => toggleWindow(),
+    },
+    { type: 'separator' },
+    {
+      label: 'Закрыть Repetitio',
+      click: () => {
+        app.quit();
+      },
+    },
+  ]);
+}
+
+/**
+ * Обновление контекстного меню трея (для динамического label)
+ */
+function updateTrayMenu() {
+  if (!tray || !mainWindow) return;
+  tray.setContextMenu(createTrayMenu());
+}
+
+/**
+ * Переключение видимости окна
+ */
+function toggleWindow() {
+  if (!mainWindow) return;
+
+  if (!mainWindow.isVisible()) {
+    mainWindow.show();
+    mainWindow.focus();
+  } else {
+    mainWindow.hide();
+  }
+}
 
 async function createWindow() {
   // Определяем режим работы и пути
@@ -62,9 +130,6 @@ async function createWindow() {
     frame: false, // Убираем рамки
     backgroundMaterial: 'acrylic', // https://www.electronjs.org/docs/latest/api/browser-window#winsetbackgroundmaterialmaterial-windows
     autoHideMenuBar: true,
-    // fullscreenable: true,
-    // hasShadow: true,
-    // roundedCorners: true,
     webPreferences: {
       preload: path.join(import.meta.dirname, 'preload.cjs'),
       nodeIntegration: false,
@@ -109,7 +174,18 @@ async function createWindow() {
     mainWindow.webContents.openDevTools(); // Открываем DevTools в dev режиме
   } else {
     await mainWindow.loadURL('lmorozanki://app/index.html');
+    mainWindow.webContents.openDevTools(); // Открываем DevTools в dev режиме
   }
+
+  // Предотвращаем закрытие окна — вместо этого скрываем его
+  mainWindow.on('close', (event) => {
+    event.preventDefault();
+    mainWindow?.hide();
+  });
+
+  // Обновляем меню трея при изменении видимости окна
+  mainWindow.on('show', updateTrayMenu);
+  mainWindow.on('hide', updateTrayMenu);
 
   mainWindow.on('closed', () => {
     mainWindow = null;
@@ -145,7 +221,7 @@ function registerIpcHandlers() {
 
   ipcMain.on('window-close', (event) => {
     const win = BrowserWindow.fromWebContents(event.sender);
-    win?.close();
+    if (win) win.hide();
   });
 }
 
@@ -155,16 +231,26 @@ app.on('ready', () => {
 
   registerIpcHandlers();
   createWindow();
+  createTray();
 });
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
+  if (process.platform === 'darwin') {
     app.quit();
   }
+  // На других платформах приложение продолжает работать
 });
 
 app.on('activate', () => {
   if (mainWindow === null) {
     createWindow();
+  }
+});
+
+app.on('before-quit', () => {
+  // Cleanup tray before quit
+  if (tray) {
+    tray.destroy();
+    tray = null;
   }
 });

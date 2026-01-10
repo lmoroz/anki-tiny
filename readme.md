@@ -295,9 +295,17 @@ backend/src/
 - **Repositories**: Clean data access layer (courses, cards, settings, progress).
 - **Services**: Business logic separation (FSRS, limits, daily progress).
 
+#### 🖥️ Desktop Integration
+
+- **System Tray**: Application minimizes to system tray instead of closing
+  - Tray icon with tooltip
+  - Context menu with "Show/Hide" and "Quit" options
+  - Left-click on tray icon to toggle window visibility
+  - Proper lifecycle management (cleanup on quit)
+  - Cross-platform support (Windows, macOS, Linux)
+
 ### In Progress 🔄
 
-- **System Tray Integration**: Minimize to tray instead of closing.
 - **System Notifications**: Native OS notifications for due cards.
 - **Deep Linking**: Open app directly in training mode from notification.
 
@@ -313,7 +321,7 @@ backend/src/
 
 ## 🎬 Current Status
 
-**Version**: 0.6.2 (MVP Feature Complete + Retention Settings)
+**Version**: 0.10.0 (MVP Feature Complete + System Tray Integration)
 
 ✅ **Core Features Complete**
 

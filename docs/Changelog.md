@@ -5,6 +5,107 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.10.0] - 2026-01-10 23:15
+
+### Added
+
+#### Feature: System Tray Integration
+
+Implemented system tray integration to enable background operation — application now minimizes to system tray instead of fully terminating when the close button is pressed.
+
+- **Backend Implementation** (`backend/src/electron/main.ts`):
+  - **createTray()** function:
+    - Loads tray icon (`backend/icon-tray.png`, 32x32 PNG with transparency)
+    - Sets tooltip: "Repetitio"
+    - Creates context menu with dynamic labels
+    - Registers click handler for window visibility toggle
+    - Error handling with graceful fallback (logs error, allows normal close behavior)
+  - **createTrayMenu()** function:
+    - Builds context menu with 2 items:
+      - **"Показать/Скрыть Repetitio"** — dynamic label based on `mainWindow.isVisible()`
+      - **"Закрыть Repetitio"** — calls `app.quit()` to fully terminate
+  - **updateTrayMenu()** function:
+    - Rebuilds context menu when window visibility changes
+    - Ensures label reflects current window state
+  - **toggleWindow()** function:
+    - Shows window if hidden (`window.show()` + `focus()`)
+    - Restores window if minimized (`window.restore()` + `focus()`)
+    - Focuses window if already visible
+  - **Window Event Handlers**:
+    - `mainWindow.on('close')` — prevents default close, calls `window.hide()` instead
+    - `mainWindow.on('show')` — calls `updateTrayMenu()` to update label
+    - `mainWindow.on('hide')` — calls `updateTrayMenu()` to update label
+  - **IPC Handler** (`window-close`):
+    - Changed from `win?.close()` to `win?.hide()`
+    - Frontend close button now hides window instead of terminating
+  - **App Lifecycle**:
+    - `app.on('ready')` — calls `createTray()` after `createWindow()`
+    - `app.on('window-all-closed')` — **modified logic**:
+      - macOS: `app.quit()` (standard behavior)
+      - Windows/Linux: continues running (no quit)
+    - `app.on('before-quit')` — calls `tray.destroy()` for cleanup
+
+- **Assets**:
+  - Created tray icon: `backend/icon-tray.png` (32x32 PNG with transparency)
+  - Purple gradient "R" logo design for system tray visibility
+
+### Changed
+
+- **Window Close Behavior**: Application no longer terminates when close button is pressed
+  - **Before**: Closing window → full app termination
+  - **After**: Closing window → hide to system tray
+  - **Rationale**: Matches UX patterns of productivity apps (Slack, Discord, Notion)
+  - Users can still fully quit via tray context menu
+
+### Fixed
+
+- **toggleWindow() Logic**: Corrected toggle behavior for tray icon click
+  - **Before**: Clicking tray icon when window is visible would only focus it
+  - **After**: Clicking tray icon properly toggles — hides window if visible, shows if hidden
+  - **Impact**: Tray icon click now works as expected per specification
+
+- **Build Script Migration**: Migrated `build-installer.js` → `build-installer.cjs`
+  - Removed incompatible `import.meta.dirname` from CommonJS module
+  - Updated `package.json` scripts to reference `.cjs` file
+  - Updated ESLint ignore patterns for new filename
+  - **Reason**: Ensure proper CommonJS compatibility for build tooling
+
+### Technical Details
+
+- **Platform Support**:
+  - Windows: Tray icon appears in bottom-right taskbar
+  - macOS: Icon appears in menu bar (top-right)
+  - Linux: Depends on DE (GNOME, KDE, XFCE); requires tray support
+
+- **Files Created**: 1
+  - `backend/icon-tray.png`
+
+- **Files Modified**: 1
+  - `backend/src/electron/main.ts`
+
+- **Documentation Updated**: 2
+  - `docs/Walkthrough.md` — Added "System Tray Integration" section to Phase 7
+  - `docs/Changelog.md` — This entry
+
+- **Interaction Flows**:
+  - **Left click on tray icon** → `toggleWindow()` → show/restore/focus window
+  - **Right click on tray icon** → display context menu
+  - **Menu: "Показать Repetitio"** → `toggleWindow()` → show window
+  - **Menu: "Закрыть Repetitio"** → `app.quit()` → full termination
+  - **Window close button** → IPC `window-close` → `window.hide()`
+  - **Native close event** → `event.preventDefault()` + `window.hide()`
+
+- **Benefits**:
+  - ✅ **Instant Access**: Click tray icon to instantly resume training
+  - ✅ **Resource Efficiency**: No need to restart app and reinitialize services
+  - ✅ **Standard UX**: Behavior matches user expectations for desktop productivity apps
+  - ✅ **Foundation for Notifications**: Creates infrastructure for future system notification integration
+  - ✅ **Graceful Lifecycle**: Proper cleanup on quit, no memory leaks
+
+- **OpenSpec Status**:
+  - ✅ All tasks completed across 5 phases (Infrastructure, Window Behavior, Integration, Testing, Documentation)
+  - Ready for archiving via `/openspec-archive add-system-tray`
+
 ## [0.9.0] - 2026-01-10 22:54
 
 ### Added

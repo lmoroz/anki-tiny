@@ -4,7 +4,7 @@
 
 **Repetitio** — desktop-приложение для изучения материала с помощью карточек и интервального повторения (spaced repetition), построенное на базе FSRS v5 алгоритма.
 
-**Версия**: 0.9.0 (MVP Feature Complete + Real-time Stats SSE)
+**Версия**: 0.10.0 (MVP Feature Complete + System Tray Integration)
 
 **Разработка**: AI-assisted development с human-in-the-loop подходом
 
@@ -357,6 +357,55 @@ availableCards = min(
   - Упрощена модель данных
   - Updated: schema, repositories, API routes, frontend types
 
+#### System Tray Integration
+
+**OpenSpec Change**: `add-system-tray`
+
+**Реализовано**:
+
+- **Minimize to Tray Behavior**:
+  - Приложение не завершается при нажатии кнопки закрытия окна
+  - Окно скрывается в системный трей (`window.hide()`)
+  - Процесс Electron продолжает работать в фоне
+
+- **Tray Icon \u0026 Menu**:
+  - Иконка `backend/icon-tray.png` (32x32 PNG с прозрачностью)
+  - Tooltip: "Repetitio"
+  - Контекстное меню:
+    - **Показать/Скрыть Repetitio** — переключает видимость окна (динамический label)
+    - **Separator**
+    - **Закрыть Repetitio** — полностью завершает приложение (`app.quit()`)
+
+- **Interaction Handlers**:
+  - **Left click на tray** — переключает видимость окна
+    - Если скрыто → показать + focus
+    - Если свёрнуто → restore + focus
+    - Если видимо → focus
+  - **Right click** — открывает контекстное меню
+  - **IPC `window-close`** — скрывает окно (вместо закрытия)
+  - **Native close event** — prevented + hide
+
+- **Platform Support**:
+  - Windows: трей в правом нижнем углу taskbar
+  - macOS: иконка в menu bar сверху
+  - Linux: зависит от DE (требует tray support)
+
+- **Lifecycle Management**:
+  - Tray создаётся при `app.on('ready')`
+  - Tray удаляется при `app.on('before-quit')`
+  - `window-all-closed` НЕ завершает приложение на Windows/Linux (только macOS)
+
+**Functions**:
+
+- `createTray()` — создание tray с иконкой и событиями
+- `createTrayMenu()` — формирование контекстного меню
+- `updateTrayMenu()` — обновление динамического label
+- `toggleWindow()` — переключение видимости окна
+
+**Specs**:
+
+- `tray-integration`
+
 ---
 
 ## Current Architecture
@@ -540,21 +589,21 @@ backend/src/
 
 ---
 
-## Next Steps (v0.6-0.9 → v1.0)
+## Next Steps (v0.9 → v1.0)
 
 ### Priority 1: Desktop Integration
 
-1. **System Tray Integration**
-   - Minimize to tray instead of closing
-   - Tray icon with context menu
-   - Restore from tray
+1. **System Tray Integration** ✅
+   - ✅ Minimize to tray instead of closing
+   - ✅ Tray icon with context menu
+   - ✅ Restore from tray
 
-2. **System Notifications**
+2. **System Notifications** (TODO)
    - Native OS notifications for due cards
    - Scheduled checks (every N minutes)
    - Notification settings (enable/disable)
 
-3. **Deep Linking**
+3. **Deep Linking** (TODO)
    - Open app in training mode from notification
    - URL scheme: `lmorozanki://train/:courseId`
 

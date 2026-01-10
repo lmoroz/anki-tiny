@@ -1,6 +1,6 @@
 {
   "name": "repetitio",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "Repetitio - Desktop application for spaced repetition learning",
   "author": "Morozhnikova Larisa",
   "private": true,
@@ -11,7 +11,7 @@
   "scripts": {
     "app:dev": "npm run app:dev --workspace=backend",
     "dev": "concurrently \"npm run dev --workspace=frontend\" \"npm run dev --workspace=backend\" -n \"frontend,backend\" -c \"blue,green\"",
-    "bundle": "npm run build --workspace=frontend && npm run build --workspace=backend && cd backend && node build-installer.js",
+    "bundle": "npm run build --workspace=frontend && npm run build --workspace=backend && cd backend && node build-installer.cjs",
     "lint": "npm run lint --workspaces --if-present && npm run lint:md",
     "lint:md": "markdownlint-cli2 \"**/*.md\"",
     "lint:md:fix": "markdownlint-cli2 --fix \"**/*.md\"",
