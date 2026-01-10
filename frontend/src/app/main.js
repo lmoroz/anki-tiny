@@ -26,6 +26,7 @@ const startApp = () => {
   return app.mount('#app');
 };
 
+console.log('window.electronAPI is:', window.electronAPI);
 if (window.electronAPI)
   window.electronAPI.onBackendPort((port) => {
     console.log('[API Client] Backend port received:', port);

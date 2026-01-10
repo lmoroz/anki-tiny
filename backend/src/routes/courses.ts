@@ -1,9 +1,9 @@
-import { Router, Request, Response } from 'express';
-import { courseRepository } from '../services/repositories/courseRepository';
-import { cardRepository } from '../services/repositories/cardRepository';
-import { createCourseSchema, updateCourseSchema } from '../schemas/course';
+import { Router, type Request, type Response } from 'express';
+import { courseRepository } from '../services/repositories/courseRepository.ts';
+import { cardRepository } from '../services/repositories/cardRepository.ts';
+import { createCourseSchema, updateCourseSchema } from '../schemas/course.ts';
 import { ZodError } from 'zod';
-import { statsScheduler } from '../services/statsScheduler';
+import { statsScheduler } from '../services/statsScheduler.ts';
 
 const router = Router();
 

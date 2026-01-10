@@ -366,6 +366,8 @@
   .card-body {
     flex: 1;
     margin-bottom: 12px;
+    max-height: 50px;
+    overflow: hidden;
   }
 
   .card-text {

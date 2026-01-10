@@ -1,19 +1,19 @@
-import { Router, Request, Response } from 'express';
-import { cardRepository } from '../services/repositories/cardRepository';
-import { settingsRepository } from '../services/repositories/settingsRepository';
-import { calculateNextReview, canShowNewCards } from '../services/fsrs';
-import { statsScheduler } from '../services/statsScheduler';
+import { Router, type Request, type Response } from 'express';
+import { cardRepository } from '../services/repositories/cardRepository.ts';
+import { settingsRepository } from '../services/repositories/settingsRepository.ts';
+import { calculateNextReview, canShowNewCards } from '../services/fsrs/index.ts';
+import { statsScheduler } from '../services/statsScheduler.ts';
 import {
   calculateAvailableCards,
   updateProgressAfterReview,
   getDailyStats,
   isNewCard,
   calculateGlobalAvailableCards,
-} from '../services/limitService';
-import { ReviewCardSchema } from '../schemas/card';
+} from '../services/limitService.ts';
+import { ReviewCardSchema } from '../schemas/card.ts';
 import { Rating } from 'ts-fsrs';
 import { ZodError } from 'zod';
-import { Card } from '../services/database/schema';
+import type { Card } from '../services/database/schema.ts';
 
 const router = Router();
 
@@ -97,6 +97,7 @@ router.get('/training/global/due-cards', async (req: Request, res: Response) => 
  */
 router.post('/training/review', async (req: Request, res: Response) => {
   let card: Card | null = null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let updates: any | null = null;
   let wasNew: boolean = false;
   try {

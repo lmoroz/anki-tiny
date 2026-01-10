@@ -1,13 +1,13 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express, { type Request, type Response, type NextFunction } from 'express';
 import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
-import { config } from './config';
-import apiRoutes from './routes';
-import { PerformanceTimer } from './utils/performance';
-import { logger, requestLogger } from './utils/logger';
-import { initializeDatabase, closeDatabase } from './services/database';
-import { statsScheduler } from './services/statsScheduler';
+import { config } from './config/index.ts';
+import apiRoutes from './routes/index.ts';
+import { PerformanceTimer } from './utils/performance.ts';
+import { logger, requestLogger } from './utils/logger.ts';
+import { initializeDatabase, closeDatabase } from './services/database/index.ts';
+import { statsScheduler } from './services/statsScheduler.ts';
 import http from 'http';
 
 const __dirname = import.meta.dirname;

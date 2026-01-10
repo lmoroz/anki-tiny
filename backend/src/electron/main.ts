@@ -2,10 +2,11 @@ import * as electron from 'electron';
 import path from 'path';
 import { pathToFileURL } from 'url';
 import { existsSync } from 'fs';
+import { logger } from '../utils/logger.ts';
 
 const __dirname = import.meta.dirname;
 
-import { startServer } from '../server';
+import { startServer } from '../server.ts';
 
 const { app, protocol, net, ipcMain, shell, BrowserWindow } = electron;
 
@@ -52,6 +53,7 @@ async function createWindow() {
   }
 
   const port = await startServer();
+  logger.info({ port }, '🚀 Electron started server!');
 
   const windowConfig = {
     width: 1280,
@@ -64,7 +66,7 @@ async function createWindow() {
     // hasShadow: true,
     // roundedCorners: true,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(import.meta.dirname, 'preload.cjs'),
       nodeIntegration: false,
       contextIsolation: true,
       allowRunningInsecureContent: true,
@@ -80,8 +82,10 @@ async function createWindow() {
     win.webContents.on('did-finish-load', () => {
       // Отправляем порт бэкенда в рендерер
       win.webContents.send('backend-port', port);
+      logger.info({ port }, '🚀 Electron sent port to the app!');
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     win.webContents.on('will-navigate', (event: any, url: string) => {
       // В dev режиме разрешаем навигацию по localhost
       if (isDev && url.startsWith('http://localhost:')) {

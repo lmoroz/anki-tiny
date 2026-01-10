@@ -44,6 +44,7 @@ export const useTrainingStore = defineStore('training', () => {
       const data = await trainingApi.getDueCards(courseId, true);
       sessionCards.value = data.cards;
       sessionLimits.value = data.limits;
+      if ((!sessionCards.value || !sessionCards.value.length) && data.message) throw new Error(data.message);
       return data;
     } catch (err) {
       error.value = err.response?.data?.error || 'Ошибка запуска тренировки';

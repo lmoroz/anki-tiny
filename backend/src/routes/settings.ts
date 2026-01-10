@@ -1,8 +1,8 @@
-import { Router, Request, Response } from 'express';
-import { settingsRepository } from '../services/repositories/settingsRepository';
-import { GlobalSettingsSchema, CourseSettingsSchema } from '../schemas/settings';
+import { Router, type Request, type Response } from 'express';
+import { settingsRepository } from '../services/repositories/settingsRepository.ts';
+import { GlobalSettingsSchema, CourseSettingsSchema } from '../schemas/settings.ts';
 import { ZodError } from 'zod';
-import { statsScheduler } from '../services/statsScheduler';
+import { statsScheduler } from '../services/statsScheduler.ts';
 
 const router = Router();
 

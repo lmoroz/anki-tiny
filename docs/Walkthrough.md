@@ -4,7 +4,7 @@
 
 **Repetitio** — desktop-приложение для изучения материала с помощью карточек и интервального повторения (spaced repetition), построенное на базе FSRS v5 алгоритма.
 
-**Версия**: 0.5.0 (MVP Feature Complete)
+**Версия**: 0.9.0 (MVP Feature Complete + Real-time Stats SSE)
 
 **Разработка**: AI-assisted development с human-in-the-loop подходом
 
@@ -292,16 +292,63 @@ availableCards = min(
 
 #### Training UI Redesign
 
-- Complete rewrite of `TrainingPage.vue`
-- Card flip animations
-- Answer buttons with visual feedback
-- Session state management
-- Limit counters with badges
+**Complete rewrite of `TrainingPage.vue` with 3D card flip animation**:
 
-**Files Modified** (last session):
+- **3D Card Flip Animation**:
+  - True 3D transform with `backface-hidden` rendering
+  - Smooth `transform: rotateY(180deg)` transition (0.7s)
+  - Perspective-based depth effect (`perspective: 1000px`)
+  - No more `display: none` flickering — both sides always rendered
 
-- Backend: `cardRepository.ts`, `courses.ts`
-- Frontend: `CourseCard.vue`, `TrainingPage.vue`, `Button.vue`, `styles.css`
+- **Auto-Scaling Text Composables**:
+  - `textFit.js` — Binary search algorithm for optimal font sizing
+    - Dynamically adjusts `font-size` from 12px to 100px
+    - O(log N) complexity (~7 iterations)
+    - Calculates based on container dimensions (width, height)
+  - `useAutoFitText.js` — Vue composable for reactive text fitting
+    - `ResizeObserver` for window resize handling
+    - `watch()` for text content changes (flush: 'post')
+    - Debounced recalculation (100ms) for performance
+    - Lifecycle management: cleanup on flip/unmount
+
+- **Improved Layout Responsiveness**:
+  - Dynamic viewport sizing: `width: clamp(50vw, 800px, 97vw)`
+  - Dynamic card height: `min/max-height: calc(100dvh - 280px)`
+  - Removed fixed font sizes, replaced with dynamic scaling
+  - Smooth font-size transitions (0.1s linear)
+
+- **Enhanced Visual Feedback**:
+  - Answer buttons with visual hover/active states
+  - Session state management (loading, training, complete, empty)
+  - Limit counters with badges
+  - Course indicator badge (global training mode)
+
+**Backend: Developer Tooling Updates**:
+
+- **Electron Preload Script Migration**:
+  - Migrated `preload.ts` → `preload.cjs` (CommonJS required for Electron)
+  - JSDoc type annotations for TypeScript compatibility
+  - Removed unused `openNewWindow` IPC handler
+
+- **TypeScript Configuration** (`tsconfig.json`):
+  - Enabled `allowArbitraryExtensions: true` for `.cjs` support
+  - Enabled `declarationMap: true` for source maps
+
+- **Package Scripts** (`backend/package.json`):
+  - Added `codegen` for Kysely type generation
+  - Updated `electron:dev` to use `tsx` for direct TS execution
+  - Changed `main` entry point to `src/electron/main.ts`
+
+**Code Formatting Standardization**:
+
+- Aligned all code with Prettier defaults (removed semicolons)
+- Added `semi: 0` to ESLint config for consistency
+- Formatted 30+ backend files for uniform style
+
+**Files Created**:
+
+- `frontend/src/pages/training/composables/textFit.js`
+- `frontend/src/pages/training/composables/useAutoFitText.js`
 
 #### Data Model Simplification
 

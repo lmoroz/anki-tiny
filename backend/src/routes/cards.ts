@@ -1,10 +1,10 @@
-import { Router, Request, Response } from 'express';
-import { cardRepository } from '../services/repositories/cardRepository';
-import { settingsRepository } from '../services/repositories/settingsRepository';
-import { CreateCardSchema, UpdateCardSchema, BatchDeleteSchema } from '../schemas/card';
-import { Card } from '../services/database/schema';
+import { Router, type Request, type Response } from 'express';
+import { cardRepository } from '../services/repositories/cardRepository.ts';
+import { settingsRepository } from '../services/repositories/settingsRepository.ts';
+import { CreateCardSchema, UpdateCardSchema, BatchDeleteSchema } from '../schemas/card.ts';
+import type { Card } from '../services/database/schema.ts';
 import { ZodError } from 'zod';
-import { statsScheduler } from '../services/statsScheduler';
+import { statsScheduler } from '../services/statsScheduler.ts';
 
 const router = Router();
 

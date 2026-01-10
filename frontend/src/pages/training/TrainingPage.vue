@@ -1,11 +1,12 @@
 <script setup>
-  import { ref, onMounted, computed, onUnmounted } from 'vue';
+  import { ref, onMounted, computed, onUnmounted, useTemplateRef, watch } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import { storeToRefs } from 'pinia';
   import { useTrainingStore } from '@/entities/training/model/useTrainingStore';
   import { useStatsStore } from '@/entities/stats/model/useStatsStore';
   import { useCourseStore } from '@/entities/course/model/useCourseStore';
   import { toast } from 'vue3-toastify';
+  import useAutoFitText from '@/pages/training/composables/useAutoFitText.js';
 
   const route = useRoute();
   const router = useRouter();
@@ -20,6 +21,12 @@
 
   // Состояние переворота карточки (локальное для UI)
   const isFlipped = ref(false);
+
+  const frontContainerRef = useTemplateRef('frontContainer');
+  const frontContentRef = useTemplateRef('frontContent');
+  const backContainerRef = useTemplateRef('backContainer');
+  const backContentRef = useTemplateRef('backContent');
+  let currentSideFitter;
 
   // Получить название курса для текущей карточки
   const currentCourseName = computed(() => {
@@ -36,30 +43,26 @@
     return { newCards, reviews };
   });
 
-  onMounted(async () => {
-    //try {
-    if (isGlobalMode) {
-      await courseStore.fetchCourses();
-      await trainingStore.startGlobalSession();
-    } else {
-      await trainingStore.startSession(courseId);
-    }
-    //} catch (error) {
-    //  toast.error('Не удалось запустить тренировку');
-    //  if (isGlobalMode) router.push('/');
-    //  else router.push(`/course/${courseId}`);
-    //}
-  });
-
-  onUnmounted(() => {
-    trainingStore.resetSession();
-  });
-
   const handleFlip = () => {
+    if (currentSideFitter) {
+      currentSideFitter.unlink();
+      currentSideFitter = null;
+    }
     isFlipped.value = !isFlipped.value;
+
+    currentSideFitter = isFlipped.value
+      ? useAutoFitText(backContainerRef, backContentRef, () => currentCard.value?.back)
+      : useAutoFitText(frontContainerRef, frontContentRef, () => currentCard.value?.front);
   };
 
   const handleAnswer = async (ratingCode) => {
+    isFlipped.value = false;
+    if (currentSideFitter) {
+      currentSideFitter.unlink();
+      currentSideFitter = null;
+    }
+    currentSideFitter = useAutoFitText(frontContainerRef, frontContentRef, () => currentCard.value?.front);
+
     const ratingMap = {
       again: 1,
       hard: 2,
@@ -72,10 +75,9 @@
 
     try {
       await trainingStore.submitReview(rating);
-      isFlipped.value = false;
 
       // Обновляем глобальную статистику
-      statsStore.fetchGlobalStats();
+      await statsStore.fetchGlobalStats();
 
       if (isSessionComplete.value) {
         toast.success('Сессия завершена!');
@@ -106,6 +108,40 @@
       toast.error('Ошибка продолжения тренировки');
     }
   };
+
+  const stopWatch = watch(
+    () => [frontContentRef.value, backContentRef.value],
+    () => {
+      if (frontContentRef.value && backContentRef.value) {
+        console.log('%cГотово! Все в сборе:', 'color: lime', frontContentRef, backContentRef);
+        currentSideFitter = useAutoFitText(frontContainerRef, frontContentRef, () => currentCard.value?.front);
+        stopWatch();
+      }
+    }
+  );
+
+  onMounted(async () => {
+    try {
+      if (isGlobalMode) {
+        await courseStore.fetchCourses();
+        await trainingStore.startGlobalSession();
+      } else {
+        await trainingStore.startSession(courseId);
+      }
+    } catch (error) {
+      toast.error('Не удалось запустить тренировку');
+      if (isGlobalMode) await router.push('/');
+      else await router.push(`/course/${courseId}`);
+    }
+  });
+
+  onUnmounted(() => {
+    trainingStore.resetSession();
+    if (currentSideFitter) {
+      currentSideFitter.unlink();
+      currentSideFitter = null;
+    }
+  });
 </script>
 
 <template>
@@ -171,27 +207,41 @@
 
     <div
       v-else-if="currentCard"
-      class="training-container">
+      class="training-container perspective-distant group"
+      :class="{ flipped: isFlipped }">
       <Card
         padding="lg"
-        class="training-card"
-        :class="{ flipped: isFlipped }"
+        class="card training-card w-full flex flex-col relative z-20 border border-white/10 transition-all duration-700 transform-3d"
         @click="handleFlip">
-        <div class="training-card__content flex-1">
-          <div class="card-front">
-            <div class="card-label">ВОПРОС</div>
+        <div
+          class="training-card__content w-full flex flex-col flex-grow relative items-center justify-start transform-3d">
+          <div
+            ref="frontContainer"
+            data-ref="frontContainer"
+            class="card-front w-full absolute inset-0 backface-hidden flex flex-col items-center justify-center z-20">
+            <div class="card-label shrink-0">ВОПРОС</div>
+
             <div
-              class="card-text"
+              ref="frontContent"
+              data-ref="frontContent"
+              class="flex-1 w-full overflow-y-auto overflow-x-hidden relative flex items-center justify-center"
               v-html="currentCard.front" />
           </div>
-          <div class="card-back">
-            <div class="card-label">ОТВЕТ</div>
+
+          <div
+            ref="backContainer"
+            data-ref="backContainer"
+            class="card-back w-full absolute inset-0 backface-hidden flex flex-col items-center justify-center rotate-y-180">
+            <div class="card-label shrink-0">ОТВЕТ</div>
+
             <div
-              class="card-text"
+              ref="backContent"
+              data-ref="backContent"
+              class="flex-1 w-full overflow-y-auto overflow-x-hidden relative flex items-center justify-center"
               v-html="currentCard.back" />
           </div>
         </div>
-        <div class="flip-hint mt-auto">
+        <div class="card-footer">
           <i class="bi bi-arrow-repeat" />
           Нажмите, чтобы {{ isFlipped ? 'вернуть' : 'перевернуть' }}
         </div>
@@ -244,8 +294,7 @@
 
 <style scoped>
   .page-container {
-    max-width: 800px;
-    width: 90%;
+    width: clamp(50vw, 800px, 97vw);
     margin: 0 auto;
     padding: 24px;
   }
@@ -333,54 +382,26 @@
   }
 
   .training-container {
+    perspective: 1000px;
     display: flex;
     flex-direction: column;
     gap: 24px;
   }
 
   .training-card {
-    perspective: 1000px;
     cursor: pointer;
-    min-height: 400px;
-    transition:
-      transform 0.6s,
-      opacity 0.2s ease;
-    transform-style: preserve-3d;
+    min-height: calc(100dvh - 280px);
+    max-height: calc(100dvh - 280px);
   }
 
-  .training-card.flipped {
+  .training-container.flipped .training-card,
+  .training-container.flipped .card-footer {
     transform: rotateY(180deg);
   }
 
   .training-card__content {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 20px;
-  }
-
-  .card-front,
-  .card-back {
-    text-align: center;
-    width: 100%;
-  }
-
-  .card-back {
-    transform: rotateY(180deg);
-    display: none;
-  }
-
-  .training-card.flipped .card-front {
-    display: none;
-  }
-
-  .training-card.flipped .card-back {
-    display: block;
-  }
-
-  .training-card.flipped .flip-hint {
-    transform: rotateY(180deg);
+    padding: 0 20px;
+    line-height: 1.25;
   }
 
   .card-label {
@@ -392,13 +413,11 @@
   }
 
   .card-text {
-    font-size: var(--text-hero-size);
-    font-weight: 500;
     color: var(--color-text-hilight);
-    line-height: 1.5;
+    transition: font-size 0.1s linear; /* Чтобы не "мигало" слишком резко при ресайзе */
   }
 
-  .flip-hint {
+  .card-footer {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -409,7 +428,7 @@
     color: var(--color-text-hint);
   }
 
-  .flip-hint i {
+  .card-footer i {
     font-size: 16px;
   }
 

@@ -1,6 +1,6 @@
-import { Router, Request, Response } from 'express';
-import { statsScheduler } from '../services/statsScheduler';
-import { logger } from '../utils/logger';
+import { Router, type Request, type Response } from 'express';
+import { statsScheduler } from '../services/statsScheduler.ts';
+import { logger } from '../utils/logger.ts';
 
 const router = Router();
 

@@ -51,8 +51,7 @@ export const useStatsStore = defineStore('stats', () => {
     if (!globalStats) return;
 
     totalNewCards.value = globalStats.totalNewCards || 0;
-    studiedToday.value =
-      (globalStats.global?.newCardsStudied || 0) + (globalStats.global?.reviewsCompleted || 0);
+    studiedToday.value = (globalStats.global?.newCardsStudied || 0) + (globalStats.global?.reviewsCompleted || 0);
     trainingsToday.value = studiedToday.value;
 
     if (globalStats.global?.limits) {

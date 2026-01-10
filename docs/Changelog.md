@@ -5,6 +5,114 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.9.0] - 2026-01-10 22:09
+
+### Added
+
+#### Enhanced 3D Card Flip Animation with Auto-Scaling Text
+
+Implemented improved 3D card flip animation with true `backface-hidden` rendering and automatic text scaling for optimal readability.
+
+- **Frontend: Training Page 3D Flip Animations** (`frontend/src/pages/training/`):
+  - **New composables**:
+    - `textFit.js` — Binary search algorithm for optimal font sizing (6-100px range)
+    - `useAutoFitText.js` — Vue composable with ResizeObserver, watch, debounce (100ms)
+  - **TrainingPage.vue** refactoring:
+    - Replaced simple `display: none` flip logic with true 3D transform
+    - Added `useTemplateRef()` for direct DOM access (`frontContainer/Content`, `backContainer/Content`)
+    - Implemented lifecycle management: `currentSideFitter` cleanup on flip/unmount
+    - Watch-based initialization: waits for DOM mount before activating textFit
+    - Dynamic viewport sizing: `width: clamp(50vw, 800px, 97vw)`, `height: calc(100dvh - 280px)`
+  - **CSS improvements**:
+    - Added `perspective: 1000px` for 3D context
+    - Applied `backface-hidden` to front/back card faces
+    - Applied `transform: rotateY(180deg)` on `.training-container.flipped`
+    - Removed fixed `font-size`, added dynamic `transition: font-size 0.1s` for smooth scaling
+    - Enabled `transform-3d`, `transform-style: preserve-3d` on card content
+
+- **Card.vue enhancements**:
+  - Removed `overflow: hidden` to prevent clipping of 3D-transformed content
+  - Added `transform-3d` CSS class with `perspective` and `transform-style: preserve-3d`
+
+### Changed
+
+#### Backend: Electron and TypeScript Configuration Updates
+
+- **Electron Preload Script** (`backend/src/electron/`):
+  - Migrated `preload.ts` → `preload.cjs` (CommonJS format required for Electron preload context)
+  - Replaced TypeScript syntax with JSDoc for type annotations (`@type {import('electron').IpcRendererEvent}`)
+  - Removed unused `openNewWindow` IPC handler
+  - Updated `main.ts` to reference `preload.cjs` instead of `preload.js`
+  - Added logging calls for server startup and port transmission
+
+- **TypeScript Configuration** (`backend/tsconfig.json`):
+  - Enabled `allowArbitraryExtensions: true` for `.cjs` file support
+  - Enabled `declarationMap: true` for TypeScript declaration source maps
+
+- **Backend Scripts** (`backend/package.json`):
+  - Added `codegen` script for Kysely type generation
+  - Updated Electron development scripts to use `tsx` for direct TypeScript execution
+  - Changed `main` entry point from `src/server.ts` to `src/electron/main.ts`
+  - Modified `electron:dev` to use `NODE_OPTIONS="--import tsx"` instead of pre-compilation
+
+#### Code Formatting Standardization
+
+- **ESLint/Prettier Alignment**:
+  - Added `semi: 0` rule to ESLint config to disable semicolon warnings
+  - Removed all trailing semicolons from backend codebase (consistent with Prettier defaults)
+  - Aligned 30+ backend files with Prettier formatting rules
+
+- **Files Formatted** (30 files):
+  - Backend routes: `cards.ts`, `courses.ts`, `training.ts`, `settings.ts`, `stats.ts`, `index.ts`
+  - Backend services: `database/index.ts`, `database/migrations.ts`, `database/schema.ts`
+  - Repositories: `cardRepository.ts`, `courseRepository.ts`, `progressRepository.ts`, `settingsRepository.ts`
+  - FSRS: `fsrs/index.ts`, `limitService.ts`, `statsScheduler.ts`
+  - Frontend: `RetentionLevelPicker.vue`, `CardItem.vue`
+
+### Fixed
+
+- **Training Page Lifecycle**: Re-enabled `try-catch` in `onMounted` for proper error handling on session start failure
+- **Stats Update**: Changed `statsStore.fetchGlobalStats()` to `await statsStore.fetchGlobalStats()` for proper async flow
+- **Router Navigation**: Added `await` to `router.push()` calls in error handling
+
+### Technical Details
+
+- **Files Created**: 2
+  - `frontend/src/pages/training/composables/textFit.js`
+  - `frontend/src/pages/training/composables/useAutoFitText.js`
+
+- **Files Modified**: 30
+  - Backend (21): `package.json`, `tsconfig.json`, `main.ts`, `preload.cjs`, `server.ts`, `routes/*.ts`, `services/**/*.ts`
+  - Frontend (9): `TrainingPage.vue`, `Card.vue`, `RetentionLevelPicker.vue`, `CardItem.vue`, `textFit.js`, `useAutoFitText.js`, `main.js`, `useTrainingStore.js`
+
+- **3D Flip Animation Architecture**:
+
+  ```text
+  TrainingPage → useAutoFitText(containerRef, contentRef, textSource)
+    ├─ ResizeObserver → adjustFontSize (debounced 100ms)
+    ├─ watch(textSource) → adjustFontSize (flush: 'post')
+    └─ textFit(element, options)
+         └─ Binary Search (minFontSize=12, maxFontSize=100)
+              • while (low <= high): test mid fontSize
+              • check: innerWidth <= containerWidth && innerHeight <= containerHeight
+              • return optimal fontSize
+  ```
+
+- **Performance Optimizations**:
+  - Debounced resize handler (100ms) prevents excessive recalculations
+  - Binary search: O(log N) complexity for font size determination (~7 iterations for 12-100px range)
+  - Single ResizeObserver per card face (unlinks on flip)
+  - Cleanup on unmount prevents memory leaks
+
+- **Breaking Changes**: None (purely visual enhancements)
+
+### Developer Experience
+
+- ✅ **Simplified Electron Development**: Direct `tsx` execution without pre-compilation step
+- ✅ **Consistent Formatting**: All code adheres to Prettier rules (no semicolons, 2-space indents)
+- ✅ **Type Safety**: JSDoc annotations in `.cjs` files preserve type checking
+- ✅ **Kysely Codegen**: New script enables type generation for database schema
+
 ## [0.9.0] - 2026-01-09 19:17
 
 ### Added

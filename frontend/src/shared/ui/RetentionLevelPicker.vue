@@ -1,5 +1,5 @@
 <script setup>
-  const props = defineProps({
+  defineProps({
     modelValue: {
       type: Number,
       default: 0.9,
@@ -59,7 +59,7 @@
 
 <template>
   <div class="retention-level-picker flex flex-col gap-[12px]">
-    <label class="text-sm font-medium text-gray-300">Интенсивность обучения</label>
+    <label>Интенсивность обучения</label>
 
     <div class="levels-container flex flex-col gap-[8px]">
       <!-- Inherited option (только для курсовых настроек) -->
@@ -83,6 +83,7 @@
         :title="RETENTION_LEVELS.LOW.description">
         <input
           type="radio"
+          name="retention-level"
           :checked="modelValue === RETENTION_LEVELS.LOW.value"
           :disabled="readonly"
           @change="handleChange('LOW')" />
@@ -98,6 +99,7 @@
         :title="RETENTION_LEVELS.MEDIUM.description">
         <input
           type="radio"
+          name="retention-level"
           :checked="modelValue === RETENTION_LEVELS.MEDIUM.value"
           :disabled="readonly"
           @change="handleChange('MEDIUM')" />
@@ -113,6 +115,7 @@
         :title="RETENTION_LEVELS.HIGH.description">
         <input
           type="radio"
+          name="retention-level"
           :checked="modelValue === RETENTION_LEVELS.HIGH.value"
           :disabled="readonly"
           @change="handleChange('HIGH')" />
@@ -126,12 +129,6 @@
 </template>
 
 <style scoped>
-  .retention-level-picker label {
-    font-size: var(--text-caption-size);
-    font-weight: 500;
-    color: var(--color-text-tertiary);
-  }
-
   .levels-container {
     padding: 12px;
     background: var(--input-bg);

@@ -1,5 +1,5 @@
 import { Kysely, sql } from 'kysely';
-import { Database } from './schema';
+import type { Database } from './schema.ts';
 
 /**
  * Интерфейс для миграции
@@ -236,7 +236,9 @@ const migrations: Migration[] = [
       await db.schema.alterTable('courseSettings').addColumn('requestRetention', 'real').execute();
 
       // Ensure all existing settings have the default value
-      await sql`UPDATE settings SET requestRetention = 0.9 WHERE requestRetention IS NULL`.execute(db);
+      await sql`UPDATE settings
+                SET requestRetention = 0.9
+                WHERE requestRetention IS NULL`.execute(db);
     },
   },
 ];
@@ -260,9 +262,11 @@ async function createMigrationsTable(db: Kysely<Database>): Promise<void> {
 async function getAppliedMigrations(db: Kysely<Database>): Promise<string[]> {
   try {
     const results = await db
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .selectFrom('_migrations' as any)
       .select('id')
       .execute();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return results.map((r: any) => r.id);
   } catch {
     // Таблица не существует
@@ -275,6 +279,7 @@ async function getAppliedMigrations(db: Kysely<Database>): Promise<string[]> {
  */
 async function markMigrationAsApplied(db: Kysely<Database>, migration: Migration): Promise<void> {
   await db
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .insertInto('_migrations' as any)
     .values({
       id: migration.id,

@@ -1,15 +1,15 @@
-import { Card as FSRSCard, FSRS, Rating, State, generatorParameters, Grade, createEmptyCard } from 'ts-fsrs';
-import { Card } from '../database/schema';
+import { type Card as FSRSCard, FSRS, Rating, State, generatorParameters, type Grade, createEmptyCard } from 'ts-fsrs';
+import type { Card } from '../database/schema.ts';
 
 /**
  * Enum для состояний карточки (синхронизирован с FSRS)
  */
-export enum CardState {
-  NEW = 0,
-  LEARNING = 1,
-  REVIEW = 2,
-  RELEARNING = 3,
-}
+export const CardState = {
+  NEW: 0,
+  LEARNING: 1,
+  REVIEW: 2,
+  RELEARNING: 3,
+};
 
 /**
  * Настройки для FSRS алгоритма

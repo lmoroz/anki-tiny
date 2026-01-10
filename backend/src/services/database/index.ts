@@ -1,8 +1,8 @@
 import SQLite from 'better-sqlite3';
 import { Kysely, SqliteDialect } from 'kysely';
-import { Database } from './schema';
-import { runMigrations } from './migrations';
-import { config } from '../../config';
+import type { Database } from './schema.ts';
+import { runMigrations } from './migrations.ts';
+import { config } from '../../config/index.ts';
 import path from 'path';
 import fs from 'fs';
 
@@ -46,7 +46,8 @@ export const db = new Proxy({} as Kysely<Database>, {
   get(target, prop) {
     const instance = getDatabase();
     return typeof instance[prop as keyof Kysely<Database>] === 'function'
-      ? (instance[prop as keyof Kysely<Database>] as any).bind(instance)
+      ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (instance[prop as keyof Kysely<Database>] as any).bind(instance)
       : instance[prop as keyof Kysely<Database>];
   },
 });

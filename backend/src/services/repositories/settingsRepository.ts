@@ -1,6 +1,6 @@
-import { db } from '../database';
-import { Settings, SettingsUpdate, CourseSettings, CourseSettingsUpdate } from '../database/schema';
-import { FSRSSettings } from '../fsrs';
+import { db } from '../database/index.ts';
+import type { Settings, SettingsUpdate, CourseSettings, CourseSettingsUpdate } from '../database/schema.ts';
+import type { FSRSSettings } from '../fsrs/index.ts';
 
 /**
  * Repository для работы с настройками

@@ -33,7 +33,7 @@
 
 <template>
   <div
-    class="card flex flex-col relative z-20 w-full overflow-hidden border border-white/10 transition-all duration-500"
+    class="card flex flex-col relative z-20 w-full border border-white/10 transition-all duration-500"
     :class="[
       `rounded-${rounded}`,
       paddingMap[padding],
@@ -59,7 +59,7 @@
       v-if="highlight"
       class="absolute -top-[20%] -right-[20%] w-[80%] h-[80%] bg-[radial-gradient(circle,rgba(255,255,255,0.7)_0%,transparent_50%)] blur-2xl pointer-events-none" />
     <!-- Content Container -->
-    <div class="card-content relative z-10 flex flex-col flex-1 gap-10 md:gap-8 sm:gap-6 h-full inset-0">
+    <div class="card-content relative z-10 flex flex-col flex-1 gap-10 md:gap-8 sm:gap-6 h-full inset-0 transform-3d">
       <slot />
     </div>
   </div>
@@ -79,5 +79,11 @@
     border-color: var(--color-border);
     box-shadow: 0 4px 12px var(--card-shadow-hover);
     transform: translateY(-2px);
+  }
+
+  .card-content {
+    perspective: 1000px;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
   }
 </style>

@@ -1,6 +1,6 @@
-import { db } from '../database';
-import { Card, CardUpdate } from '../database/schema';
-import { initializeNewCard } from '../fsrs';
+import { db } from '../database/index.ts';
+import type { Card, CardUpdate } from '../database/schema.ts';
+import { initializeNewCard } from '../fsrs/index.ts';
 
 /**
  * Repository для работы с карточками
