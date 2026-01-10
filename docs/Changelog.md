@@ -5,6 +5,14 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.9.0] - 2026-01-10 22:54
+
+### Added
+
+#### OpenSpec: System Tray Integration Proposal
+
+Created comprehensive OpenSpec proposal for implementing system tray integration to enable background operation instead of full application termination on window close.
+
 ## [0.9.0] - 2026-01-10 22:09
 
 ### Added
