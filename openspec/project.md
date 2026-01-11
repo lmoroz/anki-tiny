@@ -47,7 +47,7 @@
 ### Tooling
 
 - **ESLint** + **Prettier** — Code quality и форматирование
-- **npm workspaces** — Монорепозиторий (frontend + backend)
+- **pnpm** — Пакетный менеджер с workspace support (используется вместо npm из-за лучшей совместимости с Electron builds)
 - **electron-builder** — Создание установщиков
 - **concurrently** — Параллельный запуск процессов
 

@@ -5,6 +5,30 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.10.0] - 2026-01-11 14:00
+
+### Changed
+
+#### Documentation: Migrated from npm to pnpm
+
+Updated project documentation to reflect the package manager migration from npm workspaces to pnpm.
+
+- **Reason**: Electron production builds had compatibility issues with npm workspaces
+- **Benefits**:
+  - Better compatibility with Electron Builder
+  - Faster dependency installation
+  - More efficient disk space usage via content-addressable storage
+  - Improved monorepo workspace support
+
+- **Files Updated**:
+  - `readme.md` — Updated all commands (Prerequisites, Installation, Development, Build, Code Quality sections)
+  - `openspec/project.md` — Updated Tooling section to specify pnpm usage rationale
+
+- **Command Changes**:
+  - `npm install` → `pnpm install`
+  - `npm run dev --workspace=backend` → `pnpm --filter backend dev`
+  - All root commands now use `pnpm run` instead of `npm run`
+
 ## [0.10.0] - 2026-01-11 13:55
 
 ### Fixed

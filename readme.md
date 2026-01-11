@@ -360,7 +360,7 @@ backend/src/
 Make sure you have installed:
 
 - **Node.js** v22.0.0 or higher
-- **npm** v10.0.0 or higher
+- **pnpm** v10.0.0 or higher (project uses pnpm instead of npm due to better Electron build compatibility)
 
 ### Installation
 
@@ -374,7 +374,7 @@ Make sure you have installed:
 2. Install dependencies for all workspaces:
 
    ```bash
-   npm install
+   pnpm install
    ```
 
 ### Development mode
@@ -384,7 +384,7 @@ All commands are run from the project root:
 1. **Run full application (Electron + Frontend HMR)**
 
    ```bash
-   npm run app:dev
+   pnpm app:dev
    ```
 
    This command automatically rebuilds native dependencies, starts the frontend dev server, and launches the Electron app.
@@ -392,7 +392,7 @@ All commands are run from the project root:
 2. **Run backend API only**
 
    ```bash
-   npm run dev --workspace=backend
+   pnpm --filter backend dev
    ```
 
    Starts the Express server with Nodemon (usually on port 3000). Useful for API testing without Electron.
@@ -400,7 +400,7 @@ All commands are run from the project root:
 3. **Run frontend only**
 
    ```bash
-   npm run dev --workspace=frontend
+   pnpm --filter frontend dev
    ```
 
    Starts the Vite dev server (<http://localhost:5173>).
@@ -408,7 +408,7 @@ All commands are run from the project root:
 4. **Run both servers (Frontend + Backend API) without Electron**
 
    ```bash
-   npm run dev
+   pnpm dev
    ```
 
    Useful for development in a browser or inspecting both services simultaneously.
@@ -418,7 +418,7 @@ All commands are run from the project root:
 #### Create installer (exe and installer) with one command
 
 ```bash
-npm run bundle
+pnpm bundle
 ```
 
 This command will:
@@ -436,25 +436,25 @@ Ready installer will appear in `dist` folder.
 - **Lint all workspaces (ESLint + Markdown):**
 
   ```bash
-  npm run lint
+  pnpm lint
   ```
 
 - **Lint Markdown only:**
 
   ```bash
-  npm run lint:md
+  pnpm lint:md
   ```
 
 - **Auto-fix Markdown issues:**
 
   ```bash
-  npm run lint:md:fix
+  pnpm lint:md:fix
   ```
 
 - **Format code in all workspaces (Prettier):**
 
   ```bash
-  npm run format
+  pnpm format
   ```
 
   This formats JavaScript, TypeScript, Vue, JSON, CSS, and Markdown files.
@@ -462,7 +462,7 @@ Ready installer will appear in `dist` folder.
 - **Format Markdown only:**
 
   ```bash
-  npm run format:md
+  pnpm format:md
   ```
 
 #### Workspace-specific commands
@@ -470,8 +470,8 @@ Ready installer will appear in `dist` folder.
 - **Commands for specific workspace:**
 
   ```bash
-  npm run <script> --workspace=frontend
-  npm run <script> --workspace=backend
+  pnpm --filter frontend <script>
+  pnpm --filter backend <script>
   ```
 
 ### Pre-commit hooks
