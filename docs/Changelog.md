@@ -5,6 +5,45 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.10.0] - 2026-01-11 16:35
+
+### Added
+
+#### Documentation: Development Roadmap & Project Analysis
+
+Created comprehensive development roadmap document analyzing current project state and planning future development.
+
+- **New Document**: `docs/Development-Roadmap.md` (26.9 KB)
+  - Complete inventory of implemented features (architecture, course/card management, training system, settings, UI/UX, desktop integration, SSE, code quality)
+  - Missing functionality breakdown with priorities:
+    - **Priority 1** (for v1.0): System Notifications, Deep Linking
+    - **Priority 2** (post-v1.0): Statistics Dashboard, Import/Export, Media Support, Search & Filtering, Tags System
+  - Technical debt analysis:
+    - Absence of automated tests (critical blocker)
+    - Database performance optimization needs
+    - Logging & observability improvements required
+    - Security considerations (backup strategy, encryption)
+    - Code organization refactoring opportunities
+    - Frontend state management centralization
+  - Phased development roadmap:
+    - **Phase 1 (v1.0)**: ~80 hours — Notifications, Tests, Backup, Logging (~2 weeks)
+    - **Phase 2 (v1.1)**: ~72 hours — Dashboard, Search, Optimization (~1.5 weeks)
+    - **Phase 3 (v1.2)**: ~108 hours — Import/Export, Media, Tags (~2.5 weeks)
+
+- **Project Assessment**:
+  - Overall Score: 7.5/10
+  - Strengths: Solid architecture, modern stack, SSE implementation, developer experience
+  - Weaknesses: No tests, missing notifications, no backup, log rotation needed
+  - Production Readiness: 6/10 (needs tests, backup, log rotation for v1.0)
+
+- **Key Recommendations**:
+  - Focus on completing v1.0 critical features (Notifications + Unit Tests + Backup)
+  - Implement comprehensive backend unit tests (40-60 hours estimated)
+  - Add log rotation and auto-backup mechanisms
+  - Prioritize System Notifications as main UX blocker
+
+**Purpose**: Strategic planning document for transition from MVP (v0.10.0) to production-ready v1.0 release, providing clear roadmap with time estimates and priority classification for all pending features and technical improvements.
+
 ## [0.10.0] - 2026-01-11 14:00
 
 ### Changed
