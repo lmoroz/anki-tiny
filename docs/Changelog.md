@@ -5,6 +5,88 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.10.0] - 2026-01-11 13:33
+
+### Fixed
+
+#### Database Path Resolution in Electron Production Builds
+
+Resolved critical issue with database file paths in Electron where `process.env.APP_USER_DATA` was undefined at config module import time, causing the database to point to the wrong location in built applications.
+
+- **Root Cause Analysis**:
+  - Module import order: `main.ts` → `server.ts` → `config/index.ts` → `DATABASE_PATH` calculated
+  - `process.env.APP_USER_DATA` set in `app.on('ready')` **after** `config/index.ts` was imported
+  - Result: `DATABASE_PATH` always resolved to `process.cwd()` (development path) even in production
+
+- **Solution Architecture**:
+  - **Dynamic Path Resolution** (`backend/src/config/index.ts`):
+    - Changed `DATABASE_PATH` from static const to getter property
+    - Created `getDatabasePath()` function that evaluates at call-time, not import-time
+    - Enables correct path resolution after `APP_USER_DATA` is set
+  - **Database Setup Utility** (`backend/src/electron/dbSetup.ts` — NEW FILE):
+    - `prepareDatabase()` function handles database initialization for both dev and production
+    - **Development mode**: Returns path to `backend/repetitio.db`
+    - **Production mode**: Copies database from `.asar` archive to `userData` directory
+    - Uses `config.DB_FILENAME` instead of hardcoded string
+  - **Electron Main Process** (`backend/src/electron/main.ts`):
+    - Added `prepareDatabase()` call in `app.on('ready')` before server startup
+    - Fatal error handling: quits app if database preparation fails
+    - Execution order: `APP_USER_DATA` set → DB prepared → server started → config resolved correctly
+  - **Database Service Cleanup** (`backend/src/services/database/index.ts`):
+    - Removed all commented-out ASAR copying logic (now handled by `dbSetup.ts`)
+    - Simplified initialization: just uses `config.DATABASE_PATH` which is now always correct
+    - Database service remains Electron-agnostic as intended
+
+- **Configuration Changes**:
+  - **Eliminated Hardcoded DB Filename**:
+    - `backend/src/electron/dbSetup.ts`: Uses `config.DB_FILENAME`
+    - `backend/build-installer.js`: Created `DB_FILENAME` constant, referenced from config pattern
+    - Single source of truth: `config.DB_FILENAME = 'repetitio.db'`
+
+- **Build Script Enhancements** (`backend/build-installer.js`):
+  - Added validation: checks database file existence before build
+  - Added tray icon copying (`app-tray-icon-32x32.png` → `icon-tray.png`)
+  - Fails fast if database missing with clear error message
+
+### Technical Details
+
+- **Files Created**: 1
+  - `backend/src/electron/dbSetup.ts` (new database initialization utility)
+
+- **Files Modified**: 4
+  - `backend/src/config/index.ts` (dynamic getters for `DATA_ROOT` and `DATABASE_PATH`)
+  - `backend/src/electron/main.ts` (added `prepareDatabase()` call)
+  - `backend/src/services/database/index.ts` (cleanup, removed commented code)
+  - `backend/build-installer.js` (DB validation, tray icon copy)
+
+- **Execution Flow** (Production):
+
+  ```text
+  1. app.setName('repetitio')
+  2. app.on('ready'):
+     a. setupFileLogging()
+     b. process.env.APP_USER_DATA = app.getPath('userData')  ← set env var
+     c. prepareDatabase()  ← copy DB from asar to userData
+     d. createWindow() → startServer() → initializeDatabase()
+                                              ↓
+                                         config.DATABASE_PATH (getter)
+                                              ↓
+                                         getDatabasePath() ← NOW resolves correctly
+                                              ↓
+                                         userData/repetitio.db ✅
+  ```
+
+- **Benefits**:
+  - ✅ **Dev Mode**: Database at `backend/repetitio.db` (works without Electron)
+  - ✅ **Electron Dev**: Database at `backend/repetitio.db` (shared with non-Electron mode)
+  - ✅ **Production Build**: Database copied to `%AppData%\Roaming\Repetitio\repetitio.db`
+  - ✅ **Isolation**: Database service has zero Electron dependencies
+  - ✅ **Maintainability**: Single config constant for DB filename
+
+### Breaking Changes
+
+None — this is an internal fix. Database location in production now correctly uses userData directory instead of attempting to access ASAR-packed files.
+
 ## [0.10.0] - 2026-01-11 04:40
 
 ### Changed

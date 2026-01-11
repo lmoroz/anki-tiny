@@ -7,39 +7,14 @@ import { config } from '../../config';
 let dbInstance: Kysely<Database> | null = null;
 
 export async function initializeDatabase(): Promise<Kysely<Database>> {
-  if (dbInstance) {
-    return dbInstance;
-  }
-  console.log('[DB] Initializing database...');
-  console.log('[DB] DATA_ROOT:', config.DATA_ROOT);
-  console.log('[DB] APP_USER_DATA:', process.env.APP_USER_DATA);
-  console.log('[DB] DATABASE_PATH:', config.DATABASE_PATH);
+  if (dbInstance) return dbInstance;
 
-  // if (!process.env.APP_USER_DATA) process.env.APP_USER_DATA = app.getPath('userData');
+  const dbPath = config.DATABASE_PATH;
+  console.log('[DB] Initializing database at:', dbPath);
 
-  const sourcePath = config.DATABASE_PATH;
-
-  // const destPath = path.join(process.env.APP_USER_DATA, DB_FILENAME);
-  // const dbDir = path.dirname(sourcePath);
-  // console.log('[DB] Database directory:', dbDir);
-  //
-  // if (!fs.existsSync(destPath)) {
-  //   try {
-  //     // Node.js fs.copyFileSync прозрачно читает из .asar
-  //     fs.copyFileSync(sourcePath, destPath);
-  //     console.log('[DB] ✅ Database initialized successfully in:', destPath);
-  //   } catch (err) {
-  //     console.error('[DB] ❌ Failed to copy database file:', err);
-  //     throw err;
-  //   }
-  // } else {
-  //   console.log('[DB] Database already exists, skipping copy.');
-  // }
-
-  console.log('[DB] Creating SQLite instance...');
   let sqliteDb: SQLite.Database;
   try {
-    sqliteDb = new SQLite(sourcePath);
+    sqliteDb = new SQLite(dbPath);
     console.log('[DB] ✅ SQLite instance created');
   } catch (err) {
     console.error('[DB] ❌ Failed to create SQLite instance:', err);
@@ -55,7 +30,6 @@ export async function initializeDatabase(): Promise<Kysely<Database>> {
   });
 
   // Применить миграции (как для новой, так и для существующей БД)
-  console.log('[DB] 📦 Database at:', sourcePath);
   await runMigrations(dbInstance);
 
   return dbInstance;

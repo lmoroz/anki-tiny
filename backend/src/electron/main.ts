@@ -3,6 +3,7 @@ import path from 'path';
 import { pathToFileURL } from 'url';
 import { existsSync, appendFileSync } from 'fs';
 import { logger } from '../utils/logger.js';
+import { prepareDatabase } from './dbSetup.js';
 
 import { startServer } from '../server.js';
 
@@ -307,6 +308,16 @@ app.on('ready', () => {
   // !!! ВАЖНО: Устанавливаем путь для данных приложения
   process.env.APP_USER_DATA = app.getPath('userData');
   console.log('[MAIN] [APP] APP_USER_DATA:', process.env.APP_USER_DATA);
+
+  // Подготавливаем БД (копируем из asar в userData в production)
+  try {
+    const dbPath = prepareDatabase();
+    console.log('[MAIN] [APP] ✅ Database prepared at:', dbPath);
+  } catch (error) {
+    console.error('[MAIN] [APP] ❌ FATAL: Failed to prepare database:', error);
+    app.quit();
+    return;
+  }
 
   registerIpcHandlers();
   console.log('[MAIN] [APP] IPC Handlers registered');

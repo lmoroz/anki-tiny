@@ -2,6 +2,8 @@ const fs = require('fs-extra');
 const path = require('path');
 const { execSync } = require('child_process');
 
+const DB_FILENAME = 'repetitio.db';
+
 async function build() {
   const frontendSrc = path.join(__dirname, '../frontend/dist');
   // В собранном приложении скрипт будет работать из корня, но electron-main теперь в dist/electron
@@ -24,6 +26,19 @@ async function build() {
   const iconSrc = path.join(__dirname, '../frontend/public/app_icon.png');
   const iconDest = path.join(__dirname, 'icon.png');
   await fs.copy(iconSrc, iconDest);
+
+  console.log('Copying icon for tray...');
+  const iconTraySrc = path.join(__dirname, '../frontend/public/app-tray-icon-32x32.png');
+  const iconTrayDest = path.join(__dirname, 'icon-tray.png');
+  await fs.copy(iconTraySrc, iconTrayDest);
+
+  console.log('Ensuring database is available...');
+  const dbPath = path.join(__dirname, DB_FILENAME);
+  if (!fs.existsSync(dbPath)) {
+    console.error('Database file not found! Expected at:', dbPath);
+    process.exit(1);
+  }
+  console.log('✅ Database file found:', dbPath);
 
   console.log('Building Electron app...');
   try {
