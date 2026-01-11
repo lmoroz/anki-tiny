@@ -65,6 +65,7 @@ const { app, protocol, net, ipcMain, shell, BrowserWindow, Tray, Menu } = electr
 
 let mainWindow: electron.BrowserWindow | null;
 let tray: electron.Tray | null = null;
+let isQuitting = false; // Флаг для контроля выхода из приложения
 
 /**
  * Создание Tray иконки и подписка на события
@@ -110,6 +111,11 @@ function createTrayMenu(): electron.Menu {
     {
       label: 'Закрыть Repetitio',
       click: () => {
+        isQuitting = true;
+        // Закрываем DevTools перед выходом
+        if (mainWindow && mainWindow.webContents.isDevToolsOpened()) {
+          mainWindow.webContents.closeDevTools();
+        }
         app.quit();
       },
     },
@@ -246,9 +252,12 @@ async function createWindow() {
   }
 
   // Предотвращаем закрытие окна — вместо этого скрываем его
+  // Если приложение действительно завершается (isQuitting), разрешаем закрытие
   mainWindow.on('close', (event) => {
-    event.preventDefault();
-    mainWindow?.hide();
+    if (!isQuitting) {
+      event.preventDefault();
+      mainWindow?.hide();
+    }
   });
 
   // Обновляем меню трея при изменении видимости окна
@@ -347,8 +356,18 @@ app.on('activate', () => {
 });
 
 app.on('before-quit', () => {
+  console.log('[MAIN] [APP] before-quit event fired');
+  isQuitting = true;
+
+  // Закрываем DevTools перед выходом
+  if (mainWindow && mainWindow.webContents.isDevToolsOpened()) {
+    console.log('[MAIN] [APP] Closing DevTools...');
+    mainWindow.webContents.closeDevTools();
+  }
+
   // Cleanup tray before quit
   if (tray) {
+    console.log('[MAIN] [APP] Destroying tray...');
     tray.destroy();
     tray = null;
   }

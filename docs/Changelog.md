@@ -5,7 +5,49 @@ All notable changes to the Repetitio project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [0.10.0] - 2026-01-11 13:33
+## [0.10.0] - 2026-01-11 13:55
+
+### Fixed
+
+#### Application Quit Flow from System Tray
+
+Fixed critical issue where application process remained running after selecting "Close Repetitio" from system tray context menu.
+
+- **Root Cause**:
+  - `mainWindow.on('close')` event handler always prevented window closure via `event.preventDefault()`
+  - DevTools window remained open when main window close was triggered
+  - No distinction between hide-to-tray and actual application quit
+
+- **Solution** (`backend/src/electron/main.ts`):
+  - **Added `isQuitting` flag** — distinguishes between window hide and actual app termination
+  - **Updated tray menu handler**:
+    - Sets `isQuitting = true` before calling `app.quit()`
+    - Explicitly closes DevTools if open
+  - **Modified `mainWindow.on('close')` handler**:
+    - Only prevents default behavior when `!isQuitting`
+    - Allows normal window closure when application is actually quitting
+  - **Enhanced `app.on('before-quit')` handler**:
+    - Sets `isQuitting = true` as safety net
+    - Closes DevTools before app termination
+    - Adds logging for debugging quit flow
+    - Destroys tray icon with proper cleanup
+
+- **Behavior**:
+  - **Before**: Clicking "Close Repetitio" → window closed, DevTools remained, process hung
+  - **After**: Clicking "Close Repetitio" → DevTools closed, window closed, process terminated ✅
+  - **Window close button**: Still hides to tray (unchanged)
+  - **Tray icon click**: Still toggles window visibility (unchanged)
+
+- **Technical Details**:
+  - Files Modified: 1 (`backend/src/electron/main.ts`)
+  - Lines Changed: +24/-3
+  - Flag lifecycle: `false` (default) → `true` (on quit intent) → app exit
+
+### Changed
+
+- **Tray icon updated**: Binary changes to `backend/icon-tray.png`
+- **Assets added**: New tray icon variants in `frontend/public/` (`app-tray-icon-32x32.png`, `app-tray-icon.png`)
+- **Removed asset**: Deleted `frontend/public/app_icon.bak.png` (unused backup)
 
 ### Fixed
 
